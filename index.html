@@ -14,6 +14,9 @@
 
     <link rel="manifest" href="manifest.json">
 
+    <!-- ІКОНКА ДЛЯ iPHONE -->
+    <link rel="apple-touch-icon" href="icon-512.png">
+
     <title>Taxi Manager</title>
 
     <style>
@@ -40,7 +43,6 @@
 
         body {
             margin: 0;
-
             padding-top: env(safe-area-inset-top);
             padding-bottom: env(safe-area-inset-bottom);
 
@@ -52,14 +54,12 @@
 
             background: var(--bg);
             color: var(--text);
-
             min-height: 100vh;
         }
 
         .container {
             width: 100%;
             max-width: 760px;
-
             margin: auto;
 
             padding:
@@ -73,9 +73,7 @@
             color: white;
 
             padding: 22px 18px;
-
             border-radius: 18px;
-
             margin-bottom: 12px;
         }
 
@@ -91,15 +89,10 @@
 
         .install-box {
             background: #fef3c7;
-
             border-radius: 14px;
-
             padding: 13px;
-
             margin-bottom: 12px;
-
             font-size: 14px;
-
             line-height: 1.45;
         }
 
@@ -110,11 +103,8 @@
 
         .card {
             background: var(--card);
-
             border-radius: 18px;
-
             padding: 16px;
-
             margin-bottom: 12px;
 
             box-shadow:
@@ -123,24 +113,18 @@
 
         h2 {
             margin: 0 0 14px;
-
             font-size: 20px;
         }
 
         .grid {
             display: grid;
-
-            grid-template-columns:
-                repeat(2, 1fr);
-
+            grid-template-columns: repeat(2, 1fr);
             gap: 12px;
         }
 
         .field {
             display: flex;
-
             flex-direction: column;
-
             gap: 6px;
         }
 
@@ -151,22 +135,16 @@
 
         input {
             width: 100%;
-
             min-height: 48px;
-
             padding: 12px;
 
-            border:
-                1px solid #d1d5db;
-
+            border: 1px solid #d1d5db;
             border-radius: 12px;
 
             background: white;
-
             color: #111827;
 
             font-size: 16px;
-
             outline: none;
         }
 
@@ -176,21 +154,17 @@
 
         button {
             width: 100%;
-
             min-height: 48px;
 
             border: none;
-
             border-radius: 12px;
 
             padding: 12px 16px;
 
             font-size: 16px;
-
             font-weight: 600;
 
             cursor: pointer;
-
             margin-top: 10px;
         }
 
@@ -215,32 +189,24 @@
 
         .stats {
             display: grid;
-
-            grid-template-columns:
-                repeat(2, 1fr);
-
+            grid-template-columns: repeat(2, 1fr);
             gap: 10px;
         }
 
         .stat {
             background: #f9fafb;
-
             border-radius: 14px;
-
             padding: 13px;
         }
 
         .stat-title {
             color: var(--muted);
-
             font-size: 13px;
         }
 
         .stat-value {
             font-size: 19px;
-
             font-weight: 700;
-
             margin-top: 4px;
         }
 
@@ -253,55 +219,42 @@
         }
 
         .entry {
-            border:
-                1px solid var(--border);
-
+            border: 1px solid var(--border);
             border-radius: 14px;
-
             padding: 14px;
-
             margin-bottom: 10px;
         }
 
         .entry-title {
             font-size: 18px;
-
             font-weight: 700;
         }
 
         .entry-details {
             color: #4b5563;
-
             margin-top: 7px;
-
             line-height: 1.55;
         }
 
         .entry-buttons {
             display: flex;
-
             gap: 8px;
         }
 
         .entry-buttons button {
             width: 50%;
-
             font-size: 14px;
-
             padding: 9px 12px;
         }
 
         .message {
             margin-top: 12px;
-
             font-weight: 600;
         }
 
         .empty {
             text-align: center;
-
             color: var(--muted);
-
             padding: 20px;
         }
 
@@ -356,8 +309,6 @@
 
     </div>
 
-
-    <!-- ФОРМА -->
 
     <div class="card">
 
@@ -570,8 +521,6 @@
     </div>
 
 
-    <!-- ЗАГАЛЬНА СТАТИСТИКА -->
-
     <div class="card">
 
         <h2>
@@ -659,8 +608,6 @@
 
     </div>
 
-
-    <!-- МІСЯЦЬ -->
 
     <div class="card">
 
@@ -767,8 +714,6 @@
     </div>
 
 
-    <!-- ІСТОРІЯ -->
-
     <div class="card">
 
         <h2>
@@ -807,7 +752,6 @@ let editingId = null;
 
 /* ---------------------------
    СТАРІ ЗАПИСИ
-   АВТОМАТИЧНЕ ВИПРАВЛЕННЯ
 --------------------------- */
 
 entries = entries.map(item => {
@@ -833,32 +777,19 @@ entries = entries.map(item => {
     const otherExpenses =
         Number(item.otherExpenses || 0);
 
-
-    /*
-       ВАЖЛИВО:
-
-       Готівка НЕ є доходом.
-
-       Дохід:
-       Uber + Bolt + Інші додатки + Чайові
-    */
-
     const income =
         uber +
         bolt +
         otherApps +
         tips;
 
-
     const expenses =
         fuel +
         otherExpenses;
 
-
     const profit =
         income -
         expenses;
-
 
     return {
 
@@ -881,11 +812,6 @@ entries = entries.map(item => {
 });
 
 
-/*
-   Зберігаємо виправлені
-   старі записи.
-*/
-
 localStorage.setItem(
     "taxiEntries",
     JSON.stringify(entries)
@@ -907,10 +833,8 @@ function setDefaultDate() {
         "-" +
         String(today.getDate()).padStart(2, "0");
 
-
     document.getElementById("date").value =
         date;
-
 
     document.getElementById("monthFilter").value =
         date.substring(0, 7);
@@ -939,13 +863,9 @@ function calculateDuration(start, end) {
         timeToMinutes(end) -
         timeToMinutes(start);
 
-
     if (difference < 0) {
-
         difference += 24 * 60;
-
     }
-
 
     return difference;
 }
@@ -958,7 +878,6 @@ function formatHours(minutes) {
 
     const mins =
         minutes % 60;
-
 
     return (
         `${hours} год ${mins} хв`
@@ -994,7 +913,6 @@ function saveEntry() {
 
     const endTime =
         document.getElementById("endTime").value;
-
 
     if (
         !date ||
@@ -1071,14 +989,6 @@ function saveEntry() {
         numberValue("otherExpenses");
 
 
-    /*
-       Готівка НЕ додається
-       до доходу.
-
-       Дохід:
-       Uber + Bolt + Інші додатки + Чайові
-    */
-
     const income =
         uber +
         bolt +
@@ -1103,35 +1013,24 @@ function saveEntry() {
             Date.now(),
 
         date,
-
         startTime,
-
         endTime,
 
         totalDuration,
-
         breakMinutes,
-
         duration,
 
         uber,
-
         bolt,
-
         otherApps,
-
         cash,
-
         tips,
 
         fuel,
-
         otherExpenses,
 
         income,
-
         expenses,
-
         profit
 
     };
@@ -1182,7 +1081,6 @@ function clearForm() {
 
         "startTime",
         "endTime",
-
         "breakMinutes",
 
         "uber",
@@ -1190,6 +1088,7 @@ function clearForm() {
         "otherApps",
         "cash",
         "tips",
+
         "fuel",
         "otherExpenses"
 
@@ -1222,14 +1121,10 @@ function showMessage(
 ) {
 
     const element =
-        document.getElementById(
-            "message"
-        );
-
+        document.getElementById("message");
 
     element.textContent =
         text;
-
 
     element.className =
         error
@@ -1283,33 +1178,19 @@ function renderTotalStats() {
         );
 
 
-    document.getElementById(
-        "totalDays"
-    ).textContent =
+    document.getElementById("totalDays").textContent =
         entries.length;
 
-
-    document.getElementById(
-        "totalHours"
-    ).textContent =
+    document.getElementById("totalHours").textContent =
         formatHours(totalMinutes);
 
-
-    document.getElementById(
-        "totalIncome"
-    ).textContent =
+    document.getElementById("totalIncome").textContent =
         money(totalIncome);
 
-
-    document.getElementById(
-        "totalCash"
-    ).textContent =
+    document.getElementById("totalCash").textContent =
         money(totalCash);
 
-
-    document.getElementById(
-        "totalProfit"
-    ).textContent =
+    document.getElementById("totalProfit").textContent =
         money(totalProfit);
 }
 
@@ -1367,33 +1248,19 @@ function renderMonthStats() {
         );
 
 
-    document.getElementById(
-        "monthDays"
-    ).textContent =
+    document.getElementById("monthDays").textContent =
         monthEntries.length;
 
-
-    document.getElementById(
-        "monthHours"
-    ).textContent =
+    document.getElementById("monthHours").textContent =
         formatHours(minutes);
 
-
-    document.getElementById(
-        "monthIncome"
-    ).textContent =
+    document.getElementById("monthIncome").textContent =
         money(income);
 
-
-    document.getElementById(
-        "monthCash"
-    ).textContent =
+    document.getElementById("monthCash").textContent =
         money(cash);
 
-
-    document.getElementById(
-        "monthProfit"
-    ).textContent =
+    document.getElementById("monthProfit").textContent =
         money(profit);
 }
 
@@ -1593,69 +1460,37 @@ function editEntry(id) {
     if (!item) return;
 
 
-    document.getElementById(
-        "date"
-    ).value =
+    document.getElementById("date").value =
         item.date;
 
-
-    document.getElementById(
-        "startTime"
-    ).value =
+    document.getElementById("startTime").value =
         item.startTime;
 
-
-    document.getElementById(
-        "endTime"
-    ).value =
+    document.getElementById("endTime").value =
         item.endTime;
 
-
-    document.getElementById(
-        "breakMinutes"
-    ).value =
+    document.getElementById("breakMinutes").value =
         item.breakMinutes || 0;
 
-
-    document.getElementById(
-        "uber"
-    ).value =
+    document.getElementById("uber").value =
         item.uber || 0;
 
-
-    document.getElementById(
-        "bolt"
-    ).value =
+    document.getElementById("bolt").value =
         item.bolt || 0;
 
-
-    document.getElementById(
-        "otherApps"
-    ).value =
+    document.getElementById("otherApps").value =
         item.otherApps || 0;
 
-
-    document.getElementById(
-        "cash"
-    ).value =
+    document.getElementById("cash").value =
         item.cash || 0;
 
-
-    document.getElementById(
-        "tips"
-    ).value =
+    document.getElementById("tips").value =
         item.tips || 0;
 
-
-    document.getElementById(
-        "fuel"
-    ).value =
+    document.getElementById("fuel").value =
         item.fuel || 0;
 
-
-    document.getElementById(
-        "otherExpenses"
-    ).value =
+    document.getElementById("otherExpenses").value =
         item.otherExpenses || 0;
 
 
@@ -1672,7 +1507,6 @@ function editEntry(id) {
     window.scrollTo({
 
         top: 0,
-
         behavior: "smooth"
 
     });
@@ -1771,9 +1605,7 @@ function exportCSV() {
         csv += [
 
             item.date,
-
             item.startTime,
-
             item.endTime,
 
             formatHours(
@@ -1785,23 +1617,14 @@ function exportCSV() {
             ),
 
             item.uber,
-
             item.bolt,
-
             item.otherApps,
-
             item.cash,
-
             item.tips,
-
             item.fuel,
-
             item.otherExpenses,
-
             item.income,
-
             item.expenses,
-
             item.profit
 
         ].join(";") + "\n";
