@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="uk">
 <head>
@@ -407,8 +406,6 @@
             </div>
 
 
-            <!-- НОВЕ ПОЛЕ ПЕРЕРВИ -->
-
             <div class="field">
 
                 <label>
@@ -480,7 +477,7 @@
             <div class="field">
 
                 <label>
-                    Готівка, zł
+                    💵 Готівка, zł
                 </label>
 
                 <input
@@ -632,6 +629,21 @@
             <div class="stat">
 
                 <div class="stat-title">
+                    💵 Готівка
+                </div>
+
+                <div
+                    class="stat-value"
+                    id="totalCash">
+                    0 zł
+                </div>
+
+            </div>
+
+
+            <div class="stat">
+
+                <div class="stat-title">
                     Чистими
                 </div>
 
@@ -724,6 +736,21 @@
             <div class="stat">
 
                 <div class="stat-title">
+                    💵 Готівка
+                </div>
+
+                <div
+                    class="stat-value"
+                    id="monthCash">
+                    0 zł
+                </div>
+
+            </div>
+
+
+            <div class="stat">
+
+                <div class="stat-title">
                     Чистими
                 </div>
 
@@ -774,6 +801,104 @@ let entries =
     JSON.parse(
         localStorage.getItem("taxiEntries") || "[]"
     );
+
+let editingId = null;
+
+
+/* ---------------------------
+   СТАРІ ЗАПИСИ
+   АВТОМАТИЧНЕ ВИПРАВЛЕННЯ
+--------------------------- */
+
+entries = entries.map(item => {
+
+    const uber =
+        Number(item.uber || 0);
+
+    const bolt =
+        Number(item.bolt || 0);
+
+    const otherApps =
+        Number(item.otherApps || 0);
+
+    const tips =
+        Number(item.tips || 0);
+
+    const cash =
+        Number(item.cash || 0);
+
+    const fuel =
+        Number(item.fuel || 0);
+
+    const otherExpenses =
+        Number(item.otherExpenses || 0);
+
+
+    /*
+       ВАЖЛИВО:
+
+       Готівка НЕ є доходом.
+
+       Дохід:
+       Uber + Bolt + Інші додатки + Чайові
+    */
+
+    const income =
+        uber +
+        bolt +
+        otherApps +
+        tips;
+
+
+    const expenses =
+        fuel +
+        otherExpenses;
+
+
+    const profit =
+        income -
+        expenses;
+
+
+    return {
+
+        ...item,
+
+        uber,
+
+        bolt,
+
+        otherApps,
+
+        tips,
+
+        cash,
+
+        fuel,
+
+        otherExpenses,
+
+        income,
+
+        expenses,
+
+        profit
+
+    };
+
+});
+
+
+/*
+   Зберігаємо виправлені
+   старі записи.
+*/
+
+localStorage.setItem(
+    "taxiEntries",
+    JSON.stringify(entries)
+);
+
 
 let editingId = null;
 
@@ -897,15 +1022,6 @@ function saveEntry() {
     }
 
 
-    /*
-       ПЕРЕРВА
-
-       Наприклад:
-       45 = 45 хвилин
-       60 = 1 година
-       90 = 1 година 30 хв
-    */
-
     const breakMinutes =
         Math.max(
             0,
@@ -919,21 +1035,12 @@ function saveEntry() {
         );
 
 
-    /*
-       Загальна тривалість
-       від початку до кінця
-    */
-
     const totalDuration =
         calculateDuration(
             startTime,
             endTime
         );
 
-
-    /*
-       Перевірка перерви
-    */
 
     if (
         breakMinutes > totalDuration
@@ -947,10 +1054,6 @@ function saveEntry() {
         return;
     }
 
-
-    /*
-       Чистий робочий час
-    */
 
     const duration =
         totalDuration -
@@ -979,11 +1082,18 @@ function saveEntry() {
         numberValue("otherExpenses");
 
 
+    /*
+       Готівка НЕ додається
+       до доходу.
+
+       Дохід:
+       Uber + Bolt + Інші додатки + Чайові
+    */
+
     const income =
         uber +
         bolt +
         otherApps +
-        cash +
         tips;
 
 
@@ -1009,21 +1119,9 @@ function saveEntry() {
 
         endTime,
 
-        /*
-           Повний час зміни
-        */
-
         totalDuration,
 
-        /*
-           Час перерви
-        */
-
         breakMinutes,
-
-        /*
-           Фактичний робочий час
-        */
 
         duration,
 
@@ -1095,10 +1193,6 @@ function clearForm() {
 
         "startTime",
         "endTime",
-
-        /*
-           НОВЕ ПОЛЕ
-        */
 
         "breakMinutes",
 
@@ -1184,6 +1278,14 @@ function renderTotalStats() {
         );
 
 
+    const totalCash =
+        entries.reduce(
+            (sum, item) =>
+                sum + Number(item.cash || 0),
+            0
+        );
+
+
     const totalProfit =
         entries.reduce(
             (sum, item) =>
@@ -1208,6 +1310,12 @@ function renderTotalStats() {
         "totalIncome"
     ).textContent =
         money(totalIncome);
+
+
+    document.getElementById(
+        "totalCash"
+    ).textContent =
+        money(totalCash);
 
 
     document.getElementById(
@@ -1254,6 +1362,14 @@ function renderMonthStats() {
         );
 
 
+    const cash =
+        monthEntries.reduce(
+            (sum, item) =>
+                sum + Number(item.cash || 0),
+            0
+        );
+
+
     const profit =
         monthEntries.reduce(
             (sum, item) =>
@@ -1278,6 +1394,12 @@ function renderMonthStats() {
         "monthIncome"
     ).textContent =
         money(income);
+
+
+    document.getElementById(
+        "monthCash"
+    ).textContent =
+        money(cash);
 
 
     document.getElementById(
@@ -1359,6 +1481,11 @@ function renderEntries() {
 
                 💰 Доходи:
                 ${money(item.income)}
+
+                <br>
+
+                💵 Готівка:
+                ${money(item.cash)}
 
                 <br>
 
@@ -1495,14 +1622,6 @@ function editEntry(id) {
         item.endTime;
 
 
-    /*
-       Завантаження перерви.
-
-       Старі записи, створені
-       до додавання цієї функції,
-       автоматично отримають 0 хв.
-    */
-
     document.getElementById(
         "breakMinutes"
     ).value =
@@ -1512,43 +1631,43 @@ function editEntry(id) {
     document.getElementById(
         "uber"
     ).value =
-        item.uber;
+        item.uber || 0;
 
 
     document.getElementById(
         "bolt"
     ).value =
-        item.bolt;
+        item.bolt || 0;
 
 
     document.getElementById(
         "otherApps"
     ).value =
-        item.otherApps;
+        item.otherApps || 0;
 
 
     document.getElementById(
         "cash"
     ).value =
-        item.cash;
+        item.cash || 0;
 
 
     document.getElementById(
         "tips"
     ).value =
-        item.tips;
+        item.tips || 0;
 
 
     document.getElementById(
         "fuel"
     ).value =
-        item.fuel;
+        item.fuel || 0;
 
 
     document.getElementById(
         "otherExpenses"
     ).value =
-        item.otherExpenses;
+        item.otherExpenses || 0;
 
 
     editingId =
@@ -1653,11 +1772,6 @@ function exportCSV() {
         return;
     }
 
-
-    /*
-       Додана колонка:
-       Перерва, хв
-    */
 
     let csv =
         "Дата;Початок;Кінець;Години;Перерва, хв;Uber;Bolt;Інші додатки;Готівка;Чайові;Пальне;Інші витрати;Доходи;Витрати;Чистими\n";
@@ -1793,4 +1907,3 @@ if (
 
 </body>
 </html>
-```
