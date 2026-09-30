@@ -14,7 +14,6 @@
 
     <link rel="manifest" href="manifest.json">
 
-    <!-- ІКОНКА ДЛЯ iPHONE -->
     <link rel="apple-touch-icon" href="icon-512.png">
 
     <title>Taxi Manager</title>
@@ -75,16 +74,52 @@
             padding: 22px 18px;
             border-radius: 18px;
             margin-bottom: 12px;
+
+            position: relative;
         }
 
         header h1 {
             margin: 0 0 5px;
             font-size: 27px;
+            padding-right: 85px;
         }
 
         header p {
             margin: 0;
             color: #d1d5db;
+            padding-right: 10px;
+        }
+
+        .language-switcher {
+            position: absolute;
+            top: 16px;
+            right: 14px;
+
+            display: flex;
+            gap: 5px;
+        }
+
+        .language-button {
+            width: auto;
+            min-height: 36px;
+
+            margin: 0;
+            padding: 6px 10px;
+
+            border-radius: 9px;
+
+            background: rgba(255,255,255,.12);
+            color: white;
+
+            border: 1px solid rgba(255,255,255,.2);
+
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .language-button.active {
+            background: white;
+            color: #111827;
         }
 
         .install-box {
@@ -277,6 +312,21 @@
                 border-radius: 16px;
             }
 
+            header h1 {
+                font-size: 24px;
+            }
+
+            .language-switcher {
+                top: 12px;
+                right: 10px;
+            }
+
+            .language-button {
+                min-height: 34px;
+                padding: 5px 8px;
+                font-size: 12px;
+            }
+
         }
 
     </style>
@@ -288,9 +338,29 @@
 
     <header>
 
+        <div class="language-switcher">
+
+            <button
+                type="button"
+                id="langUk"
+                class="language-button"
+                onclick="setLanguage('uk')">
+                🇺🇦 UA
+            </button>
+
+            <button
+                type="button"
+                id="langPl"
+                class="language-button"
+                onclick="setLanguage('pl')">
+                🇵🇱 PL
+            </button>
+
+        </div>
+
         <h1>🚕 Taxi Manager</h1>
 
-        <p>
+        <p id="appSubtitle">
             Облік роботи, доходів та витрат
         </p>
 
@@ -299,13 +369,15 @@
 
     <div class="install-box">
 
-        <strong>
+        <strong id="installTitle">
             📱 Встановлення на iPhone
         </strong>
 
-        Відкрий додаток у Safari →
-        натисни «Поділитися» →
-        «На початковий екран».
+        <span id="installText">
+            Відкрий додаток у Safari →
+            натисни «Поділитися» →
+            «На початковий екран».
+        </span>
 
     </div>
 
@@ -320,7 +392,7 @@
 
             <div class="field">
 
-                <label>
+                <label id="labelDate">
                     Дата
                 </label>
 
@@ -333,7 +405,7 @@
 
             <div class="field">
 
-                <label>
+                <label id="labelStart">
                     Початок роботи
                 </label>
 
@@ -346,7 +418,7 @@
 
             <div class="field">
 
-                <label>
+                <label id="labelEnd">
                     Кінець роботи
                 </label>
 
@@ -359,7 +431,7 @@
 
             <div class="field">
 
-                <label>
+                <label id="labelBreak">
                     🍽️ Перерва, хв
                 </label>
 
@@ -376,7 +448,7 @@
 
             <div class="field">
 
-                <label>
+                <label id="labelUber">
                     Uber, zł
                 </label>
 
@@ -393,7 +465,7 @@
 
             <div class="field">
 
-                <label>
+                <label id="labelBolt">
                     Bolt, zł
                 </label>
 
@@ -410,7 +482,7 @@
 
             <div class="field">
 
-                <label>
+                <label id="labelOtherApps">
                     Інші додатки, zł
                 </label>
 
@@ -427,7 +499,7 @@
 
             <div class="field">
 
-                <label>
+                <label id="labelCash">
                     💵 Готівка, zł
                 </label>
 
@@ -444,7 +516,7 @@
 
             <div class="field">
 
-                <label>
+                <label id="labelTips">
                     Чайові, zł
                 </label>
 
@@ -461,7 +533,7 @@
 
             <div class="field">
 
-                <label>
+                <label id="labelFuel">
                     Пальне, zł
                 </label>
 
@@ -478,7 +550,7 @@
 
             <div class="field">
 
-                <label>
+                <label id="labelOtherExpenses">
                     Інші витрати, zł
                 </label>
 
@@ -497,6 +569,7 @@
 
         <button
             class="primary"
+            id="saveButton"
             onclick="saveEntry()">
 
             💾 Зберегти день
@@ -506,6 +579,7 @@
 
         <button
             class="secondary"
+            id="clearButton"
             onclick="clearForm()">
 
             Очистити
@@ -523,7 +597,7 @@
 
     <div class="card">
 
-        <h2>
+        <h2 id="totalStatsTitle">
             📊 Загальна статистика
         </h2>
 
@@ -532,7 +606,7 @@
 
             <div class="stat">
 
-                <div class="stat-title">
+                <div class="stat-title" id="totalDaysTitle">
                     Днів роботи
                 </div>
 
@@ -547,7 +621,7 @@
 
             <div class="stat">
 
-                <div class="stat-title">
+                <div class="stat-title" id="totalHoursTitle">
                     Годин
                 </div>
 
@@ -562,7 +636,7 @@
 
             <div class="stat">
 
-                <div class="stat-title">
+                <div class="stat-title" id="totalIncomeTitle">
                     Зароблено
                 </div>
 
@@ -577,7 +651,7 @@
 
             <div class="stat">
 
-                <div class="stat-title">
+                <div class="stat-title" id="totalCashTitle">
                     💵 Готівка
                 </div>
 
@@ -592,7 +666,7 @@
 
             <div class="stat">
 
-                <div class="stat-title">
+                <div class="stat-title" id="totalProfitTitle">
                     Чистими
                 </div>
 
@@ -611,14 +685,14 @@
 
     <div class="card">
 
-        <h2>
+        <h2 id="monthStatsTitle">
             📅 Статистика за місяць
         </h2>
 
 
         <div class="field">
 
-            <label>
+            <label id="monthFilterLabel">
                 Обрати місяць
             </label>
 
@@ -637,7 +711,7 @@
 
             <div class="stat">
 
-                <div class="stat-title">
+                <div class="stat-title" id="monthDaysTitle">
                     Днів
                 </div>
 
@@ -652,7 +726,7 @@
 
             <div class="stat">
 
-                <div class="stat-title">
+                <div class="stat-title" id="monthHoursTitle">
                     Годин
                 </div>
 
@@ -667,7 +741,7 @@
 
             <div class="stat">
 
-                <div class="stat-title">
+                <div class="stat-title" id="monthIncomeTitle">
                     Доходи
                 </div>
 
@@ -682,7 +756,7 @@
 
             <div class="stat">
 
-                <div class="stat-title">
+                <div class="stat-title" id="monthCashTitle">
                     💵 Готівка
                 </div>
 
@@ -697,7 +771,7 @@
 
             <div class="stat">
 
-                <div class="stat-title">
+                <div class="stat-title" id="monthProfitTitle">
                     Чистими
                 </div>
 
@@ -716,13 +790,14 @@
 
     <div class="card">
 
-        <h2>
+        <h2 id="historyTitle">
             📋 Історія роботи
         </h2>
 
 
         <button
             class="secondary top-button"
+            id="exportButton"
             onclick="exportCSV()">
 
             📥 Експорт у CSV
@@ -742,6 +817,546 @@
 
 <script>
 
+/* ===========================
+   МОВИ
+=========================== */
+
+const translations = {
+
+    uk: {
+
+        subtitle:
+            "Облік роботи, доходів та витрат",
+
+        installTitle:
+            "📱 Встановлення на iPhone",
+
+        installText:
+            "Відкрий додаток у Safari → натисни «Поділитися» → «На початковий екран».",
+
+        addDay:
+            "Додати робочий день",
+
+        editDay:
+            "Редагувати робочий день",
+
+        date:
+            "Дата",
+
+        start:
+            "Початок роботи",
+
+        end:
+            "Кінець роботи",
+
+        break:
+            "🍽️ Перерва, хв",
+
+        breakPlaceholder:
+            "Наприклад: 45",
+
+        otherApps:
+            "Інші додатки, zł",
+
+        cash:
+            "💵 Готівка, zł",
+
+        tips:
+            "Чайові, zł",
+
+        fuel:
+            "Пальне, zł",
+
+        otherExpenses:
+            "Інші витрати, zł",
+
+        save:
+            "💾 Зберегти день",
+
+        clear:
+            "Очистити",
+
+        totalStats:
+            "📊 Загальна статистика",
+
+        workDays:
+            "Днів роботи",
+
+        hours:
+            "Годин",
+
+        earned:
+            "Зароблено",
+
+        clean:
+            "Чистими",
+
+        monthStats:
+            "📅 Статистика за місяць",
+
+        chooseMonth:
+            "Обрати місяць",
+
+        days:
+            "Днів",
+
+        income:
+            "Доходи",
+
+        history:
+            "📋 Історія роботи",
+
+        export:
+            "📥 Експорт у CSV",
+
+        empty:
+            "Поки немає записів.",
+
+        workTime:
+            "Робочий час",
+
+        breakHistory:
+            "Перерва",
+
+        expenses:
+            "Витрати",
+
+        edit:
+            "✏️ Редагувати",
+
+        delete:
+            "🗑️ Видалити",
+
+        other:
+            "Інші",
+
+        confirmDelete:
+            "Точно видалити цей день?",
+
+        noExport:
+            "Немає даних для експорту.",
+
+        required:
+            "Вкажи дату, початок та кінець роботи.",
+
+        breakError:
+            "Перерва не може бути довшою за робочий час.",
+
+        saved:
+            "День успішно збережено ✅",
+
+        csvDate:
+            "Дата",
+
+        csvStart:
+            "Початок",
+
+        csvEnd:
+            "Кінець",
+
+        csvHours:
+            "Години",
+
+        csvBreak:
+            "Перерва, хв",
+
+        csvOtherApps:
+            "Інші додатки",
+
+        csvCash:
+            "Готівка",
+
+        csvTips:
+            "Чайові",
+
+        csvFuel:
+            "Пальне",
+
+        csvOtherExpenses:
+            "Інші витрати",
+
+        csvIncome:
+            "Доходи",
+
+        csvExpenses:
+            "Витрати",
+
+        csvProfit:
+            "Чистими",
+
+        moneySuffix:
+            " zł",
+
+        hour:
+            "год",
+
+        minutes:
+            "хв",
+
+        hourlyRate:
+            "зл/год"
+
+    },
+
+
+    pl: {
+
+        subtitle:
+            "Ewidencja pracy, przychodów i wydatków",
+
+        installTitle:
+            "📱 Instalacja na iPhone",
+
+        installText:
+            "Otwórz aplikację w Safari → naciśnij „Udostępnij” → „Dodaj do ekranu początkowego”.",
+
+        addDay:
+            "Dodaj dzień pracy",
+
+        editDay:
+            "Edytuj dzień pracy",
+
+        date:
+            "Data",
+
+        start:
+            "Początek pracy",
+
+        end:
+            "Koniec pracy",
+
+        break:
+            "🍽️ Przerwa, min",
+
+        breakPlaceholder:
+            "Na przykład: 45",
+
+        otherApps:
+            "Inne aplikacje, zł",
+
+        cash:
+            "💵 Gotówka, zł",
+
+        tips:
+            "Napiwki, zł",
+
+        fuel:
+            "Paliwo, zł",
+
+        otherExpenses:
+            "Inne wydatki, zł",
+
+        save:
+            "💾 Zapisz dzień",
+
+        clear:
+            "Wyczyść",
+
+        totalStats:
+            "📊 Statystyki ogólne",
+
+        workDays:
+            "Dni pracy",
+
+        hours:
+            "Godziny",
+
+        earned:
+            "Zarobiono",
+
+        clean:
+            "Na czysto",
+
+        monthStats:
+            "📅 Statystyki miesięczne",
+
+        chooseMonth:
+            "Wybierz miesiąc",
+
+        days:
+            "Dni",
+
+        income:
+            "Przychody",
+
+        history:
+            "📋 Historia pracy",
+
+        export:
+            "📥 Eksport do CSV",
+
+        empty:
+            "Brak zapisów.",
+
+        workTime:
+            "Czas pracy",
+
+        breakHistory:
+            "Przerwa",
+
+        expenses:
+            "Wydatki",
+
+        edit:
+            "✏️ Edytuj",
+
+        delete:
+            "🗑️ Usuń",
+
+        other:
+            "Inne",
+
+        confirmDelete:
+            "Na pewno usunąć ten dzień?",
+
+        noExport:
+            "Brak danych do eksportu.",
+
+        required:
+            "Podaj datę, początek i koniec pracy.",
+
+        breakError:
+            "Przerwa nie może być dłuższa niż czas pracy.",
+
+        saved:
+            "Dzień został zapisany ✅",
+
+        csvDate:
+            "Data",
+
+        csvStart:
+            "Początek",
+
+        csvEnd:
+            "Koniec",
+
+        csvHours:
+            "Godziny",
+
+        csvBreak:
+            "Przerwa, min",
+
+        csvOtherApps:
+            "Inne aplikacje",
+
+        csvCash:
+            "Gotówka",
+
+        csvTips:
+            "Napiwki",
+
+        csvFuel:
+            "Paliwo",
+
+        csvOtherExpenses:
+            "Inne wydatki",
+
+        csvIncome:
+            "Przychody",
+
+        csvExpenses:
+            "Wydatki",
+
+        csvProfit:
+            "Na czysto",
+
+        moneySuffix:
+            " zł",
+
+        hour:
+            "godz.",
+
+        minutes:
+            "min",
+
+        hourlyRate:
+            "zł/godz."
+
+    }
+
+};
+
+
+let currentLanguage =
+    localStorage.getItem("taxiLanguage") || "uk";
+
+
+function t(key) {
+
+    return (
+        translations[currentLanguage][key] ||
+        translations.uk[key] ||
+        key
+    );
+
+}
+
+
+/* ===========================
+   ЗМІНА МОВИ
+=========================== */
+
+function setLanguage(language) {
+
+    if (
+        language !== "uk" &&
+        language !== "pl"
+    ) {
+        language = "uk";
+    }
+
+    currentLanguage =
+        language;
+
+    localStorage.setItem(
+        "taxiLanguage",
+        currentLanguage
+    );
+
+    document.documentElement.lang =
+        currentLanguage;
+
+    updateLanguageUI();
+
+    renderAll();
+
+}
+
+
+function updateLanguageUI() {
+
+    document.getElementById("langUk")
+        .classList.toggle(
+            "active",
+            currentLanguage === "uk"
+        );
+
+    document.getElementById("langPl")
+        .classList.toggle(
+            "active",
+            currentLanguage === "pl"
+        );
+
+
+    document.getElementById("appSubtitle").textContent =
+        t("subtitle");
+
+    document.getElementById("installTitle").textContent =
+        t("installTitle");
+
+    document.getElementById("installText").textContent =
+        t("installText");
+
+
+    document.getElementById("labelDate").textContent =
+        t("date");
+
+    document.getElementById("labelStart").textContent =
+        t("start");
+
+    document.getElementById("labelEnd").textContent =
+        t("end");
+
+    document.getElementById("labelBreak").textContent =
+        t("break");
+
+    document.getElementById("labelUber").textContent =
+        "Uber, zł";
+
+    document.getElementById("labelBolt").textContent =
+        "Bolt, zł";
+
+    document.getElementById("labelOtherApps").textContent =
+        t("otherApps");
+
+    document.getElementById("labelCash").textContent =
+        t("cash");
+
+    document.getElementById("labelTips").textContent =
+        t("tips");
+
+    document.getElementById("labelFuel").textContent =
+        t("fuel");
+
+    document.getElementById("labelOtherExpenses").textContent =
+        t("otherExpenses");
+
+
+    document.getElementById("breakMinutes").placeholder =
+        t("breakPlaceholder");
+
+
+    document.getElementById("saveButton").textContent =
+        t("save");
+
+    document.getElementById("clearButton").textContent =
+        t("clear");
+
+
+    document.getElementById("totalStatsTitle").textContent =
+        t("totalStats");
+
+    document.getElementById("totalDaysTitle").textContent =
+        t("workDays");
+
+    document.getElementById("totalHoursTitle").textContent =
+        t("hours");
+
+    document.getElementById("totalIncomeTitle").textContent =
+        t("earned");
+
+    document.getElementById("totalCashTitle").textContent =
+        t("cash");
+
+    document.getElementById("totalProfitTitle").textContent =
+        t("clean");
+
+
+    document.getElementById("monthStatsTitle").textContent =
+        t("monthStats");
+
+    document.getElementById("monthFilterLabel").textContent =
+        t("chooseMonth");
+
+    document.getElementById("monthDaysTitle").textContent =
+        t("days");
+
+    document.getElementById("monthHoursTitle").textContent =
+        t("hours");
+
+    document.getElementById("monthIncomeTitle").textContent =
+        t("income");
+
+    document.getElementById("monthCashTitle").textContent =
+        t("cash");
+
+    document.getElementById("monthProfitTitle").textContent =
+        t("clean");
+
+
+    document.getElementById("historyTitle").textContent =
+        t("history");
+
+    document.getElementById("exportButton").textContent =
+        t("export");
+
+
+    document.getElementById("formTitle").textContent =
+        editingId
+            ? t("editDay")
+            : t("addDay");
+
+
+    document.title =
+        "Taxi Manager";
+
+}
+
+
+/* ===========================
+   ДАНІ
+=========================== */
+
 let entries =
     JSON.parse(
         localStorage.getItem("taxiEntries") || "[]"
@@ -750,9 +1365,9 @@ let entries =
 let editingId = null;
 
 
-/* ---------------------------
+/* ===========================
    СТАРІ ЗАПИСИ
---------------------------- */
+=========================== */
 
 entries = entries.map(item => {
 
@@ -818,32 +1433,39 @@ localStorage.setItem(
 );
 
 
-/* ---------------------------
+/* ===========================
    ДАТА
---------------------------- */
+=========================== */
 
 function setDefaultDate() {
 
-    const today = new Date();
+    const today =
+        new Date();
 
     const date =
         today.getFullYear() +
         "-" +
-        String(today.getMonth() + 1).padStart(2, "0") +
+        String(
+            today.getMonth() + 1
+        ).padStart(2, "0") +
         "-" +
-        String(today.getDate()).padStart(2, "0");
+        String(
+            today.getDate()
+        ).padStart(2, "0");
+
 
     document.getElementById("date").value =
         date;
 
     document.getElementById("monthFilter").value =
         date.substring(0, 7);
+
 }
 
 
-/* ---------------------------
+/* ===========================
    ЧАС
---------------------------- */
+=========================== */
 
 function timeToMinutes(time) {
 
@@ -854,40 +1476,52 @@ function timeToMinutes(time) {
         Number(parts[0]) * 60 +
         Number(parts[1])
     );
+
 }
 
 
-function calculateDuration(start, end) {
+function calculateDuration(
+    start,
+    end
+) {
 
     let difference =
         timeToMinutes(end) -
         timeToMinutes(start);
 
     if (difference < 0) {
-        difference += 24 * 60;
+
+        difference +=
+            24 * 60;
+
     }
 
     return difference;
+
 }
 
 
 function formatHours(minutes) {
 
     const hours =
-        Math.floor(minutes / 60);
+        Math.floor(
+            minutes / 60
+        );
 
     const mins =
         minutes % 60;
 
+
     return (
-        `${hours} год ${mins} хв`
+        `${hours} ${t("hour")} ${mins} ${t("minutes")}`
     );
+
 }
 
 
-/* ---------------------------
+/* ===========================
    INPUT
---------------------------- */
+=========================== */
 
 function numberValue(id) {
 
@@ -896,12 +1530,13 @@ function numberValue(id) {
             document.getElementById(id).value
         ) || 0
     );
+
 }
 
 
-/* ---------------------------
+/* ===========================
    ЗБЕРЕЖЕННЯ
---------------------------- */
+=========================== */
 
 function saveEntry() {
 
@@ -914,6 +1549,7 @@ function saveEntry() {
     const endTime =
         document.getElementById("endTime").value;
 
+
     if (
         !date ||
         !startTime ||
@@ -921,11 +1557,12 @@ function saveEntry() {
     ) {
 
         showMessage(
-            "Вкажи дату, початок та кінець роботи.",
+            t("required"),
             true
         );
 
         return;
+
     }
 
 
@@ -954,11 +1591,12 @@ function saveEntry() {
     ) {
 
         showMessage(
-            "Перерва не може бути довшою за робочий час.",
+            t("breakError"),
             true
         );
 
         return;
+
     }
 
 
@@ -988,6 +1626,8 @@ function saveEntry() {
     const otherExpenses =
         numberValue("otherExpenses");
 
+
+    /* Готівка НЕ входить у дохід */
 
     const income =
         uber +
@@ -1039,10 +1679,11 @@ function saveEntry() {
     if (editingId) {
 
         entries =
-            entries.map(item =>
-                item.id === editingId
-                    ? entry
-                    : item
+            entries.map(
+                item =>
+                    item.id === editingId
+                        ? entry
+                        : item
             );
 
         editingId = null;
@@ -1066,14 +1707,15 @@ function saveEntry() {
 
 
     showMessage(
-        "День успішно збережено ✅"
+        t("saved")
     );
+
 }
 
 
-/* ---------------------------
+/* ===========================
    ОЧИСТКА
---------------------------- */
+=========================== */
 
 function clearForm() {
 
@@ -1107,13 +1749,14 @@ function clearForm() {
     document.getElementById(
         "formTitle"
     ).textContent =
-        "Додати робочий день";
+        t("addDay");
+
 }
 
 
-/* ---------------------------
+/* ===========================
    ПОВІДОМЛЕННЯ
---------------------------- */
+=========================== */
 
 function showMessage(
     text,
@@ -1137,19 +1780,23 @@ function showMessage(
         element.textContent = "";
 
     }, 3000);
+
 }
 
 
-/* ---------------------------
+/* ===========================
    ЗАГАЛЬНА СТАТИСТИКА
---------------------------- */
+=========================== */
 
 function renderTotalStats() {
 
     const totalMinutes =
         entries.reduce(
             (sum, item) =>
-                sum + Number(item.duration || 0),
+                sum +
+                Number(
+                    item.duration || 0
+                ),
             0
         );
 
@@ -1157,7 +1804,10 @@ function renderTotalStats() {
     const totalIncome =
         entries.reduce(
             (sum, item) =>
-                sum + Number(item.income || 0),
+                sum +
+                Number(
+                    item.income || 0
+                ),
             0
         );
 
@@ -1165,7 +1815,10 @@ function renderTotalStats() {
     const totalCash =
         entries.reduce(
             (sum, item) =>
-                sum + Number(item.cash || 0),
+                sum +
+                Number(
+                    item.cash || 0
+                ),
             0
         );
 
@@ -1173,31 +1826,51 @@ function renderTotalStats() {
     const totalProfit =
         entries.reduce(
             (sum, item) =>
-                sum + Number(item.profit || 0),
+                sum +
+                Number(
+                    item.profit || 0
+                ),
             0
         );
 
 
-    document.getElementById("totalDays").textContent =
+    document.getElementById(
+        "totalDays"
+    ).textContent =
         entries.length;
 
-    document.getElementById("totalHours").textContent =
-        formatHours(totalMinutes);
 
-    document.getElementById("totalIncome").textContent =
+    document.getElementById(
+        "totalHours"
+    ).textContent =
+        formatHours(
+            totalMinutes
+        );
+
+
+    document.getElementById(
+        "totalIncome"
+    ).textContent =
         money(totalIncome);
 
-    document.getElementById("totalCash").textContent =
+
+    document.getElementById(
+        "totalCash"
+    ).textContent =
         money(totalCash);
 
-    document.getElementById("totalProfit").textContent =
+
+    document.getElementById(
+        "totalProfit"
+    ).textContent =
         money(totalProfit);
+
 }
 
 
-/* ---------------------------
+/* ===========================
    МІСЯЦЬ
---------------------------- */
+=========================== */
 
 function renderMonthStats() {
 
@@ -1219,7 +1892,10 @@ function renderMonthStats() {
     const minutes =
         monthEntries.reduce(
             (sum, item) =>
-                sum + Number(item.duration || 0),
+                sum +
+                Number(
+                    item.duration || 0
+                ),
             0
         );
 
@@ -1227,7 +1903,10 @@ function renderMonthStats() {
     const income =
         monthEntries.reduce(
             (sum, item) =>
-                sum + Number(item.income || 0),
+                sum +
+                Number(
+                    item.income || 0
+                ),
             0
         );
 
@@ -1235,7 +1914,10 @@ function renderMonthStats() {
     const cash =
         monthEntries.reduce(
             (sum, item) =>
-                sum + Number(item.cash || 0),
+                sum +
+                Number(
+                    item.cash || 0
+                ),
             0
         );
 
@@ -1243,31 +1925,49 @@ function renderMonthStats() {
     const profit =
         monthEntries.reduce(
             (sum, item) =>
-                sum + Number(item.profit || 0),
+                sum +
+                Number(
+                    item.profit || 0
+                ),
             0
         );
 
 
-    document.getElementById("monthDays").textContent =
+    document.getElementById(
+        "monthDays"
+    ).textContent =
         monthEntries.length;
 
-    document.getElementById("monthHours").textContent =
+
+    document.getElementById(
+        "monthHours"
+    ).textContent =
         formatHours(minutes);
 
-    document.getElementById("monthIncome").textContent =
+
+    document.getElementById(
+        "monthIncome"
+    ).textContent =
         money(income);
 
-    document.getElementById("monthCash").textContent =
+
+    document.getElementById(
+        "monthCash"
+    ).textContent =
         money(cash);
 
-    document.getElementById("monthProfit").textContent =
+
+    document.getElementById(
+        "monthProfit"
+    ).textContent =
         money(profit);
+
 }
 
 
-/* ---------------------------
+/* ===========================
    ІСТОРІЯ
---------------------------- */
+=========================== */
 
 function renderEntries() {
 
@@ -1282,11 +1982,12 @@ function renderEntries() {
         container.innerHTML =
             `
             <div class="empty">
-                Поки немає записів.
+                ${t("empty")}
             </div>
             `;
 
         return;
+
     }
 
 
@@ -1320,7 +2021,7 @@ function renderEntries() {
                 <br>
 
                 ⏱️
-                Робочий час:
+                ${t("workTime")}:
                 ${formatHours(
                     Number(item.duration || 0)
                 )}
@@ -1328,30 +2029,30 @@ function renderEntries() {
                 <br>
 
                 🍽️
-                Перерва:
+                ${t("breakHistory")}:
                 ${Number(
                     item.breakMinutes || 0
-                )} хв
+                )} ${t("minutes")}
 
                 <br>
 
-                💰 Доходи:
+                💰 ${t("income")}:
                 ${money(item.income)}
 
                 <br>
 
-                💵 Готівка:
+                💵 ${t("cash")}:
                 ${money(item.cash)}
 
                 <br>
 
-                💸 Витрати:
+                💸 ${t("expenses")}:
                 ${money(item.expenses)}
 
                 <br>
 
                 <strong>
-                    🟢 Чистими:
+                    🟢 ${t("clean")}:
                     ${money(item.profit)}
                 </strong>
 
@@ -1359,7 +2060,7 @@ function renderEntries() {
 
                 📊
                 ${hourlyRate(item)}
-                zł/год
+                ${t("hourlyRate")}
 
                 <br><br>
 
@@ -1369,23 +2070,23 @@ function renderEntries() {
                 · Bolt:
                 ${money(item.bolt)}
 
-                · Інші:
+                · ${t("other")}:
                 ${money(item.otherApps)}
 
                 <br>
 
-                Готівка:
+                ${t("cash")}:
                 ${money(item.cash)}
 
-                · Чайові:
+                · ${t("tips")}:
                 ${money(item.tips)}
 
                 <br>
 
-                Пальне:
+                ${t("fuel")}:
                 ${money(item.fuel)}
 
-                · Інші витрати:
+                · ${t("otherExpenses")}:
                 ${money(item.otherExpenses)}
 
             </div>
@@ -1397,7 +2098,7 @@ function renderEntries() {
                     class="secondary"
                     onclick="editEntry(${item.id})">
 
-                    ✏️ Редагувати
+                    ${t("edit")}
 
                 </button>
 
@@ -1406,7 +2107,7 @@ function renderEntries() {
                     class="danger"
                     onclick="deleteEntry(${item.id})">
 
-                    🗑️ Видалити
+                    ${t("delete")}
 
                 </button>
 
@@ -1415,17 +2116,20 @@ function renderEntries() {
         </div>
 
         `).join("");
+
 }
 
 
-/* ---------------------------
+/* ===========================
    ГОДИННА СТАВКА
---------------------------- */
+=========================== */
 
 function hourlyRate(item) {
 
     const duration =
-        Number(item.duration || 0);
+        Number(
+            item.duration || 0
+        );
 
 
     if (
@@ -1438,15 +2142,18 @@ function hourlyRate(item) {
 
 
     return (
-        Number(item.profit || 0) /
+        Number(
+            item.profit || 0
+        ) /
         (duration / 60)
     ).toFixed(2);
+
 }
 
 
-/* ---------------------------
+/* ===========================
    РЕДАГУВАННЯ
---------------------------- */
+=========================== */
 
 function editEntry(id) {
 
@@ -1501,7 +2208,7 @@ function editEntry(id) {
     document.getElementById(
         "formTitle"
     ).textContent =
-        "Редагувати робочий день";
+        t("editDay");
 
 
     window.scrollTo({
@@ -1510,18 +2217,19 @@ function editEntry(id) {
         behavior: "smooth"
 
     });
+
 }
 
 
-/* ---------------------------
+/* ===========================
    ВИДАЛЕННЯ
---------------------------- */
+=========================== */
 
 function deleteEntry(id) {
 
     const confirmed =
         confirm(
-            "Точно видалити цей день?"
+            t("confirmDelete")
         );
 
 
@@ -1542,12 +2250,13 @@ function deleteEntry(id) {
 
 
     renderAll();
+
 }
 
 
-/* ---------------------------
+/* ===========================
    ГРОШІ
---------------------------- */
+=========================== */
 
 function money(value) {
 
@@ -1555,14 +2264,15 @@ function money(value) {
         Number(value)
             .toFixed(2)
             .replace(".", ",") +
-        " zł"
+        t("moneySuffix")
     );
+
 }
 
 
-/* ---------------------------
+/* ===========================
    ДАТА
---------------------------- */
+=========================== */
 
 function formatDate(
     dateString
@@ -1575,12 +2285,13 @@ function formatDate(
     return (
         `${parts[2]}.${parts[1]}.${parts[0]}`
     );
+
 }
 
 
-/* ---------------------------
+/* ===========================
    CSV
---------------------------- */
+=========================== */
 
 function exportCSV() {
 
@@ -1589,15 +2300,32 @@ function exportCSV() {
     ) {
 
         alert(
-            "Немає даних для експорту."
+            t("noExport")
         );
 
         return;
+
     }
 
 
     let csv =
-        "Дата;Початок;Кінець;Години;Перерва, хв;Uber;Bolt;Інші додатки;Готівка;Чайові;Пальне;Інші витрати;Доходи;Витрати;Чистими\n";
+        [
+            t("csvDate"),
+            t("csvStart"),
+            t("csvEnd"),
+            t("csvHours"),
+            t("csvBreak"),
+            "Uber",
+            "Bolt",
+            t("csvOtherApps"),
+            t("csvCash"),
+            t("csvTips"),
+            t("csvFuel"),
+            t("csvOtherExpenses"),
+            t("csvIncome"),
+            t("csvExpenses"),
+            t("csvProfit")
+        ].join(";") + "\n";
 
 
     entries.forEach(item => {
@@ -1609,7 +2337,9 @@ function exportCSV() {
             item.endTime,
 
             formatHours(
-                Number(item.duration || 0)
+                Number(
+                    item.duration || 0
+                )
             ),
 
             Number(
@@ -1662,12 +2392,13 @@ function exportCSV() {
 
 
     URL.revokeObjectURL(url);
+
 }
 
 
-/* ---------------------------
+/* ===========================
    ОНОВЛЕННЯ
---------------------------- */
+=========================== */
 
 function renderAll() {
 
@@ -1676,21 +2407,24 @@ function renderAll() {
     renderMonthStats();
 
     renderEntries();
+
 }
 
 
-/* ---------------------------
+/* ===========================
    ЗАПУСК
---------------------------- */
+=========================== */
 
 setDefaultDate();
+
+updateLanguageUI();
 
 renderAll();
 
 
-/* ---------------------------
+/* ===========================
    OFFLINE PWA
---------------------------- */
+=========================== */
 
 if (
     "serviceWorker" in navigator
