@@ -1,1396 +1,878 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1, viewport-fit=cover">
-
-    <meta name="theme-color" content="#111827">
-
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Taxi Manager">
-
-    <link rel="manifest" href="manifest.json">
-
-    <link rel="apple-touch-icon" href="icon-512.png">
-
-    <title>Taxi Manager</title>
-
-    <style>
-
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        :root {
-            --bg: #f3f4f6;
-            --card: #ffffff;
-            --text: #111827;
-            --muted: #6b7280;
-            --border: #e5e7eb;
-            --primary: #111827;
-            --green: #15803d;
-            --red: #b91c1c;
-        }
-
-        html {
-            background: var(--bg);
-        }
-
-        body {
-            margin: 0;
-            padding-top: env(safe-area-inset-top);
-            padding-bottom: env(safe-area-inset-bottom);
-
-            font-family:
-                -apple-system,
-                BlinkMacSystemFont,
-                "Segoe UI",
-                sans-serif;
-
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 760px;
-            margin: auto;
-
-            padding:
-                10px
-                10px
-                calc(25px + env(safe-area-inset-bottom));
-        }
-
-        header {
-            background: #111827;
-            color: white;
-
-            padding: 22px 18px;
-            border-radius: 18px;
-            margin-bottom: 12px;
-
-            position: relative;
-        }
-
-        header h1 {
-            margin: 0 0 5px;
-            font-size: 27px;
-            padding-right: 85px;
-        }
-
-        header p {
-            margin: 0;
-            color: #d1d5db;
-            padding-right: 10px;
-        }
-
-        .language-switcher {
-            position: absolute;
-            top: 16px;
-            right: 14px;
-
-            display: flex;
-            gap: 5px;
-        }
-
-        .language-button {
-            width: auto;
-            min-height: 36px;
-
-            margin: 0;
-            padding: 6px 10px;
-
-            border-radius: 9px;
-
-            background: rgba(255,255,255,.12);
-            color: white;
-
-            border: 1px solid rgba(255,255,255,.2);
-
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .language-button.active {
-            background: white;
-            color: #111827;
-        }
-
-        .install-box {
-            background: #fef3c7;
-            border-radius: 14px;
-            padding: 13px;
-            margin-bottom: 12px;
-            font-size: 14px;
-            line-height: 1.45;
-        }
-
-        .install-box strong {
-            display: block;
-            margin-bottom: 4px;
-        }
-
-        .card {
-            background: var(--card);
-            border-radius: 18px;
-            padding: 16px;
-            margin-bottom: 12px;
-
-            box-shadow:
-                0 2px 8px rgba(0,0,0,.05);
-        }
-
-        h2 {
-            margin: 0 0 14px;
-            font-size: 20px;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
-
-        .field {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        label {
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        input {
-            width: 100%;
-            min-height: 48px;
-            padding: 12px;
-
-            border: 1px solid #d1d5db;
-            border-radius: 12px;
-
-            background: white;
-            color: #111827;
-
-            font-size: 16px;
-            outline: none;
-        }
-
-        input:focus {
-            border-color: #111827;
-        }
-
-        button {
-            width: 100%;
-            min-height: 48px;
-
-            border: none;
-            border-radius: 12px;
-
-            padding: 12px 16px;
-
-            font-size: 16px;
-            font-weight: 600;
-
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        button:active {
-            transform: scale(.98);
-        }
-
-        .primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .secondary {
-            background: #e5e7eb;
-            color: var(--text);
-        }
-
-        .danger {
-            background: #fee2e2;
-            color: var(--red);
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-        }
-
-        .stat {
-            background: #f9fafb;
-            border-radius: 14px;
-            padding: 13px;
-        }
-
-        .stat-title {
-            color: var(--muted);
-            font-size: 13px;
-        }
-
-        .stat-value {
-            font-size: 19px;
-            font-weight: 700;
-            margin-top: 4px;
-        }
-
-        .positive {
-            color: var(--green);
-        }
-
-        .negative {
-            color: var(--red);
-        }
-
-        .entry {
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 14px;
-            margin-bottom: 10px;
-        }
-
-        .entry-title {
-            font-size: 18px;
-            font-weight: 700;
-        }
-
-        .entry-details {
-            color: #4b5563;
-            margin-top: 7px;
-            line-height: 1.55;
-        }
-
-        .entry-buttons {
-            display: flex;
-            gap: 8px;
-        }
-
-        .entry-buttons button {
-            width: 50%;
-            font-size: 14px;
-            padding: 9px 12px;
-        }
-
-        .message {
-            margin-top: 12px;
-            font-weight: 600;
-        }
-
-        .empty {
-            text-align: center;
-            color: var(--muted);
-            padding: 20px;
-        }
-
-        .top-button {
-            margin-bottom: 10px;
-        }
-
-        @media (max-width: 520px) {
-
-            .grid {
-                grid-template-columns: 1fr;
-            }
-
-            .container {
-                padding-left: 8px;
-                padding-right: 8px;
-            }
-
-            header {
-                border-radius: 16px;
-            }
-
-            header h1 {
-                font-size: 24px;
-            }
-
-            .language-switcher {
-                top: 12px;
-                right: 10px;
-            }
-
-            .language-button {
-                min-height: 34px;
-                padding: 5px 8px;
-                font-size: 12px;
-            }
-
-        }
-
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Taxi Manager">
+
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-512.png">
+
+<title>Taxi Manager</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    background: #f3f4f6;
+    color: #111827;
+}
+
+header {
+    background: #111827;
+    color: white;
+    padding: 18px 16px;
+    padding-top: calc(18px + env(safe-area-inset-top));
+}
+
+.header-inner {
+    max-width: 900px;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+h1 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.subtitle {
+    margin-top: 4px;
+    color: #d1d5db;
+    font-size: 13px;
+}
+
+.lang-buttons {
+    display: flex;
+    gap: 6px;
+}
+
+.lang-buttons button {
+    border: 1px solid #4b5563;
+    background: transparent;
+    color: white;
+    padding: 7px 9px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.lang-buttons button.active {
+    background: white;
+    color: #111827;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+    padding: 14px;
+    padding-bottom: calc(30px + env(safe-area-inset-bottom));
+}
+
+.card {
+    background: white;
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 14px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.06);
+}
+
+.card h2 {
+    margin: 0 0 14px;
+    font-size: 19px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.field.full {
+    grid-column: 1 / -1;
+}
+
+label {
+    font-size: 13px;
+    color: #4b5563;
+    font-weight: 600;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    font-size: 16px;
+    background: white;
+}
+
+input:focus {
+    outline: none;
+    border-color: #2563eb;
+}
+
+.buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+button {
+    border: 0;
+    border-radius: 10px;
+    padding: 12px 15px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.primary {
+    background: #2563eb;
+    color: white;
+    flex: 1;
+}
+
+.secondary {
+    background: #e5e7eb;
+    color: #111827;
+}
+
+.danger {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.small-button {
+    padding: 8px 10px;
+    font-size: 13px;
+}
+
+.install-box {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #1e3a8a;
+}
+
+.auth-status {
+    padding: 11px 12px;
+    border-radius: 10px;
+    background: #f3f4f6;
+    margin-bottom: 12px;
+    font-size: 14px;
+}
+
+.auth-status.connected {
+    background: #ecfdf5;
+    color: #065f46;
+}
+
+.auth-status.offline {
+    background: #fff7ed;
+    color: #9a3412;
+}
+
+.auth-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.auth-actions button {
+    flex: 1;
+    min-width: 130px;
+}
+
+.message {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 9px;
+    display: none;
+    font-size: 14px;
+}
+
+.message.show {
+    display: block;
+}
+
+.message.success {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.message.error {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+}
+
+.stat {
+    background: #f9fafb;
+    border-radius: 12px;
+    padding: 12px 8px;
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.stat-label {
+    margin-top: 4px;
+    font-size: 11px;
+    color: #6b7280;
+}
+
+.history-item {
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 13px;
+    margin-bottom: 10px;
+}
+
+.history-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.history-date {
+    font-weight: 700;
+}
+
+.history-main {
+    margin-top: 8px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px 15px;
+    font-size: 13px;
+    color: #4b5563;
+}
+
+.history-actions {
+    display: flex;
+    gap: 7px;
+    margin-top: 10px;
+}
+
+.empty {
+    color: #6b7280;
+    text-align: center;
+    padding: 20px 5px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.sync-line {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+@media (max-width: 700px) {
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .stats .stat:last-child {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 560px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .field.full {
+        grid-column: auto;
+    }
+
+    .header-inner {
+        align-items: flex-start;
+    }
+
+    .history-main {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
 </head>
 
 <body>
 
-<div class="container">
-
-    <header>
-
-        <div class="language-switcher">
-
-            <button
-                type="button"
-                id="langUk"
-                class="language-button"
-                onclick="setLanguage('uk')">
-                🇺🇦 UA
-            </button>
-
-            <button
-                type="button"
-                id="langPl"
-                class="language-button"
-                onclick="setLanguage('pl')">
-                🇵🇱 PL
-            </button>
-
+<header>
+    <div class="header-inner">
+        <div>
+            <h1>🚕 Taxi Manager</h1>
+            <div class="subtitle" id="subtitle">Облік роботи та доходів</div>
         </div>
 
-        <h1>🚕 Taxi Manager</h1>
+        <div class="lang-buttons">
+            <button id="ukBtn" onclick="setLanguage('uk')">🇺🇦 UA</button>
+            <button id="plBtn" onclick="setLanguage('pl')">🇵🇱 PL</button>
+        </div>
+    </div>
+</header>
 
-        <p id="appSubtitle">
-            Облік роботи, доходів та витрат
-        </p>
+<div class="container">
 
-    </header>
-
-
-    <div class="install-box">
-
-        <strong id="installTitle">
-            📱 Встановлення на iPhone
-        </strong>
-
-        <span id="installText">
-            Відкрий додаток у Safari →
-            натисни «Поділитися» →
-            «На початковий екран».
-        </span>
-
+    <div class="card install-box">
+        <strong id="installTitle">📱 Встановлення</strong>
+        <div id="installText" style="margin-top:6px;font-size:13px;">
+            На iPhone натисни «Поділитися» → «На початковий екран».
+        </div>
     </div>
 
-
+    <!-- ACCOUNT -->
     <div class="card">
+        <h2>☁️ <span data-i18n="account">Обліковий запис</span></h2>
 
-        <h2 id="formTitle">
-            Додати робочий день
-        </h2>
+        <div id="authLoggedOut">
+            <div class="grid">
+                <div class="field">
+                    <label data-i18n="email">Email</label>
+                    <input id="authEmail" type="email" autocomplete="email" placeholder="you@example.com">
+                </div>
+
+                <div class="field">
+                    <label data-i18n="password">Пароль</label>
+                    <input id="authPassword" type="password" autocomplete="current-password" placeholder="••••••••">
+                </div>
+            </div>
+
+            <div class="auth-actions" style="margin-top:12px;">
+                <button class="primary" onclick="loginAccount()" data-i18n="login">
+                    Увійти
+                </button>
+
+                <button class="secondary" onclick="registerAccount()" data-i18n="register">
+                    Створити акаунт
+                </button>
+            </div>
+        </div>
+
+        <div id="authLoggedIn" class="hidden">
+            <div id="accountStatus" class="auth-status connected"></div>
+
+            <div class="auth-actions">
+                <button class="secondary" onclick="syncWithCloud(true)" data-i18n="sync">
+                    🔄 Синхронізувати
+                </button>
+
+                <button class="danger" onclick="logoutAccount()" data-i18n="logout">
+                    Вийти
+                </button>
+            </div>
+        </div>
+
+        <div id="authMessage" class="message"></div>
+
+        <div id="syncStatus" class="sync-line"></div>
+    </div>
+
+    <!-- FORM -->
+    <div class="card">
+        <h2>📝 <span id="formTitle">Новий робочий день</span></h2>
 
         <div class="grid">
 
             <div class="field">
-
-                <label id="labelDate">
-                    Дата
-                </label>
-
-                <input
-                    type="date"
-                    id="date">
-
+                <label data-i18n="date">Дата</label>
+                <input type="date" id="date">
             </div>
 
-
             <div class="field">
-
-                <label id="labelStart">
-                    Початок роботи
-                </label>
-
-                <input
-                    type="time"
-                    id="startTime">
-
+                <label data-i18n="break">Перерва, хв</label>
+                <input type="number" id="breakMinutes" min="0" value="0">
             </div>
 
-
             <div class="field">
-
-                <label id="labelEnd">
-                    Кінець роботи
-                </label>
-
-                <input
-                    type="time"
-                    id="endTime">
-
+                <label data-i18n="start">Початок</label>
+                <input type="time" id="startTime">
             </div>
 
-
             <div class="field">
-
-                <label id="labelBreak">
-                    🍽️ Перерва, хв
-                </label>
-
-                <input
-                    type="number"
-                    id="breakMinutes"
-                    min="0"
-                    step="1"
-                    inputmode="numeric"
-                    placeholder="Наприклад: 45">
-
+                <label data-i18n="end">Кінець</label>
+                <input type="time" id="endTime">
             </div>
 
-
             <div class="field">
-
-                <label id="labelUber">
-                    Uber, zł
-                </label>
-
-                <input
-                    type="number"
-                    id="uber"
-                    min="0"
-                    step="0.01"
-                    inputmode="decimal"
-                    placeholder="0">
-
+                <label>Uber</label>
+                <input type="number" id="uber" min="0" step="0.01" placeholder="0">
             </div>
 
-
             <div class="field">
-
-                <label id="labelBolt">
-                    Bolt, zł
-                </label>
-
-                <input
-                    type="number"
-                    id="bolt"
-                    min="0"
-                    step="0.01"
-                    inputmode="decimal"
-                    placeholder="0">
-
+                <label>Bolt</label>
+                <input type="number" id="bolt" min="0" step="0.01" placeholder="0">
             </div>
 
-
             <div class="field">
-
-                <label id="labelOtherApps">
-                    Інші додатки, zł
-                </label>
-
-                <input
-                    type="number"
-                    id="otherApps"
-                    min="0"
-                    step="0.01"
-                    inputmode="decimal"
-                    placeholder="0">
-
+                <label data-i18n="otherApps">Інші додатки</label>
+                <input type="number" id="otherApps" min="0" step="0.01" placeholder="0">
             </div>
 
-
             <div class="field">
-
-                <label id="labelCash">
-                    💵 Готівка, zł
-                </label>
-
-                <input
-                    type="number"
-                    id="cash"
-                    min="0"
-                    step="0.01"
-                    inputmode="decimal"
-                    placeholder="0">
-
+                <label data-i18n="cash">Готівка</label>
+                <input type="number" id="cash" min="0" step="0.01" placeholder="0">
             </div>
 
-
             <div class="field">
-
-                <label id="labelTips">
-                    Чайові, zł
-                </label>
-
-                <input
-                    type="number"
-                    id="tips"
-                    min="0"
-                    step="0.01"
-                    inputmode="decimal"
-                    placeholder="0">
-
+                <label data-i18n="tips">Чайові</label>
+                <input type="number" id="tips" min="0" step="0.01" placeholder="0">
             </div>
 
-
             <div class="field">
-
-                <label id="labelFuel">
-                    Пальне, zł
-                </label>
-
-                <input
-                    type="number"
-                    id="fuel"
-                    min="0"
-                    step="0.01"
-                    inputmode="decimal"
-                    placeholder="0">
-
+                <label data-i18n="fuel">Пальне</label>
+                <input type="number" id="fuel" min="0" step="0.01" placeholder="0">
             </div>
 
-
             <div class="field">
-
-                <label id="labelOtherExpenses">
-                    Інші витрати, zł
-                </label>
-
-                <input
-                    type="number"
-                    id="otherExpenses"
-                    min="0"
-                    step="0.01"
-                    inputmode="decimal"
-                    placeholder="0">
-
+                <label data-i18n="otherExpenses">Інші витрати</label>
+                <input type="number" id="otherExpenses" min="0" step="0.01" placeholder="0">
             </div>
 
         </div>
 
+        <div class="buttons">
+            <button class="primary" onclick="saveEntry()" data-i18n="save">
+                💾 Зберегти
+            </button>
 
-        <button
-            class="primary"
-            id="saveButton"
-            onclick="saveEntry()">
-
-            💾 Зберегти день
-
-        </button>
-
-
-        <button
-            class="secondary"
-            id="clearButton"
-            onclick="clearForm()">
-
-            Очистити
-
-        </button>
-
-
-        <div
-            id="message"
-            class="message">
+            <button class="secondary" onclick="clearForm()" data-i18n="clear">
+                Очистити
+            </button>
         </div>
 
+        <div id="formMessage" class="message"></div>
     </div>
 
-
+    <!-- TOTAL -->
     <div class="card">
-
-        <h2 id="totalStatsTitle">
-            📊 Загальна статистика
-        </h2>
-
+        <h2>📊 <span data-i18n="totalStats">Загальна статистика</span></h2>
 
         <div class="stats">
-
             <div class="stat">
-
-                <div class="stat-title" id="totalDaysTitle">
-                    Днів роботи
-                </div>
-
-                <div
-                    class="stat-value"
-                    id="totalDays">
-                    0
-                </div>
-
+                <div class="stat-value" id="totalDays">0</div>
+                <div class="stat-label" data-i18n="days">Днів</div>
             </div>
 
-
             <div class="stat">
-
-                <div class="stat-title" id="totalHoursTitle">
-                    Годин
-                </div>
-
-                <div
-                    class="stat-value"
-                    id="totalHours">
-                    0
-                </div>
-
+                <div class="stat-value" id="totalHours">0</div>
+                <div class="stat-label" data-i18n="hours">Годин</div>
             </div>
 
-
             <div class="stat">
-
-                <div class="stat-title" id="totalIncomeTitle">
-                    Зароблено
-                </div>
-
-                <div
-                    class="stat-value positive"
-                    id="totalIncome">
-                    0 zł
-                </div>
-
+                <div class="stat-value" id="totalIncome">0</div>
+                <div class="stat-label" data-i18n="income">Дохід</div>
             </div>
 
-
             <div class="stat">
-
-                <div class="stat-title" id="totalCashTitle">
-                    💵 Готівка
-                </div>
-
-                <div
-                    class="stat-value"
-                    id="totalCash">
-                    0 zł
-                </div>
-
+                <div class="stat-value" id="totalCash">0</div>
+                <div class="stat-label" data-i18n="cash">Готівка</div>
             </div>
 
-
             <div class="stat">
-
-                <div class="stat-title" id="totalProfitTitle">
-                    Чистими
-                </div>
-
-                <div
-                    class="stat-value positive"
-                    id="totalProfit">
-                    0 zł
-                </div>
-
+                <div class="stat-value" id="totalProfit">0</div>
+                <div class="stat-label" data-i18n="profit">Чистими</div>
             </div>
-
         </div>
-
     </div>
 
-
+    <!-- MONTH -->
     <div class="card">
-
-        <h2 id="monthStatsTitle">
-            📅 Статистика за місяць
-        </h2>
-
-
-        <div class="field">
-
-            <label id="monthFilterLabel">
-                Обрати місяць
-            </label>
-
-            <input
-                type="month"
-                id="monthFilter"
-                onchange="renderAll()">
-
-        </div>
-
-
-        <br>
-
+        <h2>📅 <span data-i18n="monthStats">Статистика за місяць</span></h2>
 
         <div class="stats">
-
             <div class="stat">
-
-                <div class="stat-title" id="monthDaysTitle">
-                    Днів
-                </div>
-
-                <div
-                    class="stat-value"
-                    id="monthDays">
-                    0
-                </div>
-
+                <div class="stat-value" id="monthDays">0</div>
+                <div class="stat-label" data-i18n="days">Днів</div>
             </div>
 
-
             <div class="stat">
-
-                <div class="stat-title" id="monthHoursTitle">
-                    Годин
-                </div>
-
-                <div
-                    class="stat-value"
-                    id="monthHours">
-                    0
-                </div>
-
+                <div class="stat-value" id="monthHours">0</div>
+                <div class="stat-label" data-i18n="hours">Годин</div>
             </div>
 
-
             <div class="stat">
-
-                <div class="stat-title" id="monthIncomeTitle">
-                    Доходи
-                </div>
-
-                <div
-                    class="stat-value"
-                    id="monthIncome">
-                    0 zł
-                </div>
-
+                <div class="stat-value" id="monthIncome">0</div>
+                <div class="stat-label" data-i18n="income">Дохід</div>
             </div>
 
-
             <div class="stat">
-
-                <div class="stat-title" id="monthCashTitle">
-                    💵 Готівка
-                </div>
-
-                <div
-                    class="stat-value"
-                    id="monthCash">
-                    0 zł
-                </div>
-
+                <div class="stat-value" id="monthCash">0</div>
+                <div class="stat-label" data-i18n="cash">Готівка</div>
             </div>
 
-
             <div class="stat">
-
-                <div class="stat-title" id="monthProfitTitle">
-                    Чистими
-                </div>
-
-                <div
-                    class="stat-value positive"
-                    id="monthProfit">
-                    0 zł
-                </div>
-
+                <div class="stat-value" id="monthProfit">0</div>
+                <div class="stat-label" data-i18n="profit">Чистими</div>
             </div>
-
         </div>
-
     </div>
 
-
+    <!-- HISTORY -->
     <div class="card">
+        <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:12px;">
+            <h2 style="margin:0;">📋 <span data-i18n="history">Історія</span></h2>
 
-        <h2 id="historyTitle">
-            📋 Історія роботи
-        </h2>
-
-
-        <button
-            class="secondary top-button"
-            id="exportButton"
-            onclick="exportCSV()">
-
-            📥 Експорт у CSV
-
-        </button>
-
-
-        <div
-            id="entriesList"
-            style="margin-top:15px">
+            <button class="secondary small-button" onclick="exportCSV()" data-i18n="export">
+                CSV
+            </button>
         </div>
 
+        <div id="entriesList"></div>
     </div>
 
 </div>
 
-
 <script>
+/* =========================================================
+   SUPABASE
+========================================================= */
 
-/* ===========================
-   МОВИ
-=========================== */
+const SUPABASE_URL = "https://evrxgxhralvxckpjoclj.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+    "sb_publishable_Bk6mnQQQFh1G7pjwxxsDBg_OS9zj3rM";
+
+let supabaseClient = null;
+
+if (window.supabase) {
+    supabaseClient = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+    );
+}
+
+
+/* =========================================================
+   TRANSLATIONS
+========================================================= */
 
 const translations = {
-
     uk: {
-
-        subtitle:
-            "Облік роботи, доходів та витрат",
-
-        installTitle:
-            "📱 Встановлення на iPhone",
-
-        installText:
-            "Відкрий додаток у Safari → натисни «Поділитися» → «На початковий екран».",
-
-        addDay:
-            "Додати робочий день",
-
-        editDay:
-            "Редагувати робочий день",
-
-        date:
-            "Дата",
-
-        start:
-            "Початок роботи",
-
-        end:
-            "Кінець роботи",
-
-        break:
-            "🍽️ Перерва, хв",
-
-        breakPlaceholder:
-            "Наприклад: 45",
-
-        otherApps:
-            "Інші додатки, zł",
-
-        cash:
-            "💵 Готівка, zł",
-
-        tips:
-            "Чайові, zł",
-
-        fuel:
-            "Пальне, zł",
-
-        otherExpenses:
-            "Інші витрати, zł",
-
-        save:
-            "💾 Зберегти день",
-
-        clear:
-            "Очистити",
-
-        totalStats:
-            "📊 Загальна статистика",
-
-        workDays:
-            "Днів роботи",
-
-        hours:
-            "Годин",
-
-        earned:
-            "Зароблено",
-
-        clean:
-            "Чистими",
-
-        monthStats:
-            "📅 Статистика за місяць",
-
-        chooseMonth:
-            "Обрати місяць",
-
-        days:
-            "Днів",
-
-        income:
-            "Доходи",
-
-        history:
-            "📋 Історія роботи",
-
-        export:
-            "📥 Експорт у CSV",
-
-        empty:
-            "Поки немає записів.",
-
-        workTime:
-            "Робочий час",
-
-        breakHistory:
-            "Перерва",
-
-        expenses:
-            "Витрати",
-
-        edit:
-            "✏️ Редагувати",
-
-        delete:
-            "🗑️ Видалити",
-
-        other:
-            "Інші",
-
-        confirmDelete:
-            "Точно видалити цей день?",
-
-        noExport:
-            "Немає даних для експорту.",
-
-        required:
-            "Вкажи дату, початок та кінець роботи.",
-
-        breakError:
-            "Перерва не може бути довшою за робочий час.",
-
-        saved:
-            "День успішно збережено ✅",
-
-        csvDate:
-            "Дата",
-
-        csvStart:
-            "Початок",
-
-        csvEnd:
-            "Кінець",
-
-        csvHours:
-            "Години",
-
-        csvBreak:
-            "Перерва, хв",
-
-        csvOtherApps:
-            "Інші додатки",
-
-        csvCash:
-            "Готівка",
-
-        csvTips:
-            "Чайові",
-
-        csvFuel:
-            "Пальне",
-
-        csvOtherExpenses:
-            "Інші витрати",
-
-        csvIncome:
-            "Доходи",
-
-        csvExpenses:
-            "Витрати",
-
-        csvProfit:
-            "Чистими",
-
-        moneySuffix:
-            " zł",
-
-        hour:
-            "год",
-
-        minutes:
-            "хв",
-
-        hourlyRate:
-            "зл/год"
-
+        subtitle: "Облік роботи та доходів",
+        account: "Обліковий запис",
+        email: "Email",
+        password: "Пароль",
+        login: "Увійти",
+        register: "Створити акаунт",
+        logout: "Вийти",
+        sync: "🔄 Синхронізувати",
+        date: "Дата",
+        break: "Перерва, хв",
+        start: "Початок",
+        end: "Кінець",
+        otherApps: "Інші додатки",
+        cash: "Готівка",
+        tips: "Чайові",
+        fuel: "Пальне",
+        otherExpenses: "Інші витрати",
+        save: "💾 Зберегти",
+        clear: "Очистити",
+        totalStats: "Загальна статистика",
+        monthStats: "Статистика за місяць",
+        days: "Днів",
+        hours: "Годин",
+        income: "Дохід",
+        profit: "Чистими",
+        history: "Історія",
+        export: "CSV",
+        edit: "Редагувати",
+        delete: "Видалити",
+        noEntries: "Записів поки немає.",
+        loggedIn: "☁️ Підключено: ",
+        syncDone: "Синхронізацію завершено.",
+        syncing: "Синхронізація...",
+        offline: "Працюємо офлайн. Дані збережені на телефоні.",
+        accountCreated: "Акаунт створено. Перевір пошту для підтвердження.",
+        accountReady: "Акаунт готовий.",
+        loginSuccess: "Вхід виконано.",
+        logoutSuccess: "Ви вийшли з акаунта.",
+        wrongCredentials: "Неправильний email або пароль.",
+        passwordShort: "Пароль має містити щонайменше 6 символів.",
+        fillAuth: "Введи email і пароль.",
+        saveSuccess: "Запис збережено.",
+        deleteConfirm: "Видалити цей запис?",
+        deleteSuccess: "Запис видалено.",
+        syncError: "Помилка синхронізації: ",
+        cloudLoaded: "Дані завантажено з хмари.",
+        localUploaded: "Локальні записи завантажено в хмару.",
+        emptyFields: "Вкажи дату, початок і кінець роботи.",
+        installTitle: "📱 Встановлення",
+        installText: "На iPhone натисни «Поділитися» → «На початковий екран».",
+        newDay: "Новий робочий день",
+        editDay: "Редагування робочого дня",
+        hour: "год",
+        minute: "хв"
     },
 
-
     pl: {
-
-        subtitle:
-            "Ewidencja pracy, przychodów i wydatków",
-
-        installTitle:
-            "📱 Instalacja na iPhone",
-
-        installText:
-            "Otwórz aplikację w Safari → naciśnij „Udostępnij” → „Dodaj do ekranu początkowego”.",
-
-        addDay:
-            "Dodaj dzień pracy",
-
-        editDay:
-            "Edytuj dzień pracy",
-
-        date:
-            "Data",
-
-        start:
-            "Początek pracy",
-
-        end:
-            "Koniec pracy",
-
-        break:
-            "🍽️ Przerwa, min",
-
-        breakPlaceholder:
-            "Na przykład: 45",
-
-        otherApps:
-            "Inne aplikacje, zł",
-
-        cash:
-            "💵 Gotówka, zł",
-
-        tips:
-            "Napiwki, zł",
-
-        fuel:
-            "Paliwo, zł",
-
-        otherExpenses:
-            "Inne wydatki, zł",
-
-        save:
-            "💾 Zapisz dzień",
-
-        clear:
-            "Wyczyść",
-
-        totalStats:
-            "📊 Statystyki ogólne",
-
-        workDays:
-            "Dni pracy",
-
-        hours:
-            "Godziny",
-
-        earned:
-            "Zarobiono",
-
-        clean:
-            "Na czysto",
-
-        monthStats:
-            "📅 Statystyki miesięczne",
-
-        chooseMonth:
-            "Wybierz miesiąc",
-
-        days:
-            "Dni",
-
-        income:
-            "Przychody",
-
-        history:
-            "📋 Historia pracy",
-
-        export:
-            "📥 Eksport do CSV",
-
-        empty:
-            "Brak zapisów.",
-
-        workTime:
-            "Czas pracy",
-
-        breakHistory:
-            "Przerwa",
-
-        expenses:
-            "Wydatki",
-
-        edit:
-            "✏️ Edytuj",
-
-        delete:
-            "🗑️ Usuń",
-
-        other:
-            "Inne",
-
-        confirmDelete:
-            "Na pewno usunąć ten dzień?",
-
-        noExport:
-            "Brak danych do eksportu.",
-
-        required:
-            "Podaj datę, początek i koniec pracy.",
-
-        breakError:
-            "Przerwa nie może być dłuższa niż czas pracy.",
-
-        saved:
-            "Dzień został zapisany ✅",
-
-        csvDate:
-            "Data",
-
-        csvStart:
-            "Początek",
-
-        csvEnd:
-            "Koniec",
-
-        csvHours:
-            "Godziny",
-
-        csvBreak:
-            "Przerwa, min",
-
-        csvOtherApps:
-            "Inne aplikacje",
-
-        csvCash:
-            "Gotówka",
-
-        csvTips:
-            "Napiwki",
-
-        csvFuel:
-            "Paliwo",
-
-        csvOtherExpenses:
-            "Inne wydatki",
-
-        csvIncome:
-            "Przychody",
-
-        csvExpenses:
-            "Wydatki",
-
-        csvProfit:
-            "Na czysto",
-
-        moneySuffix:
-            " zł",
-
-        hour:
-            "godz.",
-
-        minutes:
-            "min",
-
-        hourlyRate:
-            "zł/godz."
-
+        subtitle: "Ewidencja pracy i dochodów",
+        account: "Konto",
+        email: "Email",
+        password: "Hasło",
+        login: "Zaloguj",
+        register: "Utwórz konto",
+        logout: "Wyloguj",
+        sync: "🔄 Synchronizuj",
+        date: "Data",
+        break: "Przerwa, min",
+        start: "Początek",
+        end: "Koniec",
+        otherApps: "Inne aplikacje",
+        cash: "Gotówka",
+        tips: "Napiwki",
+        fuel: "Paliwo",
+        otherExpenses: "Inne wydatki",
+        save: "💾 Zapisz",
+        clear: "Wyczyść",
+        totalStats: "Statystyki ogólne",
+        monthStats: "Statystyki miesiąca",
+        days: "Dni",
+        hours: "Godziny",
+        income: "Dochód",
+        profit: "Na czysto",
+        history: "Historia",
+        export: "CSV",
+        edit: "Edytuj",
+        delete: "Usuń",
+        noEntries: "Brak zapisów.",
+        loggedIn: "☁️ Połączono: ",
+        syncDone: "Synchronizacja zakończona.",
+        syncing: "Synchronizacja...",
+        offline: "Praca offline. Dane zapisane w telefonie.",
+        accountCreated: "Konto utworzone. Sprawdź email, aby potwierdzić konto.",
+        accountReady: "Konto gotowe.",
+        loginSuccess: "Zalogowano.",
+        logoutSuccess: "Wylogowano.",
+        wrongCredentials: "Nieprawidłowy email lub hasło.",
+        passwordShort: "Hasło musi mieć co najmniej 6 znaków.",
+        fillAuth: "Wpisz email i hasło.",
+        saveSuccess: "Zapis zapisany.",
+        deleteConfirm: "Usunąć ten zapis?",
+        deleteSuccess: "Zapis usunięty.",
+        syncError: "Błąd synchronizacji: ",
+        cloudLoaded: "Dane pobrane z chmury.",
+        localUploaded: "Lokalne zapisy przesłane do chmury.",
+        emptyFields: "Podaj datę, początek i koniec pracy.",
+        installTitle: "📱 Instalacja",
+        installText: "Na iPhone kliknij „Udostępnij” → „Dodaj do ekranu początkowego”.",
+        newDay: "Nowy dzień pracy",
+        editDay: "Edycja dnia pracy",
+        hour: "godz.",
+        minute: "min"
     }
-
 };
 
 
-let currentLanguage =
-    localStorage.getItem("taxiLanguage") || "uk";
+/* =========================================================
+   LANGUAGE
+========================================================= */
 
+let currentLanguage = localStorage.getItem("taxiLanguage") || "uk";
 
 function t(key) {
-
-    return (
-        translations[currentLanguage][key] ||
-        translations.uk[key] ||
-        key
-    );
-
+    return translations[currentLanguage][key] || key;
 }
-
-
-/* ===========================
-   ЗМІНА МОВИ
-=========================== */
 
 function setLanguage(language) {
-
-    if (
-        language !== "uk" &&
-        language !== "pl"
-    ) {
-        language = "uk";
-    }
-
-    currentLanguage =
-        language;
-
-    localStorage.setItem(
-        "taxiLanguage",
-        currentLanguage
-    );
-
-    document.documentElement.lang =
-        currentLanguage;
-
+    currentLanguage = language;
+    localStorage.setItem("taxiLanguage", language);
     updateLanguageUI();
-
     renderAll();
-
 }
-
 
 function updateLanguageUI() {
+    document.documentElement.lang = currentLanguage;
 
-    document.getElementById("langUk")
-        .classList.toggle(
-            "active",
-            currentLanguage === "uk"
-        );
+    document.getElementById("subtitle").textContent = t("subtitle");
+    document.getElementById("installTitle").textContent = t("installTitle");
+    document.getElementById("installText").textContent = t("installText");
 
-    document.getElementById("langPl")
-        .classList.toggle(
-            "active",
-            currentLanguage === "pl"
-        );
+    document.getElementById("ukBtn").classList.toggle(
+        "active",
+        currentLanguage === "uk"
+    );
 
+    document.getElementById("plBtn").classList.toggle(
+        "active",
+        currentLanguage === "pl"
+    );
 
-    document.getElementById("appSubtitle").textContent =
-        t("subtitle");
-
-    document.getElementById("installTitle").textContent =
-        t("installTitle");
-
-    document.getElementById("installText").textContent =
-        t("installText");
-
-
-    document.getElementById("labelDate").textContent =
-        t("date");
-
-    document.getElementById("labelStart").textContent =
-        t("start");
-
-    document.getElementById("labelEnd").textContent =
-        t("end");
-
-    document.getElementById("labelBreak").textContent =
-        t("break");
-
-    document.getElementById("labelUber").textContent =
-        "Uber, zł";
-
-    document.getElementById("labelBolt").textContent =
-        "Bolt, zł";
-
-    document.getElementById("labelOtherApps").textContent =
-        t("otherApps");
-
-    document.getElementById("labelCash").textContent =
-        t("cash");
-
-    document.getElementById("labelTips").textContent =
-        t("tips");
-
-    document.getElementById("labelFuel").textContent =
-        t("fuel");
-
-    document.getElementById("labelOtherExpenses").textContent =
-        t("otherExpenses");
-
-
-    document.getElementById("breakMinutes").placeholder =
-        t("breakPlaceholder");
-
-
-    document.getElementById("saveButton").textContent =
-        t("save");
-
-    document.getElementById("clearButton").textContent =
-        t("clear");
-
-
-    document.getElementById("totalStatsTitle").textContent =
-        t("totalStats");
-
-    document.getElementById("totalDaysTitle").textContent =
-        t("workDays");
-
-    document.getElementById("totalHoursTitle").textContent =
-        t("hours");
-
-    document.getElementById("totalIncomeTitle").textContent =
-        t("earned");
-
-    document.getElementById("totalCashTitle").textContent =
-        t("cash");
-
-    document.getElementById("totalProfitTitle").textContent =
-        t("clean");
-
-
-    document.getElementById("monthStatsTitle").textContent =
-        t("monthStats");
-
-    document.getElementById("monthFilterLabel").textContent =
-        t("chooseMonth");
-
-    document.getElementById("monthDaysTitle").textContent =
-        t("days");
-
-    document.getElementById("monthHoursTitle").textContent =
-        t("hours");
-
-    document.getElementById("monthIncomeTitle").textContent =
-        t("income");
-
-    document.getElementById("monthCashTitle").textContent =
-        t("cash");
-
-    document.getElementById("monthProfitTitle").textContent =
-        t("clean");
-
-
-    document.getElementById("historyTitle").textContent =
-        t("history");
-
-    document.getElementById("exportButton").textContent =
-        t("export");
-
+    document.querySelectorAll("[data-i18n]").forEach(el => {
+        el.textContent = t(el.dataset.i18n);
+    });
 
     document.getElementById("formTitle").textContent =
-        editingId
-            ? t("editDay")
-            : t("addDay");
+        editingId ? t("editDay") : t("newDay");
 
-
-    document.title =
-        "Taxi Manager";
-
+    updateAuthUI();
 }
 
 
-/* ===========================
-   ДАНІ
-=========================== */
+/* =========================================================
+   LOCAL DATA
+========================================================= */
 
-let entries =
-    JSON.parse(
-        localStorage.getItem("taxiEntries") || "[]"
-    );
+let entries = [];
+
+try {
+    entries = JSON.parse(localStorage.getItem("taxiEntries") || "[]");
+} catch {
+    entries = [];
+}
 
 let editingId = null;
+let currentUser = null;
+let syncRunning = false;
+
+let deletedClientIds = [];
+
+try {
+    deletedClientIds = JSON.parse(
+        localStorage.getItem("taxiDeletedIds") || "[]"
+    );
+} catch {
+    deletedClientIds = [];
+}
 
 
-/* ===========================
-   СТАРІ ЗАПИСИ
-=========================== */
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function makeClientId() {
+    if (window.crypto && crypto.randomUUID) {
+        return crypto.randomUUID();
+    }
+
+    return Date.now() + "-" + Math.random().toString(36).slice(2);
+}
+
+function saveLocal() {
+    localStorage.setItem("taxiEntries", JSON.stringify(entries));
+    localStorage.setItem(
+        "taxiDeletedIds",
+        JSON.stringify(deletedClientIds)
+    );
+}
+
+function numberValue(id) {
+    return Number(document.getElementById(id).value) || 0;
+}
+
+function timeToMinutes(time) {
+    if (!time) return 0;
+
+    const [hours, minutes] = time.split(":").map(Number);
+    return hours * 60 + minutes;
+}
+
+function calculateDuration(start, end) {
+    let startMinutes = timeToMinutes(start);
+    let endMinutes = timeToMinutes(end);
+
+    if (endMinutes < startMinutes) {
+        endMinutes += 24 * 60;
+    }
+
+    return Math.max(0, endMinutes - startMinutes);
+}
+
+function formatHours(minutes) {
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+
+    if (m === 0) {
+        return `${h} ${t("hour")}`;
+    }
+
+    return `${h} ${t("hour")} ${m} ${t("minute")}`;
+}
+
+function money(value) {
+    return Number(value || 0).toFixed(2);
+}
+
+function formatDate(date) {
+    if (!date) return "";
+
+    const parts = date.split("-");
+
+    if (parts.length !== 3) return date;
+
+    return `${parts[2]}.${parts[1]}.${parts[0]}`;
+}
+
+function setDefaultDate() {
+    const input = document.getElementById("date");
+
+    if (!input.value) {
+        const now = new Date();
+        const local = new Date(
+            now.getTime() - now.getTimezoneOffset() * 60000
+        );
+
+        input.value = local.toISOString().slice(0, 10);
+    }
+}
+
+
+/* =========================================================
+   MIGRATION OF OLD LOCAL DATA
+========================================================= */
 
 entries = entries.map(item => {
+    const clientId = item.clientId || makeClientId();
 
-    const uber =
-        Number(item.uber || 0);
+    const breakMinutes = Number(item.breakMinutes || 0);
+    const totalDuration = Number(
+        item.totalDuration ||
+        calculateDuration(item.startTime, item.endTime)
+    );
 
-    const bolt =
-        Number(item.bolt || 0);
+    const duration = Math.max(
+        0,
+        totalDuration - breakMinutes
+    );
 
-    const otherApps =
-        Number(item.otherApps || 0);
+    const uber = Number(item.uber || 0);
+    const bolt = Number(item.bolt || 0);
+    const otherApps = Number(item.otherApps || 0);
+    const tips = Number(item.tips || 0);
 
-    const tips =
-        Number(item.tips || 0);
+    const cash = Number(item.cash || 0);
 
-    const cash =
-        Number(item.cash || 0);
-
-    const fuel =
-        Number(item.fuel || 0);
-
-    const otherExpenses =
-        Number(item.otherExpenses || 0);
+    const fuel = Number(item.fuel || 0);
+    const otherExpenses = Number(item.otherExpenses || 0);
 
     const income =
         uber +
@@ -1407,9 +889,11 @@ entries = entries.map(item => {
         expenses;
 
     return {
-
         ...item,
-
+        clientId,
+        totalDuration,
+        breakMinutes,
+        duration,
         uber,
         bolt,
         otherApps,
@@ -1417,129 +901,474 @@ entries = entries.map(item => {
         tips,
         fuel,
         otherExpenses,
-
         income,
         expenses,
-        profit
-
+        profit,
+        updatedAt: item.updatedAt || Date.now()
     };
-
 });
 
-
-localStorage.setItem(
-    "taxiEntries",
-    JSON.stringify(entries)
-);
+saveLocal();
 
 
-/* ===========================
-   ДАТА
-=========================== */
+/* =========================================================
+   SUPABASE MAPPING
+========================================================= */
 
-function setDefaultDate() {
+function toCloudRow(entry) {
+    return {
+        user_id: currentUser.id,
+        client_id: String(entry.clientId),
 
-    const today =
-        new Date();
+        date: entry.date,
+        start_time: entry.startTime,
+        end_time: entry.endTime,
 
-    const date =
-        today.getFullYear() +
-        "-" +
-        String(
-            today.getMonth() + 1
-        ).padStart(2, "0") +
-        "-" +
-        String(
-            today.getDate()
-        ).padStart(2, "0");
+        total_duration: Number(entry.totalDuration || 0),
+        break_minutes: Number(entry.breakMinutes || 0),
+        duration: Number(entry.duration || 0),
 
+        uber: Number(entry.uber || 0),
+        bolt: Number(entry.bolt || 0),
+        other_apps: Number(entry.otherApps || 0),
+        cash: Number(entry.cash || 0),
+        tips: Number(entry.tips || 0),
 
-    document.getElementById("date").value =
-        date;
+        fuel: Number(entry.fuel || 0),
+        other_expenses: Number(entry.otherExpenses || 0),
 
-    document.getElementById("monthFilter").value =
-        date.substring(0, 7);
+        income: Number(entry.income || 0),
+        expenses: Number(entry.expenses || 0),
+        profit: Number(entry.profit || 0),
 
+        updated_at: new Date(
+            entry.updatedAt || Date.now()
+        ).toISOString()
+    };
+}
+
+function fromCloudRow(row) {
+    return {
+        id: row.client_id,
+        clientId: row.client_id,
+
+        date: row.date,
+        startTime: row.start_time,
+        endTime: row.end_time,
+
+        totalDuration: Number(row.total_duration || 0),
+        breakMinutes: Number(row.break_minutes || 0),
+        duration: Number(row.duration || 0),
+
+        uber: Number(row.uber || 0),
+        bolt: Number(row.bolt || 0),
+        otherApps: Number(row.other_apps || 0),
+        cash: Number(row.cash || 0),
+        tips: Number(row.tips || 0),
+
+        fuel: Number(row.fuel || 0),
+        otherExpenses: Number(row.other_expenses || 0),
+
+        income: Number(row.income || 0),
+        expenses: Number(row.expenses || 0),
+        profit: Number(row.profit || 0),
+
+        updatedAt:
+            new Date(row.updated_at).getTime() ||
+            Date.now()
+    };
 }
 
 
-/* ===========================
-   ЧАС
-=========================== */
+/* =========================================================
+   AUTH UI
+========================================================= */
 
-function timeToMinutes(time) {
+function updateAuthUI() {
+    const loggedOut = document.getElementById("authLoggedOut");
+    const loggedIn = document.getElementById("authLoggedIn");
+    const status = document.getElementById("accountStatus");
 
-    const parts =
-        time.split(":");
+    if (!loggedOut || !loggedIn) return;
 
-    return (
-        Number(parts[0]) * 60 +
-        Number(parts[1])
-    );
+    if (currentUser) {
+        loggedOut.classList.add("hidden");
+        loggedIn.classList.remove("hidden");
 
+        status.textContent =
+            t("loggedIn") +
+            (currentUser.email || "");
+    } else {
+        loggedOut.classList.remove("hidden");
+        loggedIn.classList.add("hidden");
+    }
+}
+
+function showAuthMessage(message, type = "success") {
+    const box = document.getElementById("authMessage");
+
+    box.textContent = message;
+    box.className = "message show " + type;
+}
+
+function showFormMessage(message, type = "success") {
+    const box = document.getElementById("formMessage");
+
+    box.textContent = message;
+    box.className = "message show " + type;
+
+    setTimeout(() => {
+        box.classList.remove("show");
+    }, 3000);
+}
+
+function setSyncStatus(message) {
+    document.getElementById("syncStatus").textContent =
+        message || "";
 }
 
 
-function calculateDuration(
-    start,
-    end
-) {
+/* =========================================================
+   AUTH
+========================================================= */
 
-    let difference =
-        timeToMinutes(end) -
-        timeToMinutes(start);
+function getRedirectUrl() {
+    return window.location.href.split("#")[0];
+}
 
-    if (difference < 0) {
-
-        difference +=
-            24 * 60;
-
+async function registerAccount() {
+    if (!supabaseClient) {
+        showAuthMessage(
+            "Supabase не завантажився. Перевір інтернет.",
+            "error"
+        );
+        return;
     }
 
-    return difference;
+    const email =
+        document.getElementById("authEmail").value.trim();
 
-}
+    const password =
+        document.getElementById("authPassword").value;
 
+    if (!email || !password) {
+        showAuthMessage(t("fillAuth"), "error");
+        return;
+    }
 
-function formatHours(minutes) {
+    if (password.length < 6) {
+        showAuthMessage(t("passwordShort"), "error");
+        return;
+    }
 
-    const hours =
-        Math.floor(
-            minutes / 60
+    showAuthMessage(t("syncing"), "success");
+
+    const { data, error } =
+        await supabaseClient.auth.signUp({
+            email,
+            password,
+            options: {
+                emailRedirectTo: getRedirectUrl()
+            }
+        });
+
+    if (error) {
+        showAuthMessage(error.message, "error");
+        return;
+    }
+
+    if (data.session && data.user) {
+        currentUser = data.user;
+
+        updateAuthUI();
+
+        showAuthMessage(
+            t("accountReady"),
+            "success"
         );
 
-    const mins =
-        minutes % 60;
+        await syncWithCloud(true);
+    } else {
+        showAuthMessage(
+            t("accountCreated"),
+            "success"
+        );
+    }
+}
 
+async function loginAccount() {
+    if (!supabaseClient) {
+        showAuthMessage(
+            "Supabase не завантажився. Перевір інтернет.",
+            "error"
+        );
+        return;
+    }
 
-    return (
-        `${hours} ${t("hour")} ${mins} ${t("minutes")}`
+    const email =
+        document.getElementById("authEmail").value.trim();
+
+    const password =
+        document.getElementById("authPassword").value;
+
+    if (!email || !password) {
+        showAuthMessage(t("fillAuth"), "error");
+        return;
+    }
+
+    showAuthMessage(t("syncing"), "success");
+
+    const { data, error } =
+        await supabaseClient.auth.signInWithPassword({
+            email,
+            password
+        });
+
+    if (error) {
+        showAuthMessage(
+            t("wrongCredentials"),
+            "error"
+        );
+        return;
+    }
+
+    currentUser = data.user;
+
+    updateAuthUI();
+
+    showAuthMessage(
+        t("loginSuccess"),
+        "success"
     );
 
+    await syncWithCloud(true);
+}
+
+async function logoutAccount() {
+    if (!supabaseClient) return;
+
+    const { error } =
+        await supabaseClient.auth.signOut();
+
+    if (error) {
+        showAuthMessage(error.message, "error");
+        return;
+    }
+
+    currentUser = null;
+
+    updateAuthUI();
+
+    setSyncStatus("");
+
+    showAuthMessage(
+        t("logoutSuccess"),
+        "success"
+    );
 }
 
 
-/* ===========================
-   INPUT
-=========================== */
+/* =========================================================
+   CLOUD SYNC
+========================================================= */
 
-function numberValue(id) {
+async function syncEntryToCloud(entry) {
+    if (!currentUser || !supabaseClient) return;
 
-    return (
-        Number(
-            document.getElementById(id).value
-        ) || 0
-    );
+    const { error } =
+        await supabaseClient
+            .from("work_entries")
+            .upsert(
+                toCloudRow(entry),
+                {
+                    onConflict: "user_id,client_id"
+                }
+            );
 
+    if (error) {
+        throw error;
+    }
+}
+
+async function deleteEntryFromCloud(clientId) {
+    if (!currentUser || !supabaseClient) return;
+
+    const { error } =
+        await supabaseClient
+            .from("work_entries")
+            .delete()
+            .eq("user_id", currentUser.id)
+            .eq("client_id", String(clientId));
+
+    if (error) {
+        throw error;
+    }
+}
+
+async function syncDeletedItems() {
+    if (!currentUser || !supabaseClient) return;
+
+    if (!deletedClientIds.length) return;
+
+    const copy = [...deletedClientIds];
+
+    for (const clientId of copy) {
+        try {
+            await deleteEntryFromCloud(clientId);
+
+            deletedClientIds =
+                deletedClientIds.filter(
+                    id => String(id) !== String(clientId)
+                );
+
+            saveLocal();
+        } catch (error) {
+            console.error(error);
+        }
+    }
+}
+
+async function syncWithCloud(showMessageAfter = false) {
+    if (!currentUser || !supabaseClient) {
+        return;
+    }
+
+    if (syncRunning) return;
+
+    if (!navigator.onLine) {
+        setSyncStatus(t("offline"));
+        return;
+    }
+
+    syncRunning = true;
+
+    setSyncStatus(t("syncing"));
+
+    try {
+        /* First remove cloud records that were deleted locally */
+        await syncDeletedItems();
+
+        const { data: cloudRows, error } =
+            await supabaseClient
+                .from("work_entries")
+                .select("*")
+                .eq("user_id", currentUser.id);
+
+        if (error) {
+            throw error;
+        }
+
+        const cloudEntries =
+            (cloudRows || []).map(fromCloudRow);
+
+        const localMap = new Map();
+
+        entries.forEach(entry => {
+            localMap.set(
+                String(entry.clientId),
+                entry
+            );
+        });
+
+        const cloudMap = new Map();
+
+        cloudEntries.forEach(entry => {
+            cloudMap.set(
+                String(entry.clientId),
+                entry
+            );
+        });
+
+        const mergedMap = new Map();
+
+        /* Local entries */
+        localMap.forEach((local, clientId) => {
+            const cloud = cloudMap.get(clientId);
+
+            if (!cloud) {
+                mergedMap.set(clientId, local);
+                return;
+            }
+
+            const localTime =
+                Number(local.updatedAt || 0);
+
+            const cloudTime =
+                Number(cloud.updatedAt || 0);
+
+            if (cloudTime > localTime) {
+                mergedMap.set(clientId, cloud);
+            } else {
+                mergedMap.set(clientId, local);
+            }
+        });
+
+        /* Cloud-only entries */
+        cloudMap.forEach((cloud, clientId) => {
+            if (!mergedMap.has(clientId)) {
+                mergedMap.set(clientId, cloud);
+            }
+        });
+
+        entries = Array.from(mergedMap.values());
+
+        saveLocal();
+
+        /*
+         * Upload the merged list.
+         * This also uploads local data on first login.
+         */
+        for (const entry of entries) {
+            await syncEntryToCloud(entry);
+        }
+
+        renderAll();
+
+        setSyncStatus(t("syncDone"));
+
+        if (showMessageAfter) {
+            if (cloudEntries.length > 0) {
+                showAuthMessage(
+                    t("cloudLoaded"),
+                    "success"
+                );
+            } else if (entries.length > 0) {
+                showAuthMessage(
+                    t("localUploaded"),
+                    "success"
+                );
+            } else {
+                showAuthMessage(
+                    t("syncDone"),
+                    "success"
+                );
+            }
+        }
+
+    } catch (error) {
+        console.error("Cloud sync error:", error);
+
+        setSyncStatus(
+            t("syncError") + error.message
+        );
+
+        if (showMessageAfter) {
+            showAuthMessage(
+                t("syncError") + error.message,
+                "error"
+            );
+        }
+    } finally {
+        syncRunning = false;
+    }
 }
 
 
-/* ===========================
-   ЗБЕРЕЖЕННЯ
-=========================== */
+/* =========================================================
+   SAVE ENTRY
+========================================================= */
 
-function saveEntry() {
-
+async function saveEntry() {
     const date =
         document.getElementById("date").value;
 
@@ -1549,35 +1378,21 @@ function saveEntry() {
     const endTime =
         document.getElementById("endTime").value;
 
-
-    if (
-        !date ||
-        !startTime ||
-        !endTime
-    ) {
-
-        showMessage(
-            t("required"),
-            true
-        );
-
-        return;
-
-    }
-
-
     const breakMinutes =
         Math.max(
             0,
-            Math.floor(
-                Number(
-                    document.getElementById(
-                        "breakMinutes"
-                    ).value
-                ) || 0
-            )
+            Number(
+                document.getElementById("breakMinutes").value
+            ) || 0
         );
 
+    if (!date || !startTime || !endTime) {
+        showFormMessage(
+            t("emptyFields"),
+            "error"
+        );
+        return;
+    }
 
     const totalDuration =
         calculateDuration(
@@ -1585,767 +1400,588 @@ function saveEntry() {
             endTime
         );
 
-
-    if (
-        breakMinutes > totalDuration
-    ) {
-
-        showMessage(
-            t("breakError"),
-            true
+    const duration =
+        Math.max(
+            0,
+            totalDuration - breakMinutes
         );
 
-        return;
+    const uber = numberValue("uber");
+    const bolt = numberValue("bolt");
+    const otherApps = numberValue("otherApps");
+    const cash = numberValue("cash");
+    const tips = numberValue("tips");
 
-    }
-
-
-    const duration =
-        totalDuration -
-        breakMinutes;
-
-
-    const uber =
-        numberValue("uber");
-
-    const bolt =
-        numberValue("bolt");
-
-    const otherApps =
-        numberValue("otherApps");
-
-    const cash =
-        numberValue("cash");
-
-    const tips =
-        numberValue("tips");
-
-    const fuel =
-        numberValue("fuel");
-
+    const fuel = numberValue("fuel");
     const otherExpenses =
         numberValue("otherExpenses");
 
-
-    /* Готівка НЕ входить у дохід */
-
+    /*
+     * Cash is NOT included in income.
+     */
     const income =
         uber +
         bolt +
         otherApps +
         tips;
 
-
     const expenses =
         fuel +
         otherExpenses;
-
 
     const profit =
         income -
         expenses;
 
-
-    const entry = {
-
-        id:
-            editingId ||
-            Date.now(),
-
-        date,
-        startTime,
-        endTime,
-
-        totalDuration,
-        breakMinutes,
-        duration,
-
-        uber,
-        bolt,
-        otherApps,
-        cash,
-        tips,
-
-        fuel,
-        otherExpenses,
-
-        income,
-        expenses,
-        profit
-
-    };
-
+    let entry;
 
     if (editingId) {
-
-        entries =
-            entries.map(
+        const oldEntry =
+            entries.find(
                 item =>
-                    item.id === editingId
-                        ? entry
-                        : item
+                    String(item.clientId) ===
+                    String(editingId)
             );
 
-        editingId = null;
+        if (!oldEntry) {
+            editingId = null;
+            return;
+        }
+
+        entry = {
+            ...oldEntry,
+
+            date,
+            startTime,
+            endTime,
+
+            totalDuration,
+            breakMinutes,
+            duration,
+
+            uber,
+            bolt,
+            otherApps,
+            cash,
+            tips,
+
+            fuel,
+            otherExpenses,
+
+            income,
+            expenses,
+            profit,
+
+            updatedAt: Date.now()
+        };
+
+        entries = entries.map(item =>
+            String(item.clientId) ===
+            String(editingId)
+                ? entry
+                : item
+        );
 
     } else {
+        entry = {
+            id: Date.now(),
+            clientId: makeClientId(),
+
+            date,
+            startTime,
+            endTime,
+
+            totalDuration,
+            breakMinutes,
+            duration,
+
+            uber,
+            bolt,
+            otherApps,
+            cash,
+            tips,
+
+            fuel,
+            otherExpenses,
+
+            income,
+            expenses,
+            profit,
+
+            updatedAt: Date.now()
+        };
 
         entries.push(entry);
-
     }
 
-
-    localStorage.setItem(
-        "taxiEntries",
-        JSON.stringify(entries)
-    );
-
-
-    clearForm();
+    saveLocal();
 
     renderAll();
 
+    clearForm();
 
-    showMessage(
-        t("saved")
+    showFormMessage(
+        t("saveSuccess"),
+        "success"
     );
 
+    /*
+     * Sync immediately if logged in.
+     * If offline, local data remains safe and
+     * will synchronize when connection returns.
+     */
+    if (currentUser && navigator.onLine) {
+        try {
+            await syncEntryToCloud(entry);
+            setSyncStatus(t("syncDone"));
+        } catch (error) {
+            console.error(error);
+
+            setSyncStatus(
+                t("syncError") + error.message
+            );
+        }
+    } else if (currentUser) {
+        setSyncStatus(t("offline"));
+    }
 }
 
 
-/* ===========================
-   ОЧИСТКА
-=========================== */
+/* =========================================================
+   CLEAR FORM
+========================================================= */
 
 function clearForm() {
-
-    const fields = [
-
-        "startTime",
-        "endTime",
-        "breakMinutes",
-
-        "uber",
-        "bolt",
-        "otherApps",
-        "cash",
-        "tips",
-
-        "fuel",
-        "otherExpenses"
-
-    ];
-
-
-    fields.forEach(
-        id =>
-            document.getElementById(id).value = ""
-    );
-
-
     editingId = null;
 
+    document.getElementById("date").value = "";
+    document.getElementById("startTime").value = "";
+    document.getElementById("endTime").value = "";
+    document.getElementById("breakMinutes").value = "0";
 
-    document.getElementById(
-        "formTitle"
-    ).textContent =
-        t("addDay");
+    document.getElementById("uber").value = "";
+    document.getElementById("bolt").value = "";
+    document.getElementById("otherApps").value = "";
+    document.getElementById("cash").value = "";
+    document.getElementById("tips").value = "";
 
+    document.getElementById("fuel").value = "";
+    document.getElementById("otherExpenses").value = "";
+
+    document.getElementById("formTitle").textContent =
+        t("newDay");
+
+    setDefaultDate();
 }
 
 
-/* ===========================
-   ПОВІДОМЛЕННЯ
-=========================== */
+/* =========================================================
+   EDIT
+========================================================= */
 
-function showMessage(
-    text,
-    error = false
-) {
+function editEntry(clientId) {
+    const entry =
+        entries.find(
+            item =>
+                String(item.clientId) ===
+                String(clientId)
+        );
 
-    const element =
-        document.getElementById("message");
+    if (!entry) return;
 
-    element.textContent =
-        text;
+    editingId = entry.clientId;
 
-    element.className =
-        error
-            ? "message negative"
-            : "message positive";
+    document.getElementById("date").value =
+        entry.date || "";
 
+    document.getElementById("startTime").value =
+        entry.startTime || "";
 
-    setTimeout(() => {
+    document.getElementById("endTime").value =
+        entry.endTime || "";
 
-        element.textContent = "";
+    document.getElementById("breakMinutes").value =
+        entry.breakMinutes || 0;
 
-    }, 3000);
+    document.getElementById("uber").value =
+        entry.uber || "";
 
+    document.getElementById("bolt").value =
+        entry.bolt || "";
+
+    document.getElementById("otherApps").value =
+        entry.otherApps || "";
+
+    document.getElementById("cash").value =
+        entry.cash || "";
+
+    document.getElementById("tips").value =
+        entry.tips || "";
+
+    document.getElementById("fuel").value =
+        entry.fuel || "";
+
+    document.getElementById("otherExpenses").value =
+        entry.otherExpenses || "";
+
+    document.getElementById("formTitle").textContent =
+        t("editDay");
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
 }
 
 
-/* ===========================
-   ЗАГАЛЬНА СТАТИСТИКА
-=========================== */
+/* =========================================================
+   DELETE
+========================================================= */
+
+async function deleteEntry(clientId) {
+    if (!confirm(t("deleteConfirm"))) {
+        return;
+    }
+
+    const entry =
+        entries.find(
+            item =>
+                String(item.clientId) ===
+                String(clientId)
+        );
+
+    if (!entry) return;
+
+    entries =
+        entries.filter(
+            item =>
+                String(item.clientId) !==
+                String(clientId)
+        );
+
+    saveLocal();
+
+    renderAll();
+
+    showFormMessage(
+        t("deleteSuccess"),
+        "success"
+    );
+
+    if (currentUser) {
+        if (navigator.onLine) {
+            try {
+                await deleteEntryFromCloud(
+                    entry.clientId
+                );
+
+                setSyncStatus(t("syncDone"));
+
+            } catch (error) {
+                console.error(error);
+
+                if (
+                    !deletedClientIds.includes(
+                        entry.clientId
+                    )
+                ) {
+                    deletedClientIds.push(
+                        entry.clientId
+                    );
+
+                    saveLocal();
+                }
+
+                setSyncStatus(
+                    t("syncError") +
+                    error.message
+                );
+            }
+        } else {
+            if (
+                !deletedClientIds.includes(
+                    entry.clientId
+                )
+            ) {
+                deletedClientIds.push(
+                    entry.clientId
+                );
+            }
+
+            saveLocal();
+
+            setSyncStatus(t("offline"));
+        }
+    }
+}
+
+
+/* =========================================================
+   STATISTICS
+========================================================= */
 
 function renderTotalStats() {
+    const totalDays = entries.length;
 
     const totalMinutes =
         entries.reduce(
             (sum, item) =>
                 sum +
-                Number(
-                    item.duration || 0
-                ),
+                Number(item.duration || 0),
             0
         );
-
 
     const totalIncome =
         entries.reduce(
             (sum, item) =>
                 sum +
-                Number(
-                    item.income || 0
-                ),
+                Number(item.income || 0),
             0
         );
-
 
     const totalCash =
         entries.reduce(
             (sum, item) =>
                 sum +
-                Number(
-                    item.cash || 0
-                ),
+                Number(item.cash || 0),
             0
         );
-
 
     const totalProfit =
         entries.reduce(
             (sum, item) =>
                 sum +
-                Number(
-                    item.profit || 0
-                ),
+                Number(item.profit || 0),
             0
         );
 
+    document.getElementById("totalDays").textContent =
+        totalDays;
 
-    document.getElementById(
-        "totalDays"
-    ).textContent =
-        entries.length;
+    document.getElementById("totalHours").textContent =
+        formatHours(totalMinutes);
 
-
-    document.getElementById(
-        "totalHours"
-    ).textContent =
-        formatHours(
-            totalMinutes
-        );
-
-
-    document.getElementById(
-        "totalIncome"
-    ).textContent =
+    document.getElementById("totalIncome").textContent =
         money(totalIncome);
 
-
-    document.getElementById(
-        "totalCash"
-    ).textContent =
+    document.getElementById("totalCash").textContent =
         money(totalCash);
 
-
-    document.getElementById(
-        "totalProfit"
-    ).textContent =
+    document.getElementById("totalProfit").textContent =
         money(totalProfit);
-
 }
 
-
-/* ===========================
-   МІСЯЦЬ
-=========================== */
-
 function renderMonthStats() {
+    const now = new Date();
 
-    const selectedMonth =
-        document.getElementById(
-            "monthFilter"
-        ).value;
+    const year =
+        now.getFullYear();
 
+    const month =
+        String(now.getMonth() + 1)
+            .padStart(2, "0");
+
+    const prefix =
+        `${year}-${month}`;
 
     const monthEntries =
         entries.filter(
             item =>
-                item.date.startsWith(
-                    selectedMonth
-                )
+                String(item.date || "")
+                    .startsWith(prefix)
         );
 
+    const days =
+        monthEntries.length;
 
     const minutes =
         monthEntries.reduce(
             (sum, item) =>
                 sum +
-                Number(
-                    item.duration || 0
-                ),
+                Number(item.duration || 0),
             0
         );
-
 
     const income =
         monthEntries.reduce(
             (sum, item) =>
                 sum +
-                Number(
-                    item.income || 0
-                ),
+                Number(item.income || 0),
             0
         );
-
 
     const cash =
         monthEntries.reduce(
             (sum, item) =>
                 sum +
-                Number(
-                    item.cash || 0
-                ),
+                Number(item.cash || 0),
             0
         );
-
 
     const profit =
         monthEntries.reduce(
             (sum, item) =>
                 sum +
-                Number(
-                    item.profit || 0
-                ),
+                Number(item.profit || 0),
             0
         );
 
+    document.getElementById("monthDays").textContent =
+        days;
 
-    document.getElementById(
-        "monthDays"
-    ).textContent =
-        monthEntries.length;
-
-
-    document.getElementById(
-        "monthHours"
-    ).textContent =
+    document.getElementById("monthHours").textContent =
         formatHours(minutes);
 
-
-    document.getElementById(
-        "monthIncome"
-    ).textContent =
+    document.getElementById("monthIncome").textContent =
         money(income);
 
-
-    document.getElementById(
-        "monthCash"
-    ).textContent =
+    document.getElementById("monthCash").textContent =
         money(cash);
 
-
-    document.getElementById(
-        "monthProfit"
-    ).textContent =
+    document.getElementById("monthProfit").textContent =
         money(profit);
-
 }
 
 
-/* ===========================
-   ІСТОРІЯ
-=========================== */
+/* =========================================================
+   HISTORY
+========================================================= */
 
 function renderEntries() {
-
     const container =
-        document.getElementById(
-            "entriesList"
-        );
+        document.getElementById("entriesList");
 
-
-    if (entries.length === 0) {
-
+    if (!entries.length) {
         container.innerHTML =
-            `
-            <div class="empty">
-                ${t("empty")}
-            </div>
-            `;
+            `<div class="empty">${t("noEntries")}</div>`;
 
         return;
-
     }
-
 
     const sorted =
         [...entries].sort(
             (a, b) =>
-                new Date(b.date) -
-                new Date(a.date)
+                String(b.date).localeCompare(
+                    String(a.date)
+                )
         );
-
 
     container.innerHTML =
-        sorted.map(item => `
+        sorted.map(item => {
 
-        <div class="entry">
+            const rate =
+                item.duration > 0
+                    ? item.profit /
+                      (item.duration / 60)
+                    : 0;
 
-            <div class="entry-title">
+            return `
+                <div class="history-item">
 
-                ${formatDate(item.date)}
+                    <div class="history-top">
+                        <div>
+                            <div class="history-date">
+                                ${formatDate(item.date)}
+                            </div>
 
-            </div>
+                            <div style="font-size:13px;color:#6b7280;margin-top:3px;">
+                                ${item.startTime} – ${item.endTime}
+                            </div>
+                        </div>
 
+                        <strong>
+                            ${money(item.profit)}
+                        </strong>
+                    </div>
 
-            <div class="entry-details">
+                    <div class="history-main">
 
-                ⏰
-                ${item.startTime}
-                —
-                ${item.endTime}
+                        <div>
+                            ⏱️ ${formatHours(
+                                Number(item.duration || 0)
+                            )}
+                        </div>
 
-                <br>
+                        <div>
+                            💰 ${t("income")}:
+                            ${money(item.income)}
+                        </div>
 
-                ⏱️
-                ${t("workTime")}:
-                ${formatHours(
-                    Number(item.duration || 0)
-                )}
+                        <div>
+                            💵 ${t("cash")}:
+                            ${money(item.cash)}
+                        </div>
 
-                <br>
+                        <div>
+                            ⛽ ${t("fuel")}:
+                            ${money(item.fuel)}
+                        </div>
 
-                🍽️
-                ${t("breakHistory")}:
-                ${Number(
-                    item.breakMinutes || 0
-                )} ${t("minutes")}
+                        <div>
+                            💸 ${t("otherExpenses")}:
+                            ${money(item.otherExpenses)}
+                        </div>
 
-                <br>
+                        <div>
+                            📈 ${money(rate)}/h
+                        </div>
 
-                💰 ${t("income")}:
-                ${money(item.income)}
+                    </div>
 
-                <br>
+                    <div class="history-actions">
 
-                💵 ${t("cash")}:
-                ${money(item.cash)}
+                        <button
+                            class="secondary small-button"
+                            onclick="editEntry('${String(item.clientId)}')">
+                            ✏️ ${t("edit")}
+                        </button>
 
-                <br>
+                        <button
+                            class="danger small-button"
+                            onclick="deleteEntry('${String(item.clientId)}')">
+                            🗑️ ${t("delete")}
+                        </button>
 
-                💸 ${t("expenses")}:
-                ${money(item.expenses)}
+                    </div>
 
-                <br>
-
-                <strong>
-                    🟢 ${t("clean")}:
-                    ${money(item.profit)}
-                </strong>
-
-                <br>
-
-                📊
-                ${hourlyRate(item)}
-                ${t("hourlyRate")}
-
-                <br><br>
-
-                Uber:
-                ${money(item.uber)}
-
-                · Bolt:
-                ${money(item.bolt)}
-
-                · ${t("other")}:
-                ${money(item.otherApps)}
-
-                <br>
-
-                ${t("cash")}:
-                ${money(item.cash)}
-
-                · ${t("tips")}:
-                ${money(item.tips)}
-
-                <br>
-
-                ${t("fuel")}:
-                ${money(item.fuel)}
-
-                · ${t("otherExpenses")}:
-                ${money(item.otherExpenses)}
-
-            </div>
-
-
-            <div class="entry-buttons">
-
-                <button
-                    class="secondary"
-                    onclick="editEntry(${item.id})">
-
-                    ${t("edit")}
-
-                </button>
-
-
-                <button
-                    class="danger"
-                    onclick="deleteEntry(${item.id})">
-
-                    ${t("delete")}
-
-                </button>
-
-            </div>
-
-        </div>
-
-        `).join("");
-
+                </div>
+            `;
+        }).join("");
 }
 
 
-/* ===========================
-   ГОДИННА СТАВКА
-=========================== */
-
-function hourlyRate(item) {
-
-    const duration =
-        Number(
-            item.duration || 0
-        );
-
-
-    if (
-        duration === 0
-    ) {
-
-        return "0.00";
-
-    }
-
-
-    return (
-        Number(
-            item.profit || 0
-        ) /
-        (duration / 60)
-    ).toFixed(2);
-
-}
-
-
-/* ===========================
-   РЕДАГУВАННЯ
-=========================== */
-
-function editEntry(id) {
-
-    const item =
-        entries.find(
-            entry =>
-                entry.id === id
-        );
-
-
-    if (!item) return;
-
-
-    document.getElementById("date").value =
-        item.date;
-
-    document.getElementById("startTime").value =
-        item.startTime;
-
-    document.getElementById("endTime").value =
-        item.endTime;
-
-    document.getElementById("breakMinutes").value =
-        item.breakMinutes || 0;
-
-    document.getElementById("uber").value =
-        item.uber || 0;
-
-    document.getElementById("bolt").value =
-        item.bolt || 0;
-
-    document.getElementById("otherApps").value =
-        item.otherApps || 0;
-
-    document.getElementById("cash").value =
-        item.cash || 0;
-
-    document.getElementById("tips").value =
-        item.tips || 0;
-
-    document.getElementById("fuel").value =
-        item.fuel || 0;
-
-    document.getElementById("otherExpenses").value =
-        item.otherExpenses || 0;
-
-
-    editingId =
-        id;
-
-
-    document.getElementById(
-        "formTitle"
-    ).textContent =
-        t("editDay");
-
-
-    window.scrollTo({
-
-        top: 0,
-        behavior: "smooth"
-
-    });
-
-}
-
-
-/* ===========================
-   ВИДАЛЕННЯ
-=========================== */
-
-function deleteEntry(id) {
-
-    const confirmed =
-        confirm(
-            t("confirmDelete")
-        );
-
-
-    if (!confirmed) return;
-
-
-    entries =
-        entries.filter(
-            item =>
-                item.id !== id
-        );
-
-
-    localStorage.setItem(
-        "taxiEntries",
-        JSON.stringify(entries)
-    );
-
-
-    renderAll();
-
-}
-
-
-/* ===========================
-   ГРОШІ
-=========================== */
-
-function money(value) {
-
-    return (
-        Number(value)
-            .toFixed(2)
-            .replace(".", ",") +
-        t("moneySuffix")
-    );
-
-}
-
-
-/* ===========================
-   ДАТА
-=========================== */
-
-function formatDate(
-    dateString
-) {
-
-    const parts =
-        dateString.split("-");
-
-
-    return (
-        `${parts[2]}.${parts[1]}.${parts[0]}`
-    );
-
-}
-
-
-/* ===========================
+/* =========================================================
    CSV
-=========================== */
+========================================================= */
 
 function exportCSV() {
+    const headers = [
+        "Date",
+        "Start",
+        "End",
+        "Total minutes",
+        "Break minutes",
+        "Worked minutes",
+        "Uber",
+        "Bolt",
+        "Other apps",
+        "Cash",
+        "Tips",
+        "Fuel",
+        "Other expenses",
+        "Income",
+        "Expenses",
+        "Profit"
+    ];
 
-    if (
-        entries.length === 0
-    ) {
-
-        alert(
-            t("noExport")
-        );
-
-        return;
-
-    }
-
-
-    let csv =
-        [
-            t("csvDate"),
-            t("csvStart"),
-            t("csvEnd"),
-            t("csvHours"),
-            t("csvBreak"),
-            "Uber",
-            "Bolt",
-            t("csvOtherApps"),
-            t("csvCash"),
-            t("csvTips"),
-            t("csvFuel"),
-            t("csvOtherExpenses"),
-            t("csvIncome"),
-            t("csvExpenses"),
-            t("csvProfit")
-        ].join(";") + "\n";
-
-
-    entries.forEach(item => {
-
-        csv += [
-
+    const rows =
+        entries.map(item => [
             item.date,
             item.startTime,
             item.endTime,
-
-            formatHours(
-                Number(
-                    item.duration || 0
-                )
-            ),
-
-            Number(
-                item.breakMinutes || 0
-            ),
-
+            item.totalDuration,
+            item.breakMinutes,
+            item.duration,
             item.uber,
             item.bolt,
             item.otherApps,
@@ -2356,64 +1992,138 @@ function exportCSV() {
             item.income,
             item.expenses,
             item.profit
+        ]);
 
-        ].join(";") + "\n";
+    const csv =
+        [headers, ...rows]
+            .map(row =>
+                row.map(value => {
+                    const text =
+                        String(value ?? "");
 
-    });
-
+                    return `"${text.replace(
+                        /"/g,
+                        '""'
+                    )}"`;
+                }).join(",")
+            )
+            .join("\n");
 
     const blob =
         new Blob(
-            ["\ufeff" + csv],
+            ["\uFEFF" + csv],
             {
-                type:
-                    "text/csv;charset=utf-8;"
+                type: "text/csv;charset=utf-8;"
             }
         );
-
 
     const url =
         URL.createObjectURL(blob);
 
-
-    const link =
+    const a =
         document.createElement("a");
 
+    a.href = url;
 
-    link.href =
-        url;
+    a.download =
+        `taxi-manager-${new Date()
+            .toISOString()
+            .slice(0,10)}.csv`;
 
+    document.body.appendChild(a);
 
-    link.download =
-        "taxi-manager.csv";
+    a.click();
 
-
-    link.click();
-
+    a.remove();
 
     URL.revokeObjectURL(url);
-
 }
 
 
-/* ===========================
-   ОНОВЛЕННЯ
-=========================== */
+/* =========================================================
+   RENDER
+========================================================= */
 
 function renderAll() {
+    updateLanguageUI();
 
     renderTotalStats();
-
     renderMonthStats();
-
     renderEntries();
-
 }
 
 
-/* ===========================
-   ЗАПУСК
-=========================== */
+/* =========================================================
+   AUTH INITIALIZATION
+========================================================= */
+
+async function initAuth() {
+    if (!supabaseClient) {
+        updateAuthUI();
+        return;
+    }
+
+    const {
+        data
+    } = await supabaseClient.auth.getSession();
+
+    currentUser =
+        data.session?.user || null;
+
+    updateAuthUI();
+
+    if (currentUser) {
+        setTimeout(
+            () => syncWithCloud(false),
+            0
+        );
+    }
+
+    supabaseClient.auth.onAuthStateChange(
+        (event, session) => {
+
+            currentUser =
+                session?.user || null;
+
+            updateAuthUI();
+
+            if (session?.user) {
+                setTimeout(
+                    () => syncWithCloud(false),
+                    0
+                );
+            }
+        }
+    );
+}
+
+
+/* =========================================================
+   ONLINE / OFFLINE
+========================================================= */
+
+window.addEventListener(
+    "online",
+    () => {
+        if (currentUser) {
+            syncWithCloud(false);
+        }
+    }
+);
+
+window.addEventListener(
+    "offline",
+    () => {
+        if (currentUser) {
+            setSyncStatus(t("offline"));
+        }
+    }
+);
+
+
+/* =========================================================
+   START
+========================================================= */
 
 setDefaultDate();
 
@@ -2421,34 +2131,28 @@ updateLanguageUI();
 
 renderAll();
 
+initAuth();
 
-/* ===========================
-   OFFLINE PWA
-=========================== */
 
-if (
-    "serviceWorker" in navigator
-) {
+/* =========================================================
+   SERVICE WORKER
+========================================================= */
 
+if ("serviceWorker" in navigator) {
     window.addEventListener(
         "load",
         () => {
-
             navigator.serviceWorker
-                .register("sw.js")
-                .catch(
-                    error =>
-                        console.log(
-                            "Service Worker:",
-                            error
-                        )
+                .register("./sw.js")
+                .catch(error =>
+                    console.log(
+                        "Service Worker:",
+                        error
+                    )
                 );
-
         }
     );
-
 }
-
 </script>
 
 </body>
