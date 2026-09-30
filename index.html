@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="uk">
 <head>
@@ -402,6 +403,25 @@
                 <input
                     type="time"
                     id="endTime">
+
+            </div>
+
+
+            <!-- НОВЕ ПОЛЕ ПЕРЕРВИ -->
+
+            <div class="field">
+
+                <label>
+                    🍽️ Перерва, хв
+                </label>
+
+                <input
+                    type="number"
+                    id="breakMinutes"
+                    min="0"
+                    step="1"
+                    inputmode="numeric"
+                    placeholder="Наприклад: 45">
 
             </div>
 
@@ -877,11 +897,64 @@ function saveEntry() {
     }
 
 
-    const duration =
+    /*
+       ПЕРЕРВА
+
+       Наприклад:
+       45 = 45 хвилин
+       60 = 1 година
+       90 = 1 година 30 хв
+    */
+
+    const breakMinutes =
+        Math.max(
+            0,
+            Math.floor(
+                Number(
+                    document.getElementById(
+                        "breakMinutes"
+                    ).value
+                ) || 0
+            )
+        );
+
+
+    /*
+       Загальна тривалість
+       від початку до кінця
+    */
+
+    const totalDuration =
         calculateDuration(
             startTime,
             endTime
         );
+
+
+    /*
+       Перевірка перерви
+    */
+
+    if (
+        breakMinutes > totalDuration
+    ) {
+
+        showMessage(
+            "Перерва не може бути довшою за робочий час.",
+            true
+        );
+
+        return;
+    }
+
+
+    /*
+       Чистий робочий час
+    */
+
+    const duration =
+        totalDuration -
+        breakMinutes;
 
 
     const uber =
@@ -935,6 +1008,22 @@ function saveEntry() {
         startTime,
 
         endTime,
+
+        /*
+           Повний час зміни
+        */
+
+        totalDuration,
+
+        /*
+           Час перерви
+        */
+
+        breakMinutes,
+
+        /*
+           Фактичний робочий час
+        */
 
         duration,
 
@@ -1006,6 +1095,13 @@ function clearForm() {
 
         "startTime",
         "endTime",
+
+        /*
+           НОВЕ ПОЛЕ
+        */
+
+        "breakMinutes",
+
         "uber",
         "bolt",
         "otherApps",
@@ -1075,7 +1171,7 @@ function renderTotalStats() {
     const totalMinutes =
         entries.reduce(
             (sum, item) =>
-                sum + item.duration,
+                sum + Number(item.duration || 0),
             0
         );
 
@@ -1083,7 +1179,7 @@ function renderTotalStats() {
     const totalIncome =
         entries.reduce(
             (sum, item) =>
-                sum + item.income,
+                sum + Number(item.income || 0),
             0
         );
 
@@ -1091,7 +1187,7 @@ function renderTotalStats() {
     const totalProfit =
         entries.reduce(
             (sum, item) =>
-                sum + item.profit,
+                sum + Number(item.profit || 0),
             0
         );
 
@@ -1145,7 +1241,7 @@ function renderMonthStats() {
     const minutes =
         monthEntries.reduce(
             (sum, item) =>
-                sum + item.duration,
+                sum + Number(item.duration || 0),
             0
         );
 
@@ -1153,7 +1249,7 @@ function renderMonthStats() {
     const income =
         monthEntries.reduce(
             (sum, item) =>
-                sum + item.income,
+                sum + Number(item.income || 0),
             0
         );
 
@@ -1161,7 +1257,7 @@ function renderMonthStats() {
     const profit =
         monthEntries.reduce(
             (sum, item) =>
-                sum + item.profit,
+                sum + Number(item.profit || 0),
             0
         );
 
@@ -1246,7 +1342,18 @@ function renderEntries() {
                 <br>
 
                 ⏱️
-                ${formatHours(item.duration)}
+                Робочий час:
+                ${formatHours(
+                    Number(item.duration || 0)
+                )}
+
+                <br>
+
+                🍽️
+                Перерва:
+                ${Number(
+                    item.breakMinutes || 0
+                )} хв
 
                 <br>
 
@@ -1334,8 +1441,12 @@ function renderEntries() {
 
 function hourlyRate(item) {
 
+    const duration =
+        Number(item.duration || 0);
+
+
     if (
-        item.duration === 0
+        duration === 0
     ) {
 
         return "0.00";
@@ -1344,8 +1455,8 @@ function hourlyRate(item) {
 
 
     return (
-        item.profit /
-        (item.duration / 60)
+        Number(item.profit || 0) /
+        (duration / 60)
     ).toFixed(2);
 }
 
@@ -1382,6 +1493,20 @@ function editEntry(id) {
         "endTime"
     ).value =
         item.endTime;
+
+
+    /*
+       Завантаження перерви.
+
+       Старі записи, створені
+       до додавання цієї функції,
+       автоматично отримають 0 хв.
+    */
+
+    document.getElementById(
+        "breakMinutes"
+    ).value =
+        item.breakMinutes || 0;
 
 
     document.getElementById(
@@ -1529,8 +1654,13 @@ function exportCSV() {
     }
 
 
+    /*
+       Додана колонка:
+       Перерва, хв
+    */
+
     let csv =
-        "Дата;Початок;Кінець;Години;Uber;Bolt;Інші додатки;Готівка;Чайові;Пальне;Інші витрати;Доходи;Витрати;Чистими\n";
+        "Дата;Початок;Кінець;Години;Перерва, хв;Uber;Bolt;Інші додатки;Готівка;Чайові;Пальне;Інші витрати;Доходи;Витрати;Чистими\n";
 
 
     entries.forEach(item => {
@@ -1538,25 +1668,37 @@ function exportCSV() {
         csv += [
 
             item.date,
+
             item.startTime,
+
             item.endTime,
 
             formatHours(
-                item.duration
+                Number(item.duration || 0)
+            ),
+
+            Number(
+                item.breakMinutes || 0
             ),
 
             item.uber,
+
             item.bolt,
+
             item.otherApps,
 
             item.cash,
+
             item.tips,
 
             item.fuel,
+
             item.otherExpenses,
 
             item.income,
+
             item.expenses,
+
             item.profit
 
         ].join(";") + "\n";
@@ -1651,3 +1793,4 @@ if (
 
 </body>
 </html>
+```
