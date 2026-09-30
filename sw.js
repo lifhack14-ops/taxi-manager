@@ -1,4 +1,5 @@
-const CACHE_NAME = "taxi-manager-v1";
+```javascript
+const CACHE_NAME = "taxi-manager-v2";
 
 const FILES_TO_CACHE = [
     "./",
@@ -21,6 +22,10 @@ self.addEventListener(
                 )
 
         );
+
+        /*
+           Одразу активуємо нову версію
+        */
 
         self.skipWaiting();
     }
@@ -52,9 +57,11 @@ self.addEventListener(
 
                 )
 
-        );
+                .then(() =>
+                    self.clients.claim()
+                )
 
-        self.clients.claim();
+        );
     }
 );
 
@@ -62,6 +69,58 @@ self.addEventListener(
 self.addEventListener(
     "fetch",
     event => {
+
+        /*
+           Для index.html спочатку
+           намагаємося отримати
+           свіжу версію з мережі.
+        */
+
+        if (
+            event.request.method === "GET" &&
+            event.request.mode === "navigate"
+        ) {
+
+            event.respondWith(
+
+                fetch(event.request)
+                    .then(response => {
+
+                        const responseClone =
+                            response.clone();
+
+                        caches.open(CACHE_NAME)
+                            .then(cache => {
+
+                                cache.put(
+                                    "./index.html",
+                                    responseClone
+                                );
+
+                            });
+
+                        return response;
+
+                    })
+                    .catch(() => {
+
+                        return caches.match(
+                            "./index.html"
+                        );
+
+                    })
+
+            );
+
+            return;
+        }
+
+
+        /*
+           Для інших файлів:
+           спочатку кеш,
+           потім мережа.
+        */
 
         event.respondWith(
 
@@ -127,3 +186,4 @@ self.addEventListener(
 
     }
 );
+```
