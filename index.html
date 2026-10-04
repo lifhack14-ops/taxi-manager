@@ -246,6 +246,56 @@ button {
     color: #6b7280;
 }
 
+.week-range {
+    color: #6b7280;
+    font-size: 13px;
+    margin-top: -7px;
+    margin-bottom: 12px;
+}
+
+.week-days {
+    margin-top: 16px;
+}
+
+.week-day {
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 8px;
+    background: #fafafa;
+}
+
+.week-day-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.week-day-name {
+    font-weight: 700;
+}
+
+.week-day-date {
+    color: #6b7280;
+    font-size: 12px;
+}
+
+.week-day-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    font-size: 12px;
+    color: #4b5563;
+}
+
+.week-day-stat {
+    background: white;
+    border-radius: 8px;
+    padding: 7px;
+}
+
 .history-item {
     border: 1px solid #e5e7eb;
     border-radius: 12px;
@@ -303,6 +353,10 @@ button {
     .stats .stat:last-child {
         grid-column: 1 / -1;
     }
+
+    .week-day-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 @media (max-width: 560px) {
@@ -320,6 +374,10 @@ button {
 
     .history-main {
         grid-template-columns: 1fr;
+    }
+
+    .week-day-stats {
+        grid-template-columns: 1fr 1fr;
     }
 }
 </style>
@@ -489,19 +547,91 @@ button {
             </div>
 
             <div class="stat">
-                <div class="stat-value" id="totalIncome">0</div>
+                <div class="stat-value" id="totalIncome">0 zł</div>
                 <div class="stat-label" data-i18n="income">Дохід</div>
             </div>
 
             <div class="stat">
-                <div class="stat-value" id="totalCash">0</div>
+                <div class="stat-value" id="totalTips">0 zł</div>
+                <div class="stat-label" data-i18n="tips">Чайові</div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-value" id="totalCash">0 zł</div>
                 <div class="stat-label" data-i18n="cash">Готівка</div>
             </div>
 
             <div class="stat">
-                <div class="stat-value" id="totalProfit">0</div>
+                <div class="stat-value" id="totalProfit">0 zł</div>
                 <div class="stat-label" data-i18n="profit">Чистими</div>
             </div>
+        </div>
+    </div>
+
+    <!-- WEEK -->
+    <div class="card">
+        <h2>📆 <span data-i18n="weekStats">Статистика за тиждень</span></h2>
+
+        <div id="weekRange" class="week-range"></div>
+
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value" id="weekDays">0</div>
+                <div class="stat-label" data-i18n="shifts">Змін</div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-value" id="weekHours">0</div>
+                <div class="stat-label" data-i18n="hours">Годин</div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-value" id="weekIncome">0 zł</div>
+                <div class="stat-label" data-i18n="income">Дохід</div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-value" id="weekTips">0 zł</div>
+                <div class="stat-label" data-i18n="tips">Чайові</div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-value" id="weekExpenses">0 zł</div>
+                <div class="stat-label" data-i18n="expenses">Витрати</div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-value" id="weekProfit">0 zł</div>
+                <div class="stat-label" data-i18n="profit">Чистими</div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-value" id="weekCash">0 zł</div>
+                <div class="stat-label" data-i18n="cash">Готівка</div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-value" id="weekAverageDay">0 zł</div>
+                <div class="stat-label" data-i18n="averageDay">Середнє за день</div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-value" id="weekAverageHour">0 zł</div>
+                <div class="stat-label" data-i18n="averageHour">Середнє за годину</div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-value" id="weekAverageShift">0 zł</div>
+                <div class="stat-label" data-i18n="averageShift">Середнє за зміну</div>
+            </div>
+        </div>
+
+        <div class="week-days">
+            <h3 id="weekBreakdownTitle" style="margin:0 0 10px;font-size:16px;">
+                По днях
+            </h3>
+
+            <div id="weekDaysList"></div>
         </div>
     </div>
 
@@ -521,17 +651,22 @@ button {
             </div>
 
             <div class="stat">
-                <div class="stat-value" id="monthIncome">0</div>
+                <div class="stat-value" id="monthIncome">0 zł</div>
                 <div class="stat-label" data-i18n="income">Дохід</div>
             </div>
 
             <div class="stat">
-                <div class="stat-value" id="monthCash">0</div>
+                <div class="stat-value" id="monthTips">0 zł</div>
+                <div class="stat-label" data-i18n="tips">Чайові</div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-value" id="monthCash">0 zł</div>
                 <div class="stat-label" data-i18n="cash">Готівка</div>
             </div>
 
             <div class="stat">
-                <div class="stat-value" id="monthProfit">0</div>
+                <div class="stat-value" id="monthProfit">0 zł</div>
                 <div class="stat-label" data-i18n="profit">Чистими</div>
             </div>
         </div>
@@ -598,11 +733,19 @@ const translations = {
         save: "💾 Зберегти",
         clear: "Очистити",
         totalStats: "Загальна статистика",
+        weekStats: "Статистика за тиждень",
         monthStats: "Статистика за місяць",
         days: "Днів",
+        shifts: "Змін",
         hours: "Годин",
         income: "Дохід",
+        expenses: "Витрати",
         profit: "Чистими",
+        averageDay: "Середнє за день",
+        averageHour: "Середнє за годину",
+        averageShift: "Середнє за зміну",
+        breakdown: "По днях",
+        noWork: "Без роботи",
         history: "Історія",
         export: "CSV",
         edit: "Редагувати",
@@ -631,7 +774,21 @@ const translations = {
         newDay: "Новий робочий день",
         editDay: "Редагування робочого дня",
         hour: "год",
-        minute: "хв"
+        minute: "хв",
+        dayMon: "Понеділок",
+        dayTue: "Вівторок",
+        dayWed: "Середа",
+        dayThu: "Четвер",
+        dayFri: "П’ятниця",
+        daySat: "Субота",
+        daySun: "Неділя",
+        weekFrom: "Тиждень:",
+        dayIncome: "Дохід",
+        dayTips: "Чайові",
+        dayFuel: "Пальне",
+        dayOtherExpenses: "Інші витрати",
+        dayProfit: "Чистими",
+        dayCash: "Готівка"
     },
 
     pl: {
@@ -655,11 +812,19 @@ const translations = {
         save: "💾 Zapisz",
         clear: "Wyczyść",
         totalStats: "Statystyki ogólne",
+        weekStats: "Statystyki tygodnia",
         monthStats: "Statystyki miesiąca",
         days: "Dni",
+        shifts: "Zmiany",
         hours: "Godziny",
         income: "Dochód",
+        expenses: "Wydatki",
         profit: "Na czysto",
+        averageDay: "Średnio dziennie",
+        averageHour: "Średnio na godzinę",
+        averageShift: "Średnio na zmianę",
+        breakdown: "Podział na dni",
+        noWork: "Brak pracy",
         history: "Historia",
         export: "CSV",
         edit: "Edytuj",
@@ -688,7 +853,21 @@ const translations = {
         newDay: "Nowy dzień pracy",
         editDay: "Edycja dnia pracy",
         hour: "godz.",
-        minute: "min"
+        minute: "min",
+        dayMon: "Poniedziałek",
+        dayTue: "Wtorek",
+        dayWed: "Środa",
+        dayThu: "Czwartek",
+        dayFri: "Piątek",
+        daySat: "Sobota",
+        daySun: "Niedziela",
+        weekFrom: "Tydzień:",
+        dayIncome: "Dochód",
+        dayTips: "Napiwki",
+        dayFuel: "Paliwo",
+        dayOtherExpenses: "Inne wydatki",
+        dayProfit: "Na czysto",
+        dayCash: "Gotówka"
     }
 };
 
@@ -697,7 +876,8 @@ const translations = {
    LANGUAGE
 ========================================================= */
 
-let currentLanguage = localStorage.getItem("taxiLanguage") || "uk";
+let currentLanguage =
+    localStorage.getItem("taxiLanguage") || "uk";
 
 function t(key) {
     return translations[currentLanguage][key] || key;
@@ -705,17 +885,28 @@ function t(key) {
 
 function setLanguage(language) {
     currentLanguage = language;
-    localStorage.setItem("taxiLanguage", language);
+
+    localStorage.setItem(
+        "taxiLanguage",
+        language
+    );
+
     updateLanguageUI();
     renderAll();
 }
 
 function updateLanguageUI() {
-    document.documentElement.lang = currentLanguage;
+    document.documentElement.lang =
+        currentLanguage;
 
-    document.getElementById("subtitle").textContent = t("subtitle");
-    document.getElementById("installTitle").textContent = t("installTitle");
-    document.getElementById("installText").textContent = t("installText");
+    document.getElementById("subtitle").textContent =
+        t("subtitle");
+
+    document.getElementById("installTitle").textContent =
+        t("installTitle");
+
+    document.getElementById("installText").textContent =
+        t("installText");
 
     document.getElementById("ukBtn").classList.toggle(
         "active",
@@ -728,11 +919,17 @@ function updateLanguageUI() {
     );
 
     document.querySelectorAll("[data-i18n]").forEach(el => {
-        el.textContent = t(el.dataset.i18n);
+        el.textContent =
+            t(el.dataset.i18n);
     });
 
     document.getElementById("formTitle").textContent =
-        editingId ? t("editDay") : t("newDay");
+        editingId
+            ? t("editDay")
+            : t("newDay");
+
+    document.getElementById("weekBreakdownTitle").textContent =
+        t("breakdown");
 
     updateAuthUI();
 }
@@ -745,7 +942,9 @@ function updateLanguageUI() {
 let entries = [];
 
 try {
-    entries = JSON.parse(localStorage.getItem("taxiEntries") || "[]");
+    entries = JSON.parse(
+        localStorage.getItem("taxiEntries") || "[]"
+    );
 } catch {
     entries = [];
 }
@@ -770,15 +969,28 @@ try {
 ========================================================= */
 
 function makeClientId() {
-    if (window.crypto && crypto.randomUUID) {
+    if (
+        window.crypto &&
+        crypto.randomUUID
+    ) {
         return crypto.randomUUID();
     }
 
-    return Date.now() + "-" + Math.random().toString(36).slice(2);
+    return (
+        Date.now() +
+        "-" +
+        Math.random()
+            .toString(36)
+            .slice(2)
+    );
 }
 
 function saveLocal() {
-    localStorage.setItem("taxiEntries", JSON.stringify(entries));
+    localStorage.setItem(
+        "taxiEntries",
+        JSON.stringify(entries)
+    );
+
     localStorage.setItem(
         "taxiDeletedIds",
         JSON.stringify(deletedClientIds)
@@ -786,63 +998,225 @@ function saveLocal() {
 }
 
 function numberValue(id) {
-    return Number(document.getElementById(id).value) || 0;
+    return (
+        Number(
+            document.getElementById(id).value
+        ) || 0
+    );
 }
 
 function timeToMinutes(time) {
     if (!time) return 0;
 
-    const [hours, minutes] = time.split(":").map(Number);
-    return hours * 60 + minutes;
+    const [
+        hours,
+        minutes
+    ] = time
+        .split(":")
+        .map(Number);
+
+    return (
+        hours * 60 +
+        minutes
+    );
 }
 
-function calculateDuration(start, end) {
-    let startMinutes = timeToMinutes(start);
-    let endMinutes = timeToMinutes(end);
+function calculateDuration(
+    start,
+    end
+) {
+    let startMinutes =
+        timeToMinutes(start);
 
-    if (endMinutes < startMinutes) {
-        endMinutes += 24 * 60;
+    let endMinutes =
+        timeToMinutes(end);
+
+    if (
+        endMinutes <
+        startMinutes
+    ) {
+        endMinutes +=
+            24 * 60;
     }
 
-    return Math.max(0, endMinutes - startMinutes);
+    return Math.max(
+        0,
+        endMinutes -
+        startMinutes
+    );
 }
 
 function formatHours(minutes) {
-    const h = Math.floor(minutes / 60);
-    const m = minutes % 60;
+    const h =
+        Math.floor(
+            minutes / 60
+        );
+
+    const m =
+        minutes % 60;
 
     if (m === 0) {
-        return `${h} ${t("hour")}`;
+        return (
+            `${h} ${t("hour")}`
+        );
     }
 
-    return `${h} ${t("hour")} ${m} ${t("minute")}`;
+    return (
+        `${h} ${t("hour")} ` +
+        `${m} ${t("minute")}`
+    );
 }
 
+/*
+ * Усі грошові значення в інтерфейсі показуємо в PLN.
+ * Самі числа в базі не конвертуються і не змінюються.
+ */
 function money(value) {
-    return Number(value || 0).toFixed(2);
+    return (
+        Number(value || 0)
+            .toFixed(2) +
+        " zł"
+    );
 }
 
 function formatDate(date) {
     if (!date) return "";
 
-    const parts = date.split("-");
+    const parts =
+        date.split("-");
 
-    if (parts.length !== 3) return date;
+    if (
+        parts.length !== 3
+    ) {
+        return date;
+    }
 
-    return `${parts[2]}.${parts[1]}.${parts[0]}`;
+    return (
+        `${parts[2]}.` +
+        `${parts[1]}.` +
+        `${parts[0]}`
+    );
 }
 
 function setDefaultDate() {
-    const input = document.getElementById("date");
-
-    if (!input.value) {
-        const now = new Date();
-        const local = new Date(
-            now.getTime() - now.getTimezoneOffset() * 60000
+    const input =
+        document.getElementById(
+            "date"
         );
 
-        input.value = local.toISOString().slice(0, 10);
+    if (!input.value) {
+        const now =
+            new Date();
+
+        const local =
+            new Date(
+                now.getTime() -
+                now.getTimezoneOffset() *
+                60000
+            );
+
+        input.value =
+            local
+                .toISOString()
+                .slice(0, 10);
     }
+}
+
+
+/* =========================================================
+   WEEK HELPERS
+========================================================= */
+
+function getLocalDateString(date) {
+    const year =
+        date.getFullYear();
+
+    const month =
+        String(
+            date.getMonth() + 1
+        ).padStart(2, "0");
+
+    const day =
+        String(
+            date.getDate()
+        ).padStart(2, "0");
+
+    return (
+        `${year}-${month}-${day}`
+    );
+}
+
+function getStartOfCurrentWeek() {
+    const now =
+        new Date();
+
+    const day =
+        now.getDay();
+
+    /*
+     * JavaScript:
+     * Sunday = 0
+     * Monday = 1
+     */
+    const daysFromMonday =
+        day === 0
+            ? 6
+            : day - 1;
+
+    const monday =
+        new Date(now);
+
+    monday.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+    monday.setDate(
+        monday.getDate() -
+        daysFromMonday
+    );
+
+    return monday;
+}
+
+function getWeekDates() {
+    const monday =
+        getStartOfCurrentWeek();
+
+    const dates = [];
+
+    for (
+        let i = 0;
+        i < 7;
+        i++
+    ) {
+        const date =
+            new Date(monday);
+
+        date.setDate(
+            monday.getDate() + i
+        );
+
+        dates.push(date);
+    }
+
+    return dates;
+}
+
+function getWeekdayName(index) {
+    const keys = [
+        "dayMon",
+        "dayTue",
+        "dayWed",
+        "dayThu",
+        "dayFri",
+        "daySat",
+        "daySun"
+    ];
+
+    return t(keys[index]);
 }
 
 
@@ -850,63 +1224,111 @@ function setDefaultDate() {
    MIGRATION OF OLD LOCAL DATA
 ========================================================= */
 
-entries = entries.map(item => {
-    const clientId = item.clientId || makeClientId();
+entries =
+    entries.map(item => {
 
-    const breakMinutes = Number(item.breakMinutes || 0);
-    const totalDuration = Number(
-        item.totalDuration ||
-        calculateDuration(item.startTime, item.endTime)
-    );
+        const clientId =
+            item.clientId ||
+            makeClientId();
 
-    const duration = Math.max(
-        0,
-        totalDuration - breakMinutes
-    );
+        const breakMinutes =
+            Number(
+                item.breakMinutes || 0
+            );
 
-    const uber = Number(item.uber || 0);
-    const bolt = Number(item.bolt || 0);
-    const otherApps = Number(item.otherApps || 0);
-    const tips = Number(item.tips || 0);
+        const totalDuration =
+            Number(
+                item.totalDuration ||
+                calculateDuration(
+                    item.startTime,
+                    item.endTime
+                )
+            );
 
-    const cash = Number(item.cash || 0);
+        const duration =
+            Math.max(
+                0,
+                totalDuration -
+                breakMinutes
+            );
 
-    const fuel = Number(item.fuel || 0);
-    const otherExpenses = Number(item.otherExpenses || 0);
+        const uber =
+            Number(
+                item.uber || 0
+            );
 
-    const income =
-        uber +
-        bolt +
-        otherApps +
-        tips;
+        const bolt =
+            Number(
+                item.bolt || 0
+            );
 
-    const expenses =
-        fuel +
-        otherExpenses;
+        const otherApps =
+            Number(
+                item.otherApps || 0
+            );
 
-    const profit =
-        income -
-        expenses;
+        const tips =
+            Number(
+                item.tips || 0
+            );
 
-    return {
-        ...item,
-        clientId,
-        totalDuration,
-        breakMinutes,
-        duration,
-        uber,
-        bolt,
-        otherApps,
-        cash,
-        tips,
-        fuel,
-        otherExpenses,
-        income,
-        expenses,
-        profit,
-        updatedAt: item.updatedAt || Date.now()
-    };
-});
+        const cash =
+            Number(
+                item.cash || 0
+            );
+
+        const fuel =
+            Number(
+                item.fuel || 0
+            );
+
+        const otherExpenses =
+            Number(
+                item.otherExpenses || 0
+            );
+
+        const income =
+            uber +
+            bolt +
+            otherApps +
+            tips;
+
+        const expenses =
+            fuel +
+            otherExpenses;
+
+        const profit =
+            income -
+            expenses;
+
+        return {
+            ...item,
+
+            clientId,
+
+            totalDuration,
+            breakMinutes,
+            duration,
+
+            uber,
+            bolt,
+            otherApps,
+
+            cash,
+            tips,
+
+            fuel,
+            otherExpenses,
+
+            income,
+            expenses,
+            profit,
+
+            updatedAt:
+                item.updatedAt ||
+                Date.now()
+        };
+    });
 
 saveLocal();
 
@@ -917,64 +1339,180 @@ saveLocal();
 
 function toCloudRow(entry) {
     return {
-        user_id: currentUser.id,
-        client_id: String(entry.clientId),
+        user_id:
+            currentUser.id,
 
-        date: entry.date,
-        start_time: entry.startTime,
-        end_time: entry.endTime,
+        client_id:
+            String(entry.clientId),
 
-        total_duration: Number(entry.totalDuration || 0),
-        break_minutes: Number(entry.breakMinutes || 0),
-        duration: Number(entry.duration || 0),
+        date:
+            entry.date,
 
-        uber: Number(entry.uber || 0),
-        bolt: Number(entry.bolt || 0),
-        other_apps: Number(entry.otherApps || 0),
-        cash: Number(entry.cash || 0),
-        tips: Number(entry.tips || 0),
+        start_time:
+            entry.startTime,
 
-        fuel: Number(entry.fuel || 0),
-        other_expenses: Number(entry.otherExpenses || 0),
+        end_time:
+            entry.endTime,
 
-        income: Number(entry.income || 0),
-        expenses: Number(entry.expenses || 0),
-        profit: Number(entry.profit || 0),
+        total_duration:
+            Number(
+                entry.totalDuration || 0
+            ),
 
-        updated_at: new Date(
-            entry.updatedAt || Date.now()
-        ).toISOString()
+        break_minutes:
+            Number(
+                entry.breakMinutes || 0
+            ),
+
+        duration:
+            Number(
+                entry.duration || 0
+            ),
+
+        uber:
+            Number(
+                entry.uber || 0
+            ),
+
+        bolt:
+            Number(
+                entry.bolt || 0
+            ),
+
+        other_apps:
+            Number(
+                entry.otherApps || 0
+            ),
+
+        cash:
+            Number(
+                entry.cash || 0
+            ),
+
+        tips:
+            Number(
+                entry.tips || 0
+            ),
+
+        fuel:
+            Number(
+                entry.fuel || 0
+            ),
+
+        other_expenses:
+            Number(
+                entry.otherExpenses || 0
+            ),
+
+        income:
+            Number(
+                entry.income || 0
+            ),
+
+        expenses:
+            Number(
+                entry.expenses || 0
+            ),
+
+        profit:
+            Number(
+                entry.profit || 0
+            ),
+
+        updated_at:
+            new Date(
+                entry.updatedAt ||
+                Date.now()
+            ).toISOString()
     };
 }
 
 function fromCloudRow(row) {
     return {
-        id: row.client_id,
-        clientId: row.client_id,
+        id:
+            row.client_id,
 
-        date: row.date,
-        startTime: row.start_time,
-        endTime: row.end_time,
+        clientId:
+            row.client_id,
 
-        totalDuration: Number(row.total_duration || 0),
-        breakMinutes: Number(row.break_minutes || 0),
-        duration: Number(row.duration || 0),
+        date:
+            row.date,
 
-        uber: Number(row.uber || 0),
-        bolt: Number(row.bolt || 0),
-        otherApps: Number(row.other_apps || 0),
-        cash: Number(row.cash || 0),
-        tips: Number(row.tips || 0),
+        startTime:
+            row.start_time,
 
-        fuel: Number(row.fuel || 0),
-        otherExpenses: Number(row.other_expenses || 0),
+        endTime:
+            row.end_time,
 
-        income: Number(row.income || 0),
-        expenses: Number(row.expenses || 0),
-        profit: Number(row.profit || 0),
+        totalDuration:
+            Number(
+                row.total_duration || 0
+            ),
+
+        breakMinutes:
+            Number(
+                row.break_minutes || 0
+            ),
+
+        duration:
+            Number(
+                row.duration || 0
+            ),
+
+        uber:
+            Number(
+                row.uber || 0
+            ),
+
+        bolt:
+            Number(
+                row.bolt || 0
+            ),
+
+        otherApps:
+            Number(
+                row.other_apps || 0
+            ),
+
+        cash:
+            Number(
+                row.cash || 0
+            ),
+
+        tips:
+            Number(
+                row.tips || 0
+            ),
+
+        fuel:
+            Number(
+                row.fuel || 0
+            ),
+
+        otherExpenses:
+            Number(
+                row.other_expenses || 0
+            ),
+
+        income:
+            Number(
+                row.income || 0
+            ),
+
+        expenses:
+            Number(
+                row.expenses || 0
+            ),
+
+        profit:
+            Number(
+                row.profit || 0
+            ),
 
         updatedAt:
-            new Date(row.updated_at).getTime() ||
+            new Date(
+                row.updated_at
+            ).getTime() ||
             Date.now()
     };
 }
@@ -985,45 +1523,100 @@ function fromCloudRow(row) {
 ========================================================= */
 
 function updateAuthUI() {
-    const loggedOut = document.getElementById("authLoggedOut");
-    const loggedIn = document.getElementById("authLoggedIn");
-    const status = document.getElementById("accountStatus");
+    const loggedOut =
+        document.getElementById(
+            "authLoggedOut"
+        );
 
-    if (!loggedOut || !loggedIn) return;
+    const loggedIn =
+        document.getElementById(
+            "authLoggedIn"
+        );
+
+    const status =
+        document.getElementById(
+            "accountStatus"
+        );
+
+    if (
+        !loggedOut ||
+        !loggedIn
+    ) {
+        return;
+    }
 
     if (currentUser) {
-        loggedOut.classList.add("hidden");
-        loggedIn.classList.remove("hidden");
+        loggedOut.classList.add(
+            "hidden"
+        );
+
+        loggedIn.classList.remove(
+            "hidden"
+        );
 
         status.textContent =
             t("loggedIn") +
-            (currentUser.email || "");
+            (
+                currentUser.email ||
+                ""
+            );
     } else {
-        loggedOut.classList.remove("hidden");
-        loggedIn.classList.add("hidden");
+        loggedOut.classList.remove(
+            "hidden"
+        );
+
+        loggedIn.classList.add(
+            "hidden"
+        );
     }
 }
 
-function showAuthMessage(message, type = "success") {
-    const box = document.getElementById("authMessage");
+function showAuthMessage(
+    message,
+    type = "success"
+) {
+    const box =
+        document.getElementById(
+            "authMessage"
+        );
 
-    box.textContent = message;
-    box.className = "message show " + type;
+    box.textContent =
+        message;
+
+    box.className =
+        "message show " +
+        type;
 }
 
-function showFormMessage(message, type = "success") {
-    const box = document.getElementById("formMessage");
+function showFormMessage(
+    message,
+    type = "success"
+) {
+    const box =
+        document.getElementById(
+            "formMessage"
+        );
 
-    box.textContent = message;
-    box.className = "message show " + type;
+    box.textContent =
+        message;
+
+    box.className =
+        "message show " +
+        type;
 
     setTimeout(() => {
-        box.classList.remove("show");
+        box.classList.remove(
+            "show"
+        );
     }, 3000);
 }
 
-function setSyncStatus(message) {
-    document.getElementById("syncStatus").textContent =
+function setSyncStatus(
+    message
+) {
+    document.getElementById(
+        "syncStatus"
+    ).textContent =
         message || "";
 }
 
@@ -1033,7 +1626,8 @@ function setSyncStatus(message) {
 ========================================================= */
 
 function getRedirectUrl() {
-    return window.location.href.split("#")[0];
+    return window.location.href
+        .split("#")[0];
 }
 
 async function registerAccount() {
@@ -1042,43 +1636,78 @@ async function registerAccount() {
             "Supabase не завантажився. Перевір інтернет.",
             "error"
         );
+
         return;
     }
 
     const email =
-        document.getElementById("authEmail").value.trim();
+        document.getElementById(
+            "authEmail"
+        ).value.trim();
 
     const password =
-        document.getElementById("authPassword").value;
+        document.getElementById(
+            "authPassword"
+        ).value;
 
-    if (!email || !password) {
-        showAuthMessage(t("fillAuth"), "error");
+    if (
+        !email ||
+        !password
+    ) {
+        showAuthMessage(
+            t("fillAuth"),
+            "error"
+        );
+
         return;
     }
 
-    if (password.length < 6) {
-        showAuthMessage(t("passwordShort"), "error");
+    if (
+        password.length < 6
+    ) {
+        showAuthMessage(
+            t("passwordShort"),
+            "error"
+        );
+
         return;
     }
 
-    showAuthMessage(t("syncing"), "success");
+    showAuthMessage(
+        t("syncing"),
+        "success"
+    );
 
-    const { data, error } =
-        await supabaseClient.auth.signUp({
-            email,
-            password,
-            options: {
-                emailRedirectTo: getRedirectUrl()
-            }
-        });
+    const {
+        data,
+        error
+    } =
+        await supabaseClient.auth
+            .signUp({
+                email,
+                password,
+
+                options: {
+                    emailRedirectTo:
+                        getRedirectUrl()
+                }
+            });
 
     if (error) {
-        showAuthMessage(error.message, "error");
+        showAuthMessage(
+            error.message,
+            "error"
+        );
+
         return;
     }
 
-    if (data.session && data.user) {
-        currentUser = data.user;
+    if (
+        data.session &&
+        data.user
+    ) {
+        currentUser =
+            data.user;
 
         updateAuthUI();
 
@@ -1087,7 +1716,9 @@ async function registerAccount() {
             "success"
         );
 
-        await syncWithCloud(true);
+        await syncWithCloud(
+            true
+        );
     } else {
         showAuthMessage(
             t("accountCreated"),
@@ -1102,37 +1733,58 @@ async function loginAccount() {
             "Supabase не завантажився. Перевір інтернет.",
             "error"
         );
+
         return;
     }
 
     const email =
-        document.getElementById("authEmail").value.trim();
+        document.getElementById(
+            "authEmail"
+        ).value.trim();
 
     const password =
-        document.getElementById("authPassword").value;
+        document.getElementById(
+            "authPassword"
+        ).value;
 
-    if (!email || !password) {
-        showAuthMessage(t("fillAuth"), "error");
+    if (
+        !email ||
+        !password
+    ) {
+        showAuthMessage(
+            t("fillAuth"),
+            "error"
+        );
+
         return;
     }
 
-    showAuthMessage(t("syncing"), "success");
+    showAuthMessage(
+        t("syncing"),
+        "success"
+    );
 
-    const { data, error } =
-        await supabaseClient.auth.signInWithPassword({
-            email,
-            password
-        });
+    const {
+        data,
+        error
+    } =
+        await supabaseClient.auth
+            .signInWithPassword({
+                email,
+                password
+            });
 
     if (error) {
         showAuthMessage(
             t("wrongCredentials"),
             "error"
         );
+
         return;
     }
 
-    currentUser = data.user;
+    currentUser =
+        data.user;
 
     updateAuthUI();
 
@@ -1141,17 +1793,26 @@ async function loginAccount() {
         "success"
     );
 
-    await syncWithCloud(true);
+    await syncWithCloud(
+        true
+    );
 }
 
 async function logoutAccount() {
-    if (!supabaseClient) return;
+    if (!supabaseClient) {
+        return;
+    }
 
     const { error } =
-        await supabaseClient.auth.signOut();
+        await supabaseClient.auth
+            .signOut();
 
     if (error) {
-        showAuthMessage(error.message, "error");
+        showAuthMessage(
+            error.message,
+            "error"
+        );
+
         return;
     }
 
@@ -1172,8 +1833,15 @@ async function logoutAccount() {
    CLOUD SYNC
 ========================================================= */
 
-async function syncEntryToCloud(entry) {
-    if (!currentUser || !supabaseClient) return;
+async function syncEntryToCloud(
+    entry
+) {
+    if (
+        !currentUser ||
+        !supabaseClient
+    ) {
+        return;
+    }
 
     const { error } =
         await supabaseClient
@@ -1181,7 +1849,8 @@ async function syncEntryToCloud(entry) {
             .upsert(
                 toCloudRow(entry),
                 {
-                    onConflict: "user_id,client_id"
+                    onConflict:
+                        "user_id,client_id"
                 }
             );
 
@@ -1190,15 +1859,28 @@ async function syncEntryToCloud(entry) {
     }
 }
 
-async function deleteEntryFromCloud(clientId) {
-    if (!currentUser || !supabaseClient) return;
+async function deleteEntryFromCloud(
+    clientId
+) {
+    if (
+        !currentUser ||
+        !supabaseClient
+    ) {
+        return;
+    }
 
     const { error } =
         await supabaseClient
             .from("work_entries")
             .delete()
-            .eq("user_id", currentUser.id)
-            .eq("client_id", String(clientId));
+            .eq(
+                "user_id",
+                currentUser.id
+            )
+            .eq(
+                "client_id",
+                String(clientId)
+            );
 
     if (error) {
         throw error;
@@ -1206,133 +1888,234 @@ async function deleteEntryFromCloud(clientId) {
 }
 
 async function syncDeletedItems() {
-    if (!currentUser || !supabaseClient) return;
+    if (
+        !currentUser ||
+        !supabaseClient
+    ) {
+        return;
+    }
 
-    if (!deletedClientIds.length) return;
+    if (
+        !deletedClientIds.length
+    ) {
+        return;
+    }
 
-    const copy = [...deletedClientIds];
+    const copy =
+        [...deletedClientIds];
 
-    for (const clientId of copy) {
+    for (
+        const clientId
+        of copy
+    ) {
         try {
-            await deleteEntryFromCloud(clientId);
+            await deleteEntryFromCloud(
+                clientId
+            );
 
             deletedClientIds =
                 deletedClientIds.filter(
-                    id => String(id) !== String(clientId)
+                    id =>
+                        String(id) !==
+                        String(clientId)
                 );
 
             saveLocal();
+
         } catch (error) {
             console.error(error);
         }
     }
 }
 
-async function syncWithCloud(showMessageAfter = false) {
-    if (!currentUser || !supabaseClient) {
+async function syncWithCloud(
+    showMessageAfter = false
+) {
+    if (
+        !currentUser ||
+        !supabaseClient
+    ) {
         return;
     }
 
-    if (syncRunning) return;
+    if (syncRunning) {
+        return;
+    }
 
     if (!navigator.onLine) {
-        setSyncStatus(t("offline"));
+        setSyncStatus(
+            t("offline")
+        );
+
         return;
     }
 
     syncRunning = true;
 
-    setSyncStatus(t("syncing"));
+    setSyncStatus(
+        t("syncing")
+    );
 
     try {
-        /* First remove cloud records that were deleted locally */
         await syncDeletedItems();
 
-        const { data: cloudRows, error } =
+        const {
+            data: cloudRows,
+            error
+        } =
             await supabaseClient
                 .from("work_entries")
                 .select("*")
-                .eq("user_id", currentUser.id);
+                .eq(
+                    "user_id",
+                    currentUser.id
+                );
 
         if (error) {
             throw error;
         }
 
         const cloudEntries =
-            (cloudRows || []).map(fromCloudRow);
-
-        const localMap = new Map();
-
-        entries.forEach(entry => {
-            localMap.set(
-                String(entry.clientId),
-                entry
+            (
+                cloudRows || []
+            ).map(
+                fromCloudRow
             );
-        });
 
-        const cloudMap = new Map();
+        const localMap =
+            new Map();
 
-        cloudEntries.forEach(entry => {
-            cloudMap.set(
-                String(entry.clientId),
-                entry
+        entries.forEach(
+            entry => {
+                localMap.set(
+                    String(
+                        entry.clientId
+                    ),
+                    entry
+                );
+            }
+        );
+
+        const cloudMap =
+            new Map();
+
+        cloudEntries.forEach(
+            entry => {
+                cloudMap.set(
+                    String(
+                        entry.clientId
+                    ),
+                    entry
+                );
+            }
+        );
+
+        const mergedMap =
+            new Map();
+
+        localMap.forEach(
+            (
+                local,
+                clientId
+            ) => {
+
+                const cloud =
+                    cloudMap.get(
+                        clientId
+                    );
+
+                if (!cloud) {
+                    mergedMap.set(
+                        clientId,
+                        local
+                    );
+
+                    return;
+                }
+
+                const localTime =
+                    Number(
+                        local.updatedAt ||
+                        0
+                    );
+
+                const cloudTime =
+                    Number(
+                        cloud.updatedAt ||
+                        0
+                    );
+
+                if (
+                    cloudTime >
+                    localTime
+                ) {
+                    mergedMap.set(
+                        clientId,
+                        cloud
+                    );
+                } else {
+                    mergedMap.set(
+                        clientId,
+                        local
+                    );
+                }
+            }
+        );
+
+        cloudMap.forEach(
+            (
+                cloud,
+                clientId
+            ) => {
+
+                if (
+                    !mergedMap.has(
+                        clientId
+                    )
+                ) {
+                    mergedMap.set(
+                        clientId,
+                        cloud
+                    );
+                }
+            }
+        );
+
+        entries =
+            Array.from(
+                mergedMap.values()
             );
-        });
-
-        const mergedMap = new Map();
-
-        /* Local entries */
-        localMap.forEach((local, clientId) => {
-            const cloud = cloudMap.get(clientId);
-
-            if (!cloud) {
-                mergedMap.set(clientId, local);
-                return;
-            }
-
-            const localTime =
-                Number(local.updatedAt || 0);
-
-            const cloudTime =
-                Number(cloud.updatedAt || 0);
-
-            if (cloudTime > localTime) {
-                mergedMap.set(clientId, cloud);
-            } else {
-                mergedMap.set(clientId, local);
-            }
-        });
-
-        /* Cloud-only entries */
-        cloudMap.forEach((cloud, clientId) => {
-            if (!mergedMap.has(clientId)) {
-                mergedMap.set(clientId, cloud);
-            }
-        });
-
-        entries = Array.from(mergedMap.values());
 
         saveLocal();
 
-        /*
-         * Upload the merged list.
-         * This also uploads local data on first login.
-         */
-        for (const entry of entries) {
-            await syncEntryToCloud(entry);
+        for (
+            const entry
+            of entries
+        ) {
+            await syncEntryToCloud(
+                entry
+            );
         }
 
         renderAll();
 
-        setSyncStatus(t("syncDone"));
+        setSyncStatus(
+            t("syncDone")
+        );
 
-        if (showMessageAfter) {
-            if (cloudEntries.length > 0) {
+        if (
+            showMessageAfter
+        ) {
+            if (
+                cloudEntries.length > 0
+            ) {
                 showAuthMessage(
                     t("cloudLoaded"),
                     "success"
                 );
-            } else if (entries.length > 0) {
+            } else if (
+                entries.length > 0
+            ) {
                 showAuthMessage(
                     t("localUploaded"),
                     "success"
@@ -1346,18 +2129,26 @@ async function syncWithCloud(showMessageAfter = false) {
         }
 
     } catch (error) {
-        console.error("Cloud sync error:", error);
-
-        setSyncStatus(
-            t("syncError") + error.message
+        console.error(
+            "Cloud sync error:",
+            error
         );
 
-        if (showMessageAfter) {
+        setSyncStatus(
+            t("syncError") +
+            error.message
+        );
+
+        if (
+            showMessageAfter
+        ) {
             showAuthMessage(
-                t("syncError") + error.message,
+                t("syncError") +
+                error.message,
                 "error"
             );
         }
+
     } finally {
         syncRunning = false;
     }
@@ -1370,27 +2161,40 @@ async function syncWithCloud(showMessageAfter = false) {
 
 async function saveEntry() {
     const date =
-        document.getElementById("date").value;
+        document.getElementById(
+            "date"
+        ).value;
 
     const startTime =
-        document.getElementById("startTime").value;
+        document.getElementById(
+            "startTime"
+        ).value;
 
     const endTime =
-        document.getElementById("endTime").value;
+        document.getElementById(
+            "endTime"
+        ).value;
 
     const breakMinutes =
         Math.max(
             0,
             Number(
-                document.getElementById("breakMinutes").value
+                document.getElementById(
+                    "breakMinutes"
+                ).value
             ) || 0
         );
 
-    if (!date || !startTime || !endTime) {
+    if (
+        !date ||
+        !startTime ||
+        !endTime
+    ) {
         showFormMessage(
             t("emptyFields"),
             "error"
         );
+
         return;
     }
 
@@ -1403,21 +2207,35 @@ async function saveEntry() {
     const duration =
         Math.max(
             0,
-            totalDuration - breakMinutes
+            totalDuration -
+            breakMinutes
         );
 
-    const uber = numberValue("uber");
-    const bolt = numberValue("bolt");
-    const otherApps = numberValue("otherApps");
-    const cash = numberValue("cash");
-    const tips = numberValue("tips");
+    const uber =
+        numberValue("uber");
 
-    const fuel = numberValue("fuel");
+    const bolt =
+        numberValue("bolt");
+
+    const otherApps =
+        numberValue("otherApps");
+
+    const cash =
+        numberValue("cash");
+
+    const tips =
+        numberValue("tips");
+
+    const fuel =
+        numberValue("fuel");
+
     const otherExpenses =
-        numberValue("otherExpenses");
+        numberValue(
+            "otherExpenses"
+        );
 
     /*
-     * Cash is NOT included in income.
+     * Готівка НЕ входить у дохід.
      */
     const income =
         uber +
@@ -1436,11 +2254,16 @@ async function saveEntry() {
     let entry;
 
     if (editingId) {
+
         const oldEntry =
             entries.find(
                 item =>
-                    String(item.clientId) ===
-                    String(editingId)
+                    String(
+                        item.clientId
+                    ) ===
+                    String(
+                        editingId
+                    )
             );
 
         if (!oldEntry) {
@@ -1472,20 +2295,31 @@ async function saveEntry() {
             expenses,
             profit,
 
-            updatedAt: Date.now()
+            updatedAt:
+                Date.now()
         };
 
-        entries = entries.map(item =>
-            String(item.clientId) ===
-            String(editingId)
-                ? entry
-                : item
-        );
+        entries =
+            entries.map(
+                item =>
+                    String(
+                        item.clientId
+                    ) ===
+                    String(
+                        editingId
+                    )
+                        ? entry
+                        : item
+            );
 
     } else {
+
         entry = {
-            id: Date.now(),
-            clientId: makeClientId(),
+            id:
+                Date.now(),
+
+            clientId:
+                makeClientId(),
 
             date,
             startTime,
@@ -1508,7 +2342,8 @@ async function saveEntry() {
             expenses,
             profit,
 
-            updatedAt: Date.now()
+            updatedAt:
+                Date.now()
         };
 
         entries.push(entry);
@@ -1525,24 +2360,34 @@ async function saveEntry() {
         "success"
     );
 
-    /*
-     * Sync immediately if logged in.
-     * If offline, local data remains safe and
-     * will synchronize when connection returns.
-     */
-    if (currentUser && navigator.onLine) {
+    if (
+        currentUser &&
+        navigator.onLine
+    ) {
         try {
-            await syncEntryToCloud(entry);
-            setSyncStatus(t("syncDone"));
+            await syncEntryToCloud(
+                entry
+            );
+
+            setSyncStatus(
+                t("syncDone")
+            );
+
         } catch (error) {
             console.error(error);
 
             setSyncStatus(
-                t("syncError") + error.message
+                t("syncError") +
+                error.message
             );
         }
-    } else if (currentUser) {
-        setSyncStatus(t("offline"));
+
+    } else if (
+        currentUser
+    ) {
+        setSyncStatus(
+            t("offline")
+        );
     }
 }
 
@@ -1554,21 +2399,53 @@ async function saveEntry() {
 function clearForm() {
     editingId = null;
 
-    document.getElementById("date").value = "";
-    document.getElementById("startTime").value = "";
-    document.getElementById("endTime").value = "";
-    document.getElementById("breakMinutes").value = "0";
+    document.getElementById(
+        "date"
+    ).value = "";
 
-    document.getElementById("uber").value = "";
-    document.getElementById("bolt").value = "";
-    document.getElementById("otherApps").value = "";
-    document.getElementById("cash").value = "";
-    document.getElementById("tips").value = "";
+    document.getElementById(
+        "startTime"
+    ).value = "";
 
-    document.getElementById("fuel").value = "";
-    document.getElementById("otherExpenses").value = "";
+    document.getElementById(
+        "endTime"
+    ).value = "";
 
-    document.getElementById("formTitle").textContent =
+    document.getElementById(
+        "breakMinutes"
+    ).value = "0";
+
+    document.getElementById(
+        "uber"
+    ).value = "";
+
+    document.getElementById(
+        "bolt"
+    ).value = "";
+
+    document.getElementById(
+        "otherApps"
+    ).value = "";
+
+    document.getElementById(
+        "cash"
+    ).value = "";
+
+    document.getElementById(
+        "tips"
+    ).value = "";
+
+    document.getElementById(
+        "fuel"
+    ).value = "";
+
+    document.getElementById(
+        "otherExpenses"
+    ).value = "";
+
+    document.getElementById(
+        "formTitle"
+    ).textContent =
         t("newDay");
 
     setDefaultDate();
@@ -1579,52 +2456,85 @@ function clearForm() {
    EDIT
 ========================================================= */
 
-function editEntry(clientId) {
+function editEntry(
+    clientId
+) {
     const entry =
         entries.find(
             item =>
-                String(item.clientId) ===
-                String(clientId)
+                String(
+                    item.clientId
+                ) ===
+                String(
+                    clientId
+                )
         );
 
-    if (!entry) return;
+    if (!entry) {
+        return;
+    }
 
-    editingId = entry.clientId;
+    editingId =
+        entry.clientId;
 
-    document.getElementById("date").value =
+    document.getElementById(
+        "date"
+    ).value =
         entry.date || "";
 
-    document.getElementById("startTime").value =
+    document.getElementById(
+        "startTime"
+    ).value =
         entry.startTime || "";
 
-    document.getElementById("endTime").value =
+    document.getElementById(
+        "endTime"
+    ).value =
         entry.endTime || "";
 
-    document.getElementById("breakMinutes").value =
+    document.getElementById(
+        "breakMinutes"
+    ).value =
         entry.breakMinutes || 0;
 
-    document.getElementById("uber").value =
+    document.getElementById(
+        "uber"
+    ).value =
         entry.uber || "";
 
-    document.getElementById("bolt").value =
+    document.getElementById(
+        "bolt"
+    ).value =
         entry.bolt || "";
 
-    document.getElementById("otherApps").value =
+    document.getElementById(
+        "otherApps"
+    ).value =
         entry.otherApps || "";
 
-    document.getElementById("cash").value =
+    document.getElementById(
+        "cash"
+    ).value =
         entry.cash || "";
 
-    document.getElementById("tips").value =
+    document.getElementById(
+        "tips"
+    ).value =
         entry.tips || "";
 
-    document.getElementById("fuel").value =
+    document.getElementById(
+        "fuel"
+    ).value =
         entry.fuel || "";
 
-    document.getElementById("otherExpenses").value =
+    document.getElementById(
+        "otherExpenses"
+    ).value =
         entry.otherExpenses || "";
 
-    document.getElementById("formTitle").textContent =
+    document.getElementById(
+        "formTitle"
+    ).textContent =
         t("editDay");
 
     window.scrollTo({
@@ -1638,25 +2548,41 @@ function editEntry(clientId) {
    DELETE
 ========================================================= */
 
-async function deleteEntry(clientId) {
-    if (!confirm(t("deleteConfirm"))) {
+async function deleteEntry(
+    clientId
+) {
+    if (
+        !confirm(
+            t("deleteConfirm")
+        )
+    ) {
         return;
     }
 
     const entry =
         entries.find(
             item =>
-                String(item.clientId) ===
-                String(clientId)
+                String(
+                    item.clientId
+                ) ===
+                String(
+                    clientId
+                )
         );
 
-    if (!entry) return;
+    if (!entry) {
+        return;
+    }
 
     entries =
         entries.filter(
             item =>
-                String(item.clientId) !==
-                String(clientId)
+                String(
+                    item.clientId
+                ) !==
+                String(
+                    clientId
+                )
         );
 
     saveLocal();
@@ -1669,16 +2595,25 @@ async function deleteEntry(clientId) {
     );
 
     if (currentUser) {
-        if (navigator.onLine) {
+
+        if (
+            navigator.onLine
+        ) {
+
             try {
                 await deleteEntryFromCloud(
                     entry.clientId
                 );
 
-                setSyncStatus(t("syncDone"));
+                setSyncStatus(
+                    t("syncDone")
+                );
 
             } catch (error) {
-                console.error(error);
+
+                console.error(
+                    error
+                );
 
                 if (
                     !deletedClientIds.includes(
@@ -1697,7 +2632,9 @@ async function deleteEntry(clientId) {
                     error.message
                 );
             }
+
         } else {
+
             if (
                 !deletedClientIds.includes(
                     entry.clientId
@@ -1710,24 +2647,30 @@ async function deleteEntry(clientId) {
 
             saveLocal();
 
-            setSyncStatus(t("offline"));
+            setSyncStatus(
+                t("offline")
+            );
         }
     }
 }
 
 
 /* =========================================================
-   STATISTICS
+   STATISTICS - TOTAL
 ========================================================= */
 
 function renderTotalStats() {
-    const totalDays = entries.length;
+
+    const totalDays =
+        entries.length;
 
     const totalMinutes =
         entries.reduce(
             (sum, item) =>
                 sum +
-                Number(item.duration || 0),
+                Number(
+                    item.duration || 0
+                ),
             0
         );
 
@@ -1735,7 +2678,19 @@ function renderTotalStats() {
         entries.reduce(
             (sum, item) =>
                 sum +
-                Number(item.income || 0),
+                Number(
+                    item.income || 0
+                ),
+            0
+        );
+
+    const totalTips =
+        entries.reduce(
+            (sum, item) =>
+                sum +
+                Number(
+                    item.tips || 0
+                ),
             0
         );
 
@@ -1743,7 +2698,9 @@ function renderTotalStats() {
         entries.reduce(
             (sum, item) =>
                 sum +
-                Number(item.cash || 0),
+                Number(
+                    item.cash || 0
+                ),
             0
         );
 
@@ -1751,35 +2708,420 @@ function renderTotalStats() {
         entries.reduce(
             (sum, item) =>
                 sum +
-                Number(item.profit || 0),
+                Number(
+                    item.profit || 0
+                ),
             0
         );
 
-    document.getElementById("totalDays").textContent =
+    document.getElementById(
+        "totalDays"
+    ).textContent =
         totalDays;
 
-    document.getElementById("totalHours").textContent =
-        formatHours(totalMinutes);
+    document.getElementById(
+        "totalHours"
+    ).textContent =
+        formatHours(
+            totalMinutes
+        );
 
-    document.getElementById("totalIncome").textContent =
-        money(totalIncome);
+    document.getElementById(
+        "totalIncome"
+    ).textContent =
+        money(
+            totalIncome
+        );
 
-    document.getElementById("totalCash").textContent =
-        money(totalCash);
+    document.getElementById(
+        "totalTips"
+    ).textContent =
+        money(
+            totalTips
+        );
 
-    document.getElementById("totalProfit").textContent =
-        money(totalProfit);
+    document.getElementById(
+        "totalCash"
+    ).textContent =
+        money(
+            totalCash
+        );
+
+    document.getElementById(
+        "totalProfit"
+    ).textContent =
+        money(
+            totalProfit
+        );
 }
 
+
+/* =========================================================
+   STATISTICS - WEEK
+========================================================= */
+
+function renderWeekStats() {
+
+    const weekDates =
+        getWeekDates();
+
+    const monday =
+        weekDates[0];
+
+    const sunday =
+        weekDates[6];
+
+    const mondayString =
+        getLocalDateString(
+            monday
+        );
+
+    const sundayString =
+        getLocalDateString(
+            sunday
+        );
+
+    document.getElementById(
+        "weekRange"
+    ).textContent =
+        `${t("weekFrom")} ` +
+        `${formatDate(mondayString)} – ` +
+        `${formatDate(sundayString)}`;
+
+    const weekEntries =
+        entries.filter(
+            item =>
+                String(
+                    item.date || ""
+                ) >= mondayString &&
+                String(
+                    item.date || ""
+                ) <= sundayString
+        );
+
+    const shifts =
+        weekEntries.length;
+
+    const minutes =
+        weekEntries.reduce(
+            (sum, item) =>
+                sum +
+                Number(
+                    item.duration || 0
+                ),
+            0
+        );
+
+    const income =
+        weekEntries.reduce(
+            (sum, item) =>
+                sum +
+                Number(
+                    item.income || 0
+                ),
+            0
+        );
+
+    const tips =
+        weekEntries.reduce(
+            (sum, item) =>
+                sum +
+                Number(
+                    item.tips || 0
+                ),
+            0
+        );
+
+    const expenses =
+        weekEntries.reduce(
+            (sum, item) =>
+                sum +
+                Number(
+                    item.expenses || 0
+                ),
+            0
+        );
+
+    const profit =
+        weekEntries.reduce(
+            (sum, item) =>
+                sum +
+                Number(
+                    item.profit || 0
+                ),
+            0
+        );
+
+    const cash =
+        weekEntries.reduce(
+            (sum, item) =>
+                sum +
+                Number(
+                    item.cash || 0
+                ),
+            0
+        );
+
+    const averageDay =
+        shifts > 0
+            ? profit / shifts
+            : 0;
+
+    const averageHour =
+        minutes > 0
+            ? profit /
+              (minutes / 60)
+            : 0;
+
+    const averageShift =
+        shifts > 0
+            ? profit / shifts
+            : 0;
+
+    document.getElementById(
+        "weekDays"
+    ).textContent =
+        shifts;
+
+    document.getElementById(
+        "weekHours"
+    ).textContent =
+        formatHours(
+            minutes
+        );
+
+    document.getElementById(
+        "weekIncome"
+    ).textContent =
+        money(income);
+
+    document.getElementById(
+        "weekTips"
+    ).textContent =
+        money(tips);
+
+    document.getElementById(
+        "weekExpenses"
+    ).textContent =
+        money(expenses);
+
+    document.getElementById(
+        "weekProfit"
+    ).textContent =
+        money(profit);
+
+    document.getElementById(
+        "weekCash"
+    ).textContent =
+        money(cash);
+
+    document.getElementById(
+        "weekAverageDay"
+    ).textContent =
+        money(averageDay);
+
+    document.getElementById(
+        "weekAverageHour"
+    ).textContent =
+        money(averageHour);
+
+    document.getElementById(
+        "weekAverageShift"
+    ).textContent =
+        money(averageShift);
+
+
+    /*
+     * Розбивка по кожному дню
+     */
+    const weekDaysList =
+        document.getElementById(
+            "weekDaysList"
+        );
+
+    weekDaysList.innerHTML =
+        weekDates.map(
+            (date, index) => {
+
+                const dateString =
+                    getLocalDateString(
+                        date
+                    );
+
+                const dayEntries =
+                    weekEntries.filter(
+                        item =>
+                            String(
+                                item.date
+                            ) ===
+                            dateString
+                    );
+
+                const dayMinutes =
+                    dayEntries.reduce(
+                        (sum, item) =>
+                            sum +
+                            Number(
+                                item.duration ||
+                                0
+                            ),
+                        0
+                    );
+
+                const dayIncome =
+                    dayEntries.reduce(
+                        (sum, item) =>
+                            sum +
+                            Number(
+                                item.income ||
+                                0
+                            ),
+                        0
+                    );
+
+                const dayTips =
+                    dayEntries.reduce(
+                        (sum, item) =>
+                            sum +
+                            Number(
+                                item.tips ||
+                                0
+                            ),
+                        0
+                    );
+
+                const dayFuel =
+                    dayEntries.reduce(
+                        (sum, item) =>
+                            sum +
+                            Number(
+                                item.fuel ||
+                                0
+                            ),
+                        0
+                    );
+
+                const dayOtherExpenses =
+                    dayEntries.reduce(
+                        (sum, item) =>
+                            sum +
+                            Number(
+                                item.otherExpenses ||
+                                0
+                            ),
+                        0
+                    );
+
+                const dayProfit =
+                    dayEntries.reduce(
+                        (sum, item) =>
+                            sum +
+                            Number(
+                                item.profit ||
+                                0
+                            ),
+                        0
+                    );
+
+                const dayCash =
+                    dayEntries.reduce(
+                        (sum, item) =>
+                            sum +
+                            Number(
+                                item.cash ||
+                                0
+                            ),
+                        0
+                    );
+
+                const hasWork =
+                    dayEntries.length > 0;
+
+                return `
+                    <div class="week-day">
+
+                        <div class="week-day-header">
+                            <div>
+                                <div class="week-day-name">
+                                    ${getWeekdayName(index)}
+                                </div>
+
+                                <div class="week-day-date">
+                                    ${formatDate(dateString)}
+                                </div>
+                            </div>
+
+                            <strong>
+                                ${
+                                    hasWork
+                                        ? money(dayProfit)
+                                        : t("noWork")
+                                }
+                            </strong>
+                        </div>
+
+                        ${
+                            hasWork
+                                ? `
+                                    <div class="week-day-stats">
+
+                                        <div class="week-day-stat">
+                                            💰 ${t("dayIncome")}:<br>
+                                            <strong>${money(dayIncome)}</strong>
+                                        </div>
+
+                                        <div class="week-day-stat">
+                                            💛 ${t("dayTips")}:<br>
+                                            <strong>${money(dayTips)}</strong>
+                                        </div>
+
+                                        <div class="week-day-stat">
+                                            ⛽ ${t("dayFuel")}:<br>
+                                            <strong>${money(dayFuel)}</strong>
+                                        </div>
+
+                                        <div class="week-day-stat">
+                                            💸 ${t("dayOtherExpenses")}:<br>
+                                            <strong>${money(dayOtherExpenses)}</strong>
+                                        </div>
+
+                                        <div class="week-day-stat">
+                                            💵 ${t("dayCash")}:<br>
+                                            <strong>${money(dayCash)}</strong>
+                                        </div>
+
+                                        <div class="week-day-stat">
+                                            ⏱️ ${formatHours(dayMinutes)}
+                                        </div>
+
+                                    </div>
+                                `
+                                : ""
+                        }
+
+                    </div>
+                `;
+            }
+        ).join("");
+}
+
+
+/* =========================================================
+   STATISTICS - MONTH
+========================================================= */
+
 function renderMonthStats() {
-    const now = new Date();
+
+    const now =
+        new Date();
 
     const year =
         now.getFullYear();
 
     const month =
-        String(now.getMonth() + 1)
-            .padStart(2, "0");
+        String(
+            now.getMonth() + 1
+        ).padStart(2, "0");
 
     const prefix =
         `${year}-${month}`;
@@ -1787,8 +3129,11 @@ function renderMonthStats() {
     const monthEntries =
         entries.filter(
             item =>
-                String(item.date || "")
-                    .startsWith(prefix)
+                String(
+                    item.date || ""
+                ).startsWith(
+                    prefix
+                )
         );
 
     const days =
@@ -1798,7 +3143,9 @@ function renderMonthStats() {
         monthEntries.reduce(
             (sum, item) =>
                 sum +
-                Number(item.duration || 0),
+                Number(
+                    item.duration || 0
+                ),
             0
         );
 
@@ -1806,7 +3153,19 @@ function renderMonthStats() {
         monthEntries.reduce(
             (sum, item) =>
                 sum +
-                Number(item.income || 0),
+                Number(
+                    item.income || 0
+                ),
+            0
+        );
+
+    const tips =
+        monthEntries.reduce(
+            (sum, item) =>
+                sum +
+                Number(
+                    item.tips || 0
+                ),
             0
         );
 
@@ -1814,7 +3173,9 @@ function renderMonthStats() {
         monthEntries.reduce(
             (sum, item) =>
                 sum +
-                Number(item.cash || 0),
+                Number(
+                    item.cash || 0
+                ),
             0
         );
 
@@ -1822,23 +3183,42 @@ function renderMonthStats() {
         monthEntries.reduce(
             (sum, item) =>
                 sum +
-                Number(item.profit || 0),
+                Number(
+                    item.profit || 0
+                ),
             0
         );
 
-    document.getElementById("monthDays").textContent =
+    document.getElementById(
+        "monthDays"
+    ).textContent =
         days;
 
-    document.getElementById("monthHours").textContent =
-        formatHours(minutes);
+    document.getElementById(
+        "monthHours"
+    ).textContent =
+        formatHours(
+            minutes
+        );
 
-    document.getElementById("monthIncome").textContent =
+    document.getElementById(
+        "monthIncome"
+    ).textContent =
         money(income);
 
-    document.getElementById("monthCash").textContent =
+    document.getElementById(
+        "monthTips"
+    ).textContent =
+        money(tips);
+
+    document.getElementById(
+        "monthCash"
+    ).textContent =
         money(cash);
 
-    document.getElementById("monthProfit").textContent =
+    document.getElementById(
+        "monthProfit"
+    ).textContent =
         money(profit);
 }
 
@@ -1848,10 +3228,14 @@ function renderMonthStats() {
 ========================================================= */
 
 function renderEntries() {
+
     const container =
-        document.getElementById("entriesList");
+        document.getElementById(
+            "entriesList"
+        );
 
     if (!entries.length) {
+
         container.innerHTML =
             `<div class="empty">${t("noEntries")}</div>`;
 
@@ -1861,92 +3245,111 @@ function renderEntries() {
     const sorted =
         [...entries].sort(
             (a, b) =>
-                String(b.date).localeCompare(
-                    String(a.date)
+                String(
+                    b.date
+                ).localeCompare(
+                    String(
+                        a.date
+                    )
                 )
         );
 
     container.innerHTML =
-        sorted.map(item => {
+        sorted.map(
+            item => {
 
-            const rate =
-                item.duration > 0
-                    ? item.profit /
-                      (item.duration / 60)
-                    : 0;
+                const rate =
+                    item.duration > 0
+                        ? item.profit /
+                          (
+                              item.duration /
+                              60
+                          )
+                        : 0;
 
-            return `
-                <div class="history-item">
+                return `
+                    <div class="history-item">
 
-                    <div class="history-top">
-                        <div>
-                            <div class="history-date">
-                                ${formatDate(item.date)}
+                        <div class="history-top">
+
+                            <div>
+                                <div class="history-date">
+                                    ${formatDate(item.date)}
+                                </div>
+
+                                <div style="font-size:13px;color:#6b7280;margin-top:3px;">
+                                    ${item.startTime} – ${item.endTime}
+                                </div>
                             </div>
 
-                            <div style="font-size:13px;color:#6b7280;margin-top:3px;">
-                                ${item.startTime} – ${item.endTime}
+                            <strong>
+                                ${money(item.profit)}
+                            </strong>
+
+                        </div>
+
+                        <div class="history-main">
+
+                            <div>
+                                ⏱️ ${formatHours(
+                                    Number(
+                                        item.duration ||
+                                        0
+                                    )
+                                )}
                             </div>
+
+                            <div>
+                                💰 ${t("income")}:
+                                ${money(item.income)}
+                            </div>
+
+                            <div>
+                                💛 ${t("tips")}:
+                                ${money(item.tips)}
+                            </div>
+
+                            <div>
+                                💵 ${t("cash")}:
+                                ${money(item.cash)}
+                            </div>
+
+                            <div>
+                                ⛽ ${t("fuel")}:
+                                ${money(item.fuel)}
+                            </div>
+
+                            <div>
+                                💸 ${t("otherExpenses")}:
+                                ${money(item.otherExpenses)}
+                            </div>
+
+                            <div>
+                                📈 ${money(rate)}/h
+                            </div>
+
                         </div>
 
-                        <strong>
-                            ${money(item.profit)}
-                        </strong>
-                    </div>
+                        <div class="history-actions">
 
-                    <div class="history-main">
+                            <button
+                                class="secondary small-button"
+                                onclick="editEntry('${String(item.clientId)}')">
+                                ✏️ ${t("edit")}
+                            </button>
 
-                        <div>
-                            ⏱️ ${formatHours(
-                                Number(item.duration || 0)
-                            )}
+                            <button
+                                class="danger small-button"
+                                onclick="deleteEntry('${String(item.clientId)}')">
+                                🗑️ ${t("delete")}
+                            </button>
+
                         </div>
-
-                        <div>
-                            💰 ${t("income")}:
-                            ${money(item.income)}
-                        </div>
-
-                        <div>
-                            💵 ${t("cash")}:
-                            ${money(item.cash)}
-                        </div>
-
-                        <div>
-                            ⛽ ${t("fuel")}:
-                            ${money(item.fuel)}
-                        </div>
-
-                        <div>
-                            💸 ${t("otherExpenses")}:
-                            ${money(item.otherExpenses)}
-                        </div>
-
-                        <div>
-                            📈 ${money(rate)}/h
-                        </div>
-
-                    </div>
-
-                    <div class="history-actions">
-
-                        <button
-                            class="secondary small-button"
-                            onclick="editEntry('${String(item.clientId)}')">
-                            ✏️ ${t("edit")}
-                        </button>
-
-                        <button
-                            class="danger small-button"
-                            onclick="deleteEntry('${String(item.clientId)}')">
-                            🗑️ ${t("delete")}
-                        </button>
 
                     </div>
-
-                </div>
-            `;
-        }).join("");
+                `;
+            }
+        ).join("");
 }
 
 
@@ -1955,6 +3358,7 @@ function renderEntries() {
 ========================================================= */
 
 function exportCSV() {
+
     const headers = [
         "Date",
         "Start",
@@ -1975,60 +3379,79 @@ function exportCSV() {
     ];
 
     const rows =
-        entries.map(item => [
-            item.date,
-            item.startTime,
-            item.endTime,
-            item.totalDuration,
-            item.breakMinutes,
-            item.duration,
-            item.uber,
-            item.bolt,
-            item.otherApps,
-            item.cash,
-            item.tips,
-            item.fuel,
-            item.otherExpenses,
-            item.income,
-            item.expenses,
-            item.profit
-        ]);
+        entries.map(
+            item => [
+                item.date,
+                item.startTime,
+                item.endTime,
+                item.totalDuration,
+                item.breakMinutes,
+                item.duration,
+                item.uber,
+                item.bolt,
+                item.otherApps,
+                item.cash,
+                item.tips,
+                item.fuel,
+                item.otherExpenses,
+                item.income,
+                item.expenses,
+                item.profit
+            ]
+        );
 
     const csv =
         [headers, ...rows]
-            .map(row =>
-                row.map(value => {
-                    const text =
-                        String(value ?? "");
+            .map(
+                row =>
+                    row.map(
+                        value => {
 
-                    return `"${text.replace(
-                        /"/g,
-                        '""'
-                    )}"`;
-                }).join(",")
+                            const text =
+                                String(
+                                    value ??
+                                    ""
+                                );
+
+                            return (
+                                `"${text.replace(
+                                    /"/g,
+                                    '""'
+                                )}"`
+                            );
+                        }
+                    ).join(",")
             )
             .join("\n");
 
     const blob =
         new Blob(
-            ["\uFEFF" + csv],
+            [
+                "\uFEFF" +
+                csv
+            ],
             {
-                type: "text/csv;charset=utf-8;"
+                type:
+                    "text/csv;charset=utf-8;"
             }
         );
 
     const url =
-        URL.createObjectURL(blob);
+        URL.createObjectURL(
+            blob
+        );
 
     const a =
-        document.createElement("a");
+        document.createElement(
+            "a"
+        );
 
     a.href = url;
 
     a.download =
         `taxi-manager-${new Date()
             .toISOString()
-            .slice(0,10)}.csv`;
+            .slice(0, 10)}.csv`;
 
     document.body.appendChild(a);
 
@@ -2036,7 +3459,9 @@ function exportCSV() {
 
     a.remove();
 
-    URL.revokeObjectURL(url);
+    URL.revokeObjectURL(
+        url
+    );
 }
 
 
@@ -2045,10 +3470,15 @@ function exportCSV() {
 ========================================================= */
 
 function renderAll() {
+
     updateLanguageUI();
 
     renderTotalStats();
+
+    renderWeekStats();
+
     renderMonthStats();
+
     renderEntries();
 }
 
@@ -2058,6 +3488,7 @@ function renderAll() {
 ========================================================= */
 
 async function initAuth() {
+
     if (!supabaseClient) {
         updateAuthUI();
         return;
@@ -2065,36 +3496,53 @@ async function initAuth() {
 
     const {
         data
-    } = await supabaseClient.auth.getSession();
+    } =
+        await supabaseClient
+            .auth
+            .getSession();
 
     currentUser =
-        data.session?.user || null;
+        data.session?.user ||
+        null;
 
     updateAuthUI();
 
     if (currentUser) {
         setTimeout(
-            () => syncWithCloud(false),
+            () =>
+                syncWithCloud(
+                    false
+                ),
             0
         );
     }
 
-    supabaseClient.auth.onAuthStateChange(
-        (event, session) => {
+    supabaseClient.auth
+        .onAuthStateChange(
+            (
+                event,
+                session
+            ) => {
 
-            currentUser =
-                session?.user || null;
+                currentUser =
+                    session?.user ||
+                    null;
 
-            updateAuthUI();
+                updateAuthUI();
 
-            if (session?.user) {
-                setTimeout(
-                    () => syncWithCloud(false),
-                    0
-                );
+                if (
+                    session?.user
+                ) {
+                    setTimeout(
+                        () =>
+                            syncWithCloud(
+                                false
+                            ),
+                        0
+                    );
+                }
             }
-        }
-    );
+        );
 }
 
 
@@ -2105,8 +3553,11 @@ async function initAuth() {
 window.addEventListener(
     "online",
     () => {
+
         if (currentUser) {
-            syncWithCloud(false);
+            syncWithCloud(
+                false
+            );
         }
     }
 );
@@ -2114,8 +3565,11 @@ window.addEventListener(
 window.addEventListener(
     "offline",
     () => {
+
         if (currentUser) {
-            setSyncStatus(t("offline"));
+            setSyncStatus(
+                t("offline")
+            );
         }
     }
 );
@@ -2138,17 +3592,21 @@ initAuth();
    SERVICE WORKER
 ========================================================= */
 
-if ("serviceWorker" in navigator) {
+if (
+    "serviceWorker" in navigator
+) {
     window.addEventListener(
         "load",
         () => {
+
             navigator.serviceWorker
                 .register("./sw.js")
-                .catch(error =>
-                    console.log(
-                        "Service Worker:",
-                        error
-                    )
+                .catch(
+                    error =>
+                        console.log(
+                            "Service Worker:",
+                            error
+                        )
                 );
         }
     );
