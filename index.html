@@ -257,6 +257,14 @@ button {
     background: #f5f3ff;
 }
 
+.stat.tax {
+    background: #fef2f2;
+}
+
+.stat.rental {
+    background: #fff7ed;
+}
+
 .navigation {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -354,6 +362,7 @@ button {
     margin-top: 8px;
     color: #6b7280;
     font-size: 12px;
+    line-height: 1.4;
 }
 
 .week-range {
@@ -460,10 +469,47 @@ button {
     font-size: 12px;
     margin-top: -5px;
     margin-bottom: 12px;
+    line-height: 1.4;
 }
 
 .month-expenses {
     margin-top: 14px;
+}
+
+.car-cost-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.car-cost-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.car-cost-field label {
+    color: #5b21b6;
+}
+
+.car-cost-total {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    background: white;
+    font-weight: 700;
+    text-align: center;
+}
+
+.month-car-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.month-car-grid .stat {
+    min-width: 0;
 }
 
 @media (max-width: 700px) {
@@ -501,6 +547,14 @@ button {
     .period-title {
         font-size: 14px;
     }
+
+    .car-cost-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .month-car-grid {
+        grid-template-columns: 1fr 1fr;
+    }
 }
 </style>
 </head>
@@ -533,7 +587,7 @@ button {
         </button>
     </div>
 
-    <!-- ================= HOME ================= -->
+    <!-- HOME -->
 
     <div id="homePage" class="page active">
 
@@ -544,7 +598,6 @@ button {
             </div>
         </div>
 
-        <!-- ACCOUNT -->
         <div class="card">
             <h2>☁️ <span data-i18n="account">Обліковий запис</span></h2>
 
@@ -597,8 +650,6 @@ button {
             <div id="syncStatus" class="sync-line"></div>
         </div>
 
-
-        <!-- FORM -->
         <div class="card">
 
             <h2>📝 <span id="formTitle">Новий робочий день</span></h2>
@@ -678,8 +729,6 @@ button {
 
         </div>
 
-
-        <!-- HISTORY -->
         <div class="card">
 
             <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:12px;">
@@ -701,7 +750,7 @@ button {
     </div>
 
 
-    <!-- ================= STATISTICS ================= -->
+    <!-- STATISTICS -->
 
     <div id="statsPage" class="page">
 
@@ -724,7 +773,7 @@ button {
         </div>
 
 
-        <!-- WEEKLY STATISTICS -->
+        <!-- WEEK -->
 
         <div id="weeklyStatsPage">
 
@@ -732,23 +781,16 @@ button {
 
                 <div class="period-navigation">
 
-                    <button class="secondary" onclick="changeWeek(-1)">
-                        ←
-                    </button>
+                    <button class="secondary" onclick="changeWeek(-1)">←</button>
 
                     <div class="period-title">
 
-                        <div id="weekTitle">
-                            Тиждень
-                        </div>
-
+                        <div id="weekTitle">Тиждень</div>
                         <div id="weekRange" class="period-subtitle"></div>
 
                     </div>
 
-                    <button class="secondary" onclick="changeWeek(1)">
-                        →
-                    </button>
+                    <button class="secondary" onclick="changeWeek(1)">→</button>
 
                 </div>
 
@@ -760,12 +802,16 @@ button {
 
                 </div>
 
-
                 <div class="stats">
 
                     <div class="stat">
                         <div class="stat-value" id="weekDays">0</div>
                         <div class="stat-label" data-i18n="shifts">Змін</div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="stat-value" id="weekWorkedDays">0</div>
+                        <div class="stat-label" data-i18n="workedDays">Робочих днів</div>
                     </div>
 
                     <div class="stat">
@@ -793,9 +839,19 @@ button {
                         <div class="stat-label" data-i18n="otherExpenses">Інші витрати</div>
                     </div>
 
+                    <div class="stat tax">
+                        <div class="stat-value" id="weekTax">0 zł</div>
+                        <div class="stat-label" data-i18n="carTax">Податок</div>
+                    </div>
+
+                    <div class="stat rental">
+                        <div class="stat-value" id="weekRental">0 zł</div>
+                        <div class="stat-label" data-i18n="carRental">Оренда</div>
+                    </div>
+
                     <div class="stat car">
                         <div class="stat-value" id="weekCarCost">0 zł</div>
-                        <div class="stat-label" data-i18n="carCost">Податок + оренда</div>
+                        <div class="stat-label" data-i18n="carCost">Автомобіль разом</div>
                     </div>
 
                     <div class="stat expense">
@@ -831,22 +887,56 @@ button {
                 </div>
 
 
-                <!-- WEEKLY CAR COST -->
+                <!-- WEEK CAR COST -->
 
                 <div class="car-cost-box">
 
-                    <label for="weekCarCostInput">
-                        🚗 <span data-i18n="carCostInput">Податок + оренда автомобіля за цей тиждень</span>
+                    <label data-i18n="carCostInput">
+                        🚗 Витрати автомобіля за цей тиждень
                     </label>
 
-                    <input
-                        type="number"
-                        id="weekCarCostInput"
-                        min="0"
-                        step="0.01"
-                        placeholder="0"
-                        style="margin-top:6px;"
-                    >
+                    <div class="car-cost-grid">
+
+                        <div class="car-cost-field">
+
+                            <label for="weekTaxInput" data-i18n="carTax">
+                                Податок
+                            </label>
+
+                            <input
+                                type="number"
+                                id="weekTaxInput"
+                                min="0"
+                                step="0.01"
+                                placeholder="0"
+                                oninput="updateWeekCarCostPreview()"
+                            >
+
+                        </div>
+
+                        <div class="car-cost-field">
+
+                            <label for="weekRentalInput" data-i18n="carRental">
+                                Оренда
+                            </label>
+
+                            <input
+                                type="number"
+                                id="weekRentalInput"
+                                min="0"
+                                step="0.01"
+                                placeholder="0"
+                                oninput="updateWeekCarCostPreview()"
+                            >
+
+                        </div>
+
+                    </div>
+
+                    <div class="car-cost-total">
+                        <span data-i18n="carCostTotal">Разом автомобіль:</span>
+                        <span id="weekCarCostPreview">0.00 zł</span>
+                    </div>
 
                     <div class="car-cost-actions">
 
@@ -861,7 +951,7 @@ button {
                     </div>
 
                     <div class="car-cost-info" data-i18n="carCostInfo">
-                        Ця сума враховується у витратах вибраного тижня та відповідного місяця.
+                        Ця сума належить до всіх 7 календарних днів тижня. У місячній статистиці вона автоматично розподіляється між місяцями пропорційно кількості днів.
                     </div>
 
                 </div>
@@ -869,7 +959,7 @@ button {
             </div>
 
 
-            <!-- WEEKLY BREAKDOWN -->
+            <!-- WEEK DAYS -->
 
             <div class="card">
 
@@ -884,7 +974,7 @@ button {
         </div>
 
 
-        <!-- MONTHLY STATISTICS -->
+        <!-- MONTH -->
 
         <div id="monthlyStatsPage" class="hidden">
 
@@ -892,23 +982,16 @@ button {
 
                 <div class="period-navigation">
 
-                    <button class="secondary" onclick="changeMonth(-1)">
-                        ←
-                    </button>
+                    <button class="secondary" onclick="changeMonth(-1)">←</button>
 
                     <div class="period-title">
 
-                        <div id="monthTitle">
-                            Місяць
-                        </div>
-
+                        <div id="monthTitle">Місяць</div>
                         <div id="monthRange" class="period-subtitle"></div>
 
                     </div>
 
-                    <button class="secondary" onclick="changeMonth(1)">
-                        →
-                    </button>
+                    <button class="secondary" onclick="changeMonth(1)">→</button>
 
                 </div>
 
@@ -926,6 +1009,11 @@ button {
                     <div class="stat">
                         <div class="stat-value" id="monthDays">0</div>
                         <div class="stat-label" data-i18n="shifts">Змін</div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="stat-value" id="monthWorkedDays">0</div>
+                        <div class="stat-label" data-i18n="workedDays">Робочих днів</div>
                     </div>
 
                     <div class="stat">
@@ -953,9 +1041,19 @@ button {
                         <div class="stat-label" data-i18n="otherExpenses">Інші витрати</div>
                     </div>
 
+                    <div class="stat tax">
+                        <div class="stat-value" id="monthTax">0 zł</div>
+                        <div class="stat-label" data-i18n="carTax">Податок</div>
+                    </div>
+
+                    <div class="stat rental">
+                        <div class="stat-value" id="monthRental">0 zł</div>
+                        <div class="stat-label" data-i18n="carRental">Оренда</div>
+                    </div>
+
                     <div class="stat car">
                         <div class="stat-value" id="monthCarCost">0 zł</div>
-                        <div class="stat-label" data-i18n="carCost">Податок + оренда</div>
+                        <div class="stat-label" data-i18n="carCost">Автомобіль разом</div>
                     </div>
 
                     <div class="stat expense">
@@ -983,26 +1081,47 @@ button {
                         <div class="stat-label" data-i18n="averageHour">Середнє за годину</div>
                     </div>
 
+                    <div class="stat">
+                        <div class="stat-value" id="monthAverageShift">0 zł</div>
+                        <div class="stat-label" data-i18n="averageShift">Середнє за зміну</div>
+                    </div>
+
                 </div>
 
             </div>
 
 
-            <!-- MONTHLY CAR COSTS -->
+            <!-- MONTH CAR COSTS -->
 
             <div class="card">
 
                 <h2>
-                    🚗 <span data-i18n="carCostMonthTitle">Податок + оренда за місяць</span>
+                    🚗 <span data-i18n="carCostMonthTitle">
+                        Податок + оренда за місяць
+                    </span>
                 </h2>
 
                 <div class="section-note" data-i18n="carCostMonthNote">
-                    Тут показана сума всіх щотижневих оплат, які належать до вибраного місяця.
+                    Кожна тижнева оплата ділиться на 7 календарних днів. Місяць отримує тільки ту частину суми, яка припадає на його дні.
+                </div>
+
+                <div class="month-car-grid">
+
+                    <div class="stat tax">
+                        <div class="stat-value" id="monthTaxLarge">0 zł</div>
+                        <div class="stat-label" data-i18n="carTax">Податок</div>
+                    </div>
+
+                    <div class="stat rental">
+                        <div class="stat-value" id="monthRentalLarge">0 zł</div>
+                        <div class="stat-label" data-i18n="carRental">Оренда</div>
+                    </div>
+
                 </div>
 
                 <div class="stat car" style="margin-top:8px;">
                     <div class="stat-value" id="monthCarCostLarge">0 zł</div>
-                    <div class="stat-label" data-i18n="carCost">Податок + оренда</div>
+                    <div class="stat-label" data-i18n="carCostTotal">Автомобіль разом</div>
                 </div>
 
             </div>
@@ -1044,6 +1163,7 @@ if (window.supabase) {
 const translations = {
 
     uk: {
+
         subtitle: "Облік роботи та доходів",
         home: "Головна",
         statistics: "Статистика",
@@ -1070,12 +1190,12 @@ const translations = {
         save: "💾 Зберегти",
         clear: "Очистити",
 
-        totalStats: "Загальна статистика",
         weekStats: "Тиждень",
         monthStats: "Місяць",
 
         days: "Днів",
         shifts: "Змін",
+        workedDays: "Робочих днів",
         hours: "Годин",
 
         income: "Дохід",
@@ -1086,12 +1206,22 @@ const translations = {
         averageHour: "Середнє за годину",
         averageShift: "Середнє за зміну",
 
-        carCost: "Податок + оренда",
-        carCostInput: "Податок + оренда автомобіля за цей тиждень",
+        carTax: "Податок",
+        carRental: "Оренда",
+        carCost: "Автомобіль разом",
+        carCostTotal: "Автомобіль разом",
+
+        carCostInput: "🚗 Витрати автомобіля за цей тиждень",
         saveCarCost: "Зберегти",
-        carCostInfo: "Ця сума враховується у витратах вибраного тижня та відповідного місяця.",
-        carCostMonthTitle: "Податок + оренда за місяць",
-        carCostMonthNote: "Тут показана сума всіх щотижневих оплат, які належать до вибраного місяця.",
+
+        carCostInfo:
+            "Ця сума належить до всіх 7 календарних днів тижня. У місячній статистиці вона автоматично розподіляється між місяцями пропорційно кількості днів.",
+
+        carCostMonthTitle:
+            "Податок + оренда за місяць",
+
+        carCostMonthNote:
+            "Кожна тижнева оплата ділиться на 7 календарних днів. Місяць отримує тільки ту частину суми, яка припадає на його дні.",
 
         currentWeek: "Поточний тиждень",
         currentMonth: "Поточний місяць",
@@ -1110,35 +1240,67 @@ const translations = {
         syncing: "Синхронізація...",
         offline: "Працюємо офлайн. Дані збережені на телефоні.",
 
-        accountCreated: "Акаунт створено. Перевір пошту для підтвердження.",
+        accountCreated:
+            "Акаунт створено. Перевір пошту для підтвердження.",
+
         accountReady: "Акаунт готовий.",
         loginSuccess: "Вхід виконано.",
         logoutSuccess: "Ви вийшли з акаунта.",
 
-        wrongCredentials: "Неправильний email або пароль.",
-        passwordShort: "Пароль має містити щонайменше 6 символів.",
-        fillAuth: "Введи email і пароль.",
+        wrongCredentials:
+            "Неправильний email або пароль.",
 
-        saveSuccess: "Запис збережено.",
-        deleteConfirm: "Видалити цей запис?",
-        deleteSuccess: "Запис видалено.",
+        passwordShort:
+            "Пароль має містити щонайменше 6 символів.",
 
-        syncError: "Помилка синхронізації: ",
-        cloudLoaded: "Дані завантажено з хмари.",
-        localUploaded: "Локальні записи завантажено в хмару.",
+        fillAuth:
+            "Введи email і пароль.",
 
-        emptyFields: "Вкажи дату, початок і кінець роботи.",
+        saveSuccess:
+            "Запис збережено.",
 
-        installTitle: "📱 Встановлення",
-        installText: "На iPhone натисни «Поділитися» → «На початковий екран».",
+        deleteConfirm:
+            "Видалити цей запис?",
 
-        newDay: "Новий робочий день",
-        editDay: "Редагування робочого дня",
+        deleteSuccess:
+            "Запис видалено.",
+
+        syncError:
+            "Помилка синхронізації: ",
+
+        cloudLoaded:
+            "Дані завантажено з хмари.",
+
+        localUploaded:
+            "Локальні записи завантажено в хмару.",
+
+        emptyFields:
+            "Вкажи дату, початок і кінець роботи.",
+
+        installTitle:
+            "📱 Встановлення",
+
+        installText:
+            "На iPhone натисни «Поділитися» → «На початковий екран».",
+
+        newDay:
+            "Новий робочий день",
+
+        editDay:
+            "Редагування робочого дня",
 
         hour: "год",
         minute: "хв",
 
         weekFrom: "Тиждень:",
+
+        dayMon: "Понеділок",
+        dayTue: "Вівторок",
+        dayWed: "Середа",
+        dayThu: "Четвер",
+        dayFri: "П'ятниця",
+        daySat: "Субота",
+        daySun: "Неділя",
 
         dayIncome: "Дохід",
         dayTips: "Чайові",
@@ -1148,7 +1310,9 @@ const translations = {
         dayCash: "Готівка"
     },
 
+
     pl: {
+
         subtitle: "Ewidencja pracy i dochodów",
         home: "Główna",
         statistics: "Statystyki",
@@ -1175,12 +1339,12 @@ const translations = {
         save: "💾 Zapisz",
         clear: "Wyczyść",
 
-        totalStats: "Statystyki ogólne",
         weekStats: "Tydzień",
         monthStats: "Miesiąc",
 
         days: "Dni",
         shifts: "Zmiany",
+        workedDays: "Dni pracy",
         hours: "Godziny",
 
         income: "Dochód",
@@ -1191,12 +1355,24 @@ const translations = {
         averageHour: "Średnio na godzinę",
         averageShift: "Średnio na zmianę",
 
-        carCost: "Podatek + wynajem",
-        carCostInput: "Podatek + wynajem samochodu za ten tydzień",
+        carTax: "Podatek",
+        carRental: "Wynajem",
+        carCost: "Samochód razem",
+        carCostTotal: "Samochód razem",
+
+        carCostInput:
+            "🚗 Wydatki samochodu za ten tydzień",
+
         saveCarCost: "Zapisz",
-        carCostInfo: "Ta kwota jest uwzględniana w wydatkach wybranego tygodnia i odpowiedniego miesiąca.",
-        carCostMonthTitle: "Podatek + wynajem za miesiąc",
-        carCostMonthNote: "Tutaj pokazana jest suma wszystkich tygodniowych opłat przypisanych do wybranego miesiąca.",
+
+        carCostInfo:
+            "Ta kwota dotyczy wszystkich 7 dni kalendarzowych tygodnia. W statystyce miesięcznej jest automatycznie dzielona proporcjonalnie między miesiące.",
+
+        carCostMonthTitle:
+            "Podatek + wynajem za miesiąc",
+
+        carCostMonthNote:
+            "Każda tygodniowa opłata jest dzielona na 7 dni kalendarzowych. Miesiąc otrzymuje tylko część przypadającą na jego dni.",
 
         currentWeek: "Bieżący tydzień",
         currentMonth: "Bieżący miesiąc",
@@ -1215,35 +1391,67 @@ const translations = {
         syncing: "Synchronizacja...",
         offline: "Praca offline. Dane zapisane w telefonie.",
 
-        accountCreated: "Konto utworzone. Sprawdź email, aby potwierdzić konto.",
+        accountCreated:
+            "Konto utworzone. Sprawdź email, aby potwierdzić konto.",
+
         accountReady: "Konto gotowe.",
         loginSuccess: "Zalogowano.",
         logoutSuccess: "Wylogowano.",
 
-        wrongCredentials: "Nieprawidłowy email lub hasło.",
-        passwordShort: "Hasło musi mieć co najmniej 6 znaków.",
-        fillAuth: "Wpisz email i hasło.",
+        wrongCredentials:
+            "Nieprawidłowy email lub hasło.",
 
-        saveSuccess: "Zapis zapisany.",
-        deleteConfirm: "Usunąć ten zapis?",
-        deleteSuccess: "Zapis usunięty.",
+        passwordShort:
+            "Hasło musi mieć co najmniej 6 znaków.",
 
-        syncError: "Błąd synchronizacji: ",
-        cloudLoaded: "Dane pobrane z chmury.",
-        localUploaded: "Lokalne zapisy przesłane do chmury.",
+        fillAuth:
+            "Wpisz email i hasło.",
 
-        emptyFields: "Podaj datę, początek i koniec pracy.",
+        saveSuccess:
+            "Zapis zapisany.",
 
-        installTitle: "📱 Instalacja",
-        installText: "Na iPhone kliknij „Udostępnij” → „Dodaj do ekranu początkowego”.",
+        deleteConfirm:
+            "Usunąć ten zapis?",
 
-        newDay: "Nowy dzień pracy",
-        editDay: "Edycja dnia pracy",
+        deleteSuccess:
+            "Zapis usunięty.",
+
+        syncError:
+            "Błąd synchronizacji: ",
+
+        cloudLoaded:
+            "Dane pobrane z chmury.",
+
+        localUploaded:
+            "Lokalne zapisy przesłane do chmury.",
+
+        emptyFields:
+            "Podaj datę, początek i koniec pracy.",
+
+        installTitle:
+            "📱 Instalacja",
+
+        installText:
+            "Na iPhone kliknij „Udostępnij” → „Dodaj do ekranu początkowego”.",
+
+        newDay:
+            "Nowy dzień pracy",
+
+        editDay:
+            "Edycja dnia pracy",
 
         hour: "godz.",
         minute: "min",
 
         weekFrom: "Tydzień:",
+
+        dayMon: "Poniedziałek",
+        dayTue: "Wtorek",
+        dayWed: "Środa",
+        dayThu: "Czwartek",
+        dayFri: "Piątek",
+        daySat: "Sobota",
+        daySun: "Niedziela",
 
         dayIncome: "Dochód",
         dayTips: "Napiwki",
@@ -1271,8 +1479,7 @@ function t(key) {
 
 function setLanguage(language) {
 
-    currentLanguage =
-        language;
+    currentLanguage = language;
 
     localStorage.setItem(
         "taxiLanguage",
@@ -1288,51 +1495,38 @@ function updateLanguageUI() {
     document.documentElement.lang =
         currentLanguage;
 
-    document.getElementById(
-        "subtitle"
-    ).textContent =
+    document.getElementById("subtitle").textContent =
         t("subtitle");
 
-    document.getElementById(
-        "installTitle"
-    ).textContent =
+    document.getElementById("installTitle").textContent =
         t("installTitle");
 
-    document.getElementById(
-        "installText"
-    ).textContent =
+    document.getElementById("installText").textContent =
         t("installText");
 
-    document.getElementById(
-        "ukBtn"
-    ).classList.toggle(
+    document.getElementById("ukBtn").classList.toggle(
         "active",
         currentLanguage === "uk"
     );
 
-    document.getElementById(
-        "plBtn"
-    ).classList.toggle(
+    document.getElementById("plBtn").classList.toggle(
         "active",
         currentLanguage === "pl"
     );
 
-    document.querySelectorAll(
-        "[data-i18n]"
-    ).forEach(el => {
-        el.textContent =
-            t(el.dataset.i18n);
-    });
+    document.querySelectorAll("[data-i18n]").forEach(
+        el => {
+            el.textContent =
+                t(el.dataset.i18n);
+        }
+    );
 
-    document.getElementById(
-        "formTitle"
-    ).textContent =
+    document.getElementById("formTitle").textContent =
         editingId
             ? t("editDay")
             : t("newDay");
 
     updateAuthUI();
-
     updateStatsModeUI();
 }
 
@@ -1373,25 +1567,37 @@ try {
 
 
 /*
- * Окреме локальне сховище
- * для щотижневого податку + оренди.
+ * Новий формат:
  *
- * Формат:
  * {
- *   "2026-10-05": 800,
- *   "2026-09-28": 800
+ *   "2026-10-05": {
+ *       tax: 200,
+ *       rental: 800
+ *   }
  * }
+ *
+ * Старий формат:
+ *
+ * {
+ *   "2026-10-05": 1000
+ * }
+ *
+ * Старі суми автоматично переводимо
+ * в tax, щоб нічого не загубити.
  */
 let weeklyCarCosts = {};
 
 try {
+
     weeklyCarCosts =
         JSON.parse(
             localStorage.getItem(
                 "taxiWeeklyCarCosts"
             ) || "{}"
         );
+
 } catch {
+
     weeklyCarCosts = {};
 }
 
@@ -1419,6 +1625,11 @@ let selectedMonthOffset =
         )
     ) || 0;
 
+
+/* =========================================================
+   PAGE NAVIGATION
+========================================================= */
+
 function showPage(page) {
 
     const home =
@@ -1443,41 +1654,21 @@ function showPage(page) {
 
     if (page === "stats") {
 
-        home.classList.remove(
-            "active"
-        );
+        home.classList.remove("active");
+        stats.classList.add("active");
 
-        stats.classList.add(
-            "active"
-        );
-
-        homeNav.classList.remove(
-            "active"
-        );
-
-        statsNav.classList.add(
-            "active"
-        );
+        homeNav.classList.remove("active");
+        statsNav.classList.add("active");
 
         renderStatistics();
 
     } else {
 
-        stats.classList.remove(
-            "active"
-        );
+        stats.classList.remove("active");
+        home.classList.add("active");
 
-        home.classList.add(
-            "active"
-        );
-
-        statsNav.classList.remove(
-            "active"
-        );
-
-        homeNav.classList.add(
-            "active"
-        );
+        statsNav.classList.remove("active");
+        homeNav.classList.add("active");
     }
 
     window.scrollTo({
@@ -1488,8 +1679,7 @@ function showPage(page) {
 
 function setStatsMode(mode) {
 
-    statsMode =
-        mode;
+    statsMode = mode;
 
     localStorage.setItem(
         "taxiStatsMode",
@@ -1597,9 +1787,7 @@ function numberValue(id) {
 
     return (
         Number(
-            document.getElementById(
-                id
-            ).value
+            document.getElementById(id).value
         ) || 0
     );
 }
@@ -1622,10 +1810,7 @@ function timeToMinutes(time) {
     );
 }
 
-function calculateDuration(
-    start,
-    end
-) {
+function calculateDuration(start, end) {
 
     let startMinutes =
         timeToMinutes(start);
@@ -1650,13 +1835,21 @@ function calculateDuration(
 
 function formatHours(minutes) {
 
+    const safeMinutes =
+        Math.max(
+            0,
+            Math.round(
+                Number(minutes) || 0
+            )
+        );
+
     const h =
         Math.floor(
-            minutes / 60
+            safeMinutes / 60
         );
 
     const m =
-        minutes % 60;
+        safeMinutes % 60;
 
     if (m === 0) {
         return (
@@ -1672,9 +1865,11 @@ function formatHours(minutes) {
 
 function money(value) {
 
+    const number =
+        Number(value) || 0;
+
     return (
-        Number(value || 0)
-            .toFixed(2) +
+        number.toFixed(2) +
         " zł"
     );
 }
@@ -1759,6 +1954,46 @@ function parseLocalDate(dateString) {
     );
 }
 
+function addDays(date, days) {
+
+    const result =
+        new Date(date);
+
+    result.setDate(
+        result.getDate() + days
+    );
+
+    return result;
+}
+
+function dateOnlyDiffDays(
+    startDate,
+    endDate
+) {
+
+    const start =
+        new Date(
+            startDate.getFullYear(),
+            startDate.getMonth(),
+            startDate.getDate()
+        );
+
+    const end =
+        new Date(
+            endDate.getFullYear(),
+            endDate.getMonth(),
+            endDate.getDate()
+        );
+
+    return Math.round(
+        (
+            end.getTime() -
+            start.getTime()
+        ) /
+        86400000
+    );
+}
+
 
 /* =========================================================
    WEEK HELPERS
@@ -1811,9 +2046,7 @@ function getSelectedWeekStart() {
     return monday;
 }
 
-function getWeekDatesFromStart(
-    monday
-) {
+function getWeekDatesFromStart(monday) {
 
     const dates = [];
 
@@ -1823,15 +2056,12 @@ function getWeekDatesFromStart(
         i++
     ) {
 
-        const date =
-            new Date(monday);
-
-        date.setDate(
-            monday.getDate() +
-            i
+        dates.push(
+            addDays(
+                monday,
+                i
+            )
         );
-
-        dates.push(date);
     }
 
     return dates;
@@ -1849,7 +2079,9 @@ function getWeekdayName(index) {
         "daySun"
     ];
 
-    return t(keys[index]);
+    return t(
+        keys[index]
+    );
 }
 
 function getSelectedWeekKey() {
@@ -1876,8 +2108,7 @@ function changeWeek(direction) {
 
 function goCurrentWeek() {
 
-    selectedWeekOffset =
-        0;
+    selectedWeekOffset = 0;
 
     localStorage.setItem(
         "taxiSelectedWeekOffset",
@@ -1975,8 +2206,7 @@ function changeMonth(direction) {
 
 function goCurrentMonth() {
 
-    selectedMonthOffset =
-        0;
+    selectedMonthOffset = 0;
 
     localStorage.setItem(
         "taxiSelectedMonthOffset",
@@ -1988,49 +2218,238 @@ function goCurrentMonth() {
 
 
 /* =========================================================
-   CAR COST
+   CAR COST MIGRATION
 ========================================================= */
+
+function normalizeWeeklyCarCosts() {
+
+    let changed = false;
+
+    Object.keys(
+        weeklyCarCosts
+    ).forEach(
+        weekKey => {
+
+            const value =
+                weeklyCarCosts[
+                    weekKey
+                ];
+
+            if (
+                typeof value === "number"
+            ) {
+
+                /*
+                 * Старий код мав одну суму
+                 * "податок + оренда".
+                 *
+                 * Щоб не втратити старі дані,
+                 * зберігаємо всю стару суму
+                 * як tax/стару автомобільну витрату.
+                 *
+                 * Нові тижні вже можна
+                 * розділяти окремо.
+                 */
+
+                weeklyCarCosts[
+                    weekKey
+                ] = {
+                    tax:
+                        Number(value) || 0,
+                    rental: 0
+                };
+
+                changed = true;
+            }
+
+            else if (
+                value &&
+                typeof value === "object"
+            ) {
+
+                const tax =
+                    Number(
+                        value.tax || 0
+                    );
+
+                const rental =
+                    Number(
+                        value.rental || 0
+                    );
+
+                const normalized = {
+                    tax:
+                        Math.max(0, tax),
+                    rental:
+                        Math.max(0, rental)
+                };
+
+                if (
+                    value.tax !==
+                    normalized.tax ||
+                    value.rental !==
+                    normalized.rental
+                ) {
+
+                    weeklyCarCosts[
+                        weekKey
+                    ] = normalized;
+
+                    changed = true;
+                }
+            }
+
+            else {
+
+                delete weeklyCarCosts[
+                    weekKey
+                ];
+
+                changed = true;
+            }
+        }
+    );
+
+    if (changed) {
+        saveLocal();
+    }
+}
+
+normalizeWeeklyCarCosts();
+
+
+/* =========================================================
+   CAR COST FUNCTIONS
+========================================================= */
+
+function getWeekCarCostBreakdown(
+    weekKey
+) {
+
+    const value =
+        weeklyCarCosts[
+            weekKey
+        ];
+
+    if (
+        value &&
+        typeof value === "object"
+    ) {
+
+        return {
+
+            tax:
+                Math.max(
+                    0,
+                    Number(
+                        value.tax || 0
+                    )
+                ),
+
+            rental:
+                Math.max(
+                    0,
+                    Number(
+                        value.rental || 0
+                    )
+                )
+        };
+    }
+
+    return {
+        tax: 0,
+        rental: 0
+    };
+}
 
 function getWeekCarCost(
     weekKey
 ) {
 
-    return Number(
-        weeklyCarCosts[
+    const costs =
+        getWeekCarCostBreakdown(
             weekKey
-        ] || 0
+        );
+
+    return (
+        costs.tax +
+        costs.rental
     );
+}
+
+function updateWeekCarCostPreview() {
+
+    const tax =
+        Math.max(
+            0,
+            Number(
+                document.getElementById(
+                    "weekTaxInput"
+                ).value
+            ) || 0
+        );
+
+    const rental =
+        Math.max(
+            0,
+            Number(
+                document.getElementById(
+                    "weekRentalInput"
+                ).value
+            ) || 0
+        );
+
+    document.getElementById(
+        "weekCarCostPreview"
+    ).textContent =
+        money(
+            tax +
+            rental
+        );
 }
 
 function saveWeekCarCost() {
 
-    const input =
-        document.getElementById(
-            "weekCarCostInput"
-        );
-
-    const value =
+    const tax =
         Math.max(
             0,
             Number(
-                input.value
+                document.getElementById(
+                    "weekTaxInput"
+                ).value
+            ) || 0
+        );
+
+    const rental =
+        Math.max(
+            0,
+            Number(
+                document.getElementById(
+                    "weekRentalInput"
+                ).value
             ) || 0
         );
 
     const weekKey =
         getSelectedWeekKey();
 
-    if (value > 0) {
-
-        weeklyCarCosts[
-            weekKey
-        ] = value;
-
-    } else {
+    if (
+        tax === 0 &&
+        rental === 0
+    ) {
 
         delete weeklyCarCosts[
             weekKey
         ];
+
+    } else {
+
+        weeklyCarCosts[
+            weekKey
+        ] = {
+            tax,
+            rental
+        };
     }
 
     saveLocal();
@@ -2056,44 +2475,166 @@ function clearWeekCarCost() {
 
 
 /*
- * Для місячної статистики:
- * беремо всі тижневі платежі,
- * дата початку яких потрапляє
- * у вибраний місяць.
+ * ОСНОВНА ЛОГІКА МІСЯЧНОГО ПОДАТКУ/ОРЕНДИ
+ *
+ * Тиждень завжди має 7 календарних днів.
+ *
+ * Наприклад:
+ *
+ * 28.09 - 04.10
+ *
+ * Якщо вибраний вересень:
+ * 28,29,30 = 3 дні
+ *
+ * Якщо вибраний жовтень:
+ * 01,02,03,04 = 4 дні
+ *
+ * При 1000 zł:
+ *
+ * Вересень:
+ * 1000 / 7 * 3 = 428.5714
+ *
+ * Жовтень:
+ * 1000 / 7 * 4 = 571.4286
+ *
+ * Разом:
+ * 1000 zł
+ *
+ * Саме тому більше не використовуємо
+ * weekKey.startsWith(monthKey).
  */
+
 function getCarCostForMonth(
     monthKey
 ) {
 
-    let total = 0;
+    let taxTotal = 0;
+    let rentalTotal = 0;
+
+    const [
+        year,
+        month
+    ] =
+        monthKey
+            .split("-")
+            .map(Number);
+
+    const monthStart =
+        new Date(
+            year,
+            month - 1,
+            1
+        );
+
+    const monthEnd =
+        new Date(
+            year,
+            month,
+            0
+        );
 
     Object.keys(
         weeklyCarCosts
     ).forEach(
         weekKey => {
 
-            if (
-                weekKey.startsWith(
-                    monthKey
-                )
-            ) {
+            const costs =
+                getWeekCarCostBreakdown(
+                    weekKey
+                );
 
-                total +=
-                    Number(
-                        weeklyCarCosts[
-                            weekKey
-                        ] || 0
-                    );
+            if (
+                costs.tax === 0 &&
+                costs.rental === 0
+            ) {
+                return;
             }
+
+            const weekStart =
+                parseLocalDate(
+                    weekKey
+                );
+
+            const weekEnd =
+                addDays(
+                    weekStart,
+                    6
+                );
+
+            /*
+             * Якщо тиждень взагалі
+             * не перетинається з місяцем,
+             * пропускаємо.
+             */
+
+            if (
+                weekEnd <
+                monthStart ||
+                weekStart >
+                monthEnd
+            ) {
+                return;
+            }
+
+            const overlapStart =
+                weekStart >
+                monthStart
+                    ? weekStart
+                    : monthStart;
+
+            const overlapEnd =
+                weekEnd <
+                monthEnd
+                    ? weekEnd
+                    : monthEnd;
+
+            const overlapDays =
+                dateOnlyDiffDays(
+                    overlapStart,
+                    overlapEnd
+                ) + 1;
+
+            if (
+                overlapDays <= 0
+            ) {
+                return;
+            }
+
+            /*
+             * Тиждень завжди 7 днів.
+             * Не округлюємо тут.
+             */
+
+            const ratio =
+                overlapDays / 7;
+
+            taxTotal +=
+                costs.tax *
+                ratio;
+
+            rentalTotal +=
+                costs.rental *
+                ratio;
         }
     );
 
-    return total;
+    return {
+
+        tax:
+            taxTotal,
+
+        rental:
+            rentalTotal,
+
+        total:
+            taxTotal +
+            rentalTotal
+    };
 }
 
 
 /* =========================================================
-   MIGRATION OLD DATA
+   ENTRY MIGRATION
 ========================================================= */
 
 entries =
@@ -2159,6 +2700,16 @@ entries =
                 item.otherExpenses || 0
             );
 
+        /*
+         * Важливо:
+         *
+         * Готівка НЕ додається до доходу,
+         * бо це спосіб отримання грошей,
+         * а не окремий заробіток.
+         *
+         * Чайові є доходом.
+         */
+
         const income =
             uber +
             bolt +
@@ -2174,6 +2725,7 @@ entries =
             expenses;
 
         return {
+
             ...item,
 
             clientId,
@@ -2719,8 +3271,7 @@ async function logoutAccount() {
         return;
     }
 
-    currentUser =
-        null;
+    currentUser = null;
 
     updateAuthUI();
 
@@ -3080,8 +3631,7 @@ async function syncWithCloud(
 
     } finally {
 
-        syncRunning =
-            false;
+        syncRunning = false;
     }
 }
 
@@ -3167,11 +3717,6 @@ async function saveEntry() {
             "otherExpenses"
         );
 
-    /*
-     * Готівка НЕ є доходом.
-     *
-     * Чайові вже входять у дохід.
-     */
     const income =
         uber +
         bolt +
@@ -3203,8 +3748,7 @@ async function saveEntry() {
 
         if (!oldEntry) {
 
-            editingId =
-                null;
+            editingId = null;
 
             return;
         }
@@ -3346,56 +3890,24 @@ async function saveEntry() {
 
 function clearForm() {
 
-    editingId =
-        null;
+    editingId = null;
 
-    document.getElementById(
-        "date"
-    ).value = "";
+    document.getElementById("date").value = "";
+    document.getElementById("startTime").value = "";
+    document.getElementById("endTime").value = "";
+    document.getElementById("breakMinutes").value = "0";
 
-    document.getElementById(
-        "startTime"
-    ).value = "";
+    document.getElementById("uber").value = "";
+    document.getElementById("bolt").value = "";
+    document.getElementById("otherApps").value = "";
 
-    document.getElementById(
-        "endTime"
-    ).value = "";
+    document.getElementById("cash").value = "";
+    document.getElementById("tips").value = "";
 
-    document.getElementById(
-        "breakMinutes"
-    ).value = "0";
+    document.getElementById("fuel").value = "";
+    document.getElementById("otherExpenses").value = "";
 
-    document.getElementById(
-        "uber"
-    ).value = "";
-
-    document.getElementById(
-        "bolt"
-    ).value = "";
-
-    document.getElementById(
-        "otherApps"
-    ).value = "";
-
-    document.getElementById(
-        "cash"
-    ).value = "";
-
-    document.getElementById(
-        "tips"
-    ).value = "";
-
-    document.getElementById(
-        "fuel"
-    ).value = "";
-
-    document.getElementById(
-        "otherExpenses"
-    ).value = "";
-
-    document.getElementById(
-        "formTitle"
-    ).textContent =
+    document.getElementById("formTitle").textContent =
         t("newDay");
 
     setDefaultDate();
@@ -3406,9 +3918,7 @@ function clearForm() {
    EDIT
 ========================================================= */
 
-function editEntry(
-    clientId
-) {
+function editEntry(clientId) {
 
     const entry =
         entries.find(
@@ -3428,64 +3938,40 @@ function editEntry(
     editingId =
         entry.clientId;
 
-    document.getElementById(
-        "date"
-    ).value =
+    document.getElementById("date").value =
         entry.date || "";
 
-    document.getElementById(
-        "startTime"
-    ).value =
+    document.getElementById("startTime").value =
         entry.startTime || "";
 
-    document.getElementById(
-        "endTime"
-    ).value =
+    document.getElementById("endTime").value =
         entry.endTime || "";
 
-    document.getElementById(
-        "breakMinutes"
-    ).value =
+    document.getElementById("breakMinutes").value =
         entry.breakMinutes || 0;
 
-    document.getElementById(
-        "uber"
-    ).value =
+    document.getElementById("uber").value =
         entry.uber || "";
 
-    document.getElementById(
-        "bolt"
-    ).value =
+    document.getElementById("bolt").value =
         entry.bolt || "";
 
-    document.getElementById(
-        "otherApps"
-    ).value =
+    document.getElementById("otherApps").value =
         entry.otherApps || "";
 
-    document.getElementById(
-        "cash"
-    ).value =
+    document.getElementById("cash").value =
         entry.cash || "";
 
-    document.getElementById(
-        "tips"
-    ).value =
+    document.getElementById("tips").value =
         entry.tips || "";
 
-    document.getElementById(
-        "fuel"
-    ).value =
+    document.getElementById("fuel").value =
         entry.fuel || "";
 
-    document.getElementById(
-        "otherExpenses"
-    ).value =
+    document.getElementById("otherExpenses").value =
         entry.otherExpenses || "";
 
-    document.getElementById(
-        "formTitle"
-    ).textContent =
+    document.getElementById("formTitle").textContent =
         t("editDay");
 
     showPage("home");
@@ -3501,9 +3987,7 @@ function editEntry(
    DELETE
 ========================================================= */
 
-async function deleteEntry(
-    clientId
-) {
+async function deleteEntry(clientId) {
 
     if (
         !confirm(
@@ -3564,9 +4048,7 @@ async function deleteEntry(
 
             } catch (error) {
 
-                console.error(
-                    error
-                );
+                console.error(error);
 
                 if (
                     !deletedClientIds.includes(
@@ -3607,20 +4089,6 @@ async function deleteEntry(
             );
         }
     }
-}
-
-
-/* =========================================================
-   TOTAL STATISTICS
-========================================================= */
-
-function renderTotalStats() {
-
-    /*
-     * Ця функція більше не показує
-     * окрему картку на головній,
-     * але залишена для сумісності.
-     */
 }
 
 
@@ -3667,18 +4135,23 @@ function renderWeekStats() {
     const weekEntries =
         entries.filter(
             item =>
-                String(
-                    item.date || ""
-                ) >=
-                mondayString &&
-                String(
-                    item.date || ""
-                ) <=
-                sundayString
+                String(item.date || "") >= mondayString &&
+                String(item.date || "") <= sundayString
         );
 
     const shifts =
         weekEntries.length;
+
+    const workedDates =
+        new Set(
+            weekEntries.map(
+                item =>
+                    String(item.date)
+            )
+        );
+
+    const workedDays =
+        workedDates.size;
 
     const minutes =
         weekEntries.reduce(
@@ -3730,18 +4203,20 @@ function renderWeekStats() {
             0
         );
 
-    const carCost =
-        getWeekCarCost(
+    const carCosts =
+        getWeekCarCostBreakdown(
             mondayString
         );
 
-    const normalExpenses =
-        fuel +
-        otherExpenses;
+    const carCost =
+        carCosts.tax +
+        carCosts.rental;
 
     const totalExpenses =
-        normalExpenses +
-        carCost;
+        fuel +
+        otherExpenses +
+        carCosts.tax +
+        carCosts.rental;
 
     const cash =
         weekEntries.reduce(
@@ -3753,28 +4228,18 @@ function renderWeekStats() {
             0
         );
 
-    /*
-     * Податок + оренда є реальною
-     * витратою, тому віднімаємо її
-     * від прибутку.
-     */
-    const profitBeforeCar =
-        weekEntries.reduce(
-            (sum, item) =>
-                sum +
-                Number(
-                    item.profit || 0
-                ),
-            0
-        );
+    const baseProfit =
+        income -
+        fuel -
+        otherExpenses;
 
     const profit =
-        profitBeforeCar -
+        baseProfit -
         carCost;
 
     const averageDay =
-        shifts > 0
-            ? profit / shifts
+        workedDays > 0
+            ? profit / workedDays
             : 0;
 
     const averageHour =
@@ -3794,11 +4259,14 @@ function renderWeekStats() {
         shifts;
 
     document.getElementById(
+        "weekWorkedDays"
+    ).textContent =
+        workedDays;
+
+    document.getElementById(
         "weekHours"
     ).textContent =
-        formatHours(
-            minutes
-        );
+        formatHours(minutes);
 
     document.getElementById(
         "weekIncome"
@@ -3819,6 +4287,16 @@ function renderWeekStats() {
         "weekOtherExpenses"
     ).textContent =
         money(otherExpenses);
+
+    document.getElementById(
+        "weekTax"
+    ).textContent =
+        money(carCosts.tax);
+
+    document.getElementById(
+        "weekRental"
+    ).textContent =
+        money(carCosts.rental);
 
     document.getElementById(
         "weekCarCost"
@@ -3855,12 +4333,27 @@ function renderWeekStats() {
     ).textContent =
         money(averageShift);
 
+
+    /*
+     * Показуємо збережені
+     * податок та оренду окремо.
+     */
+
     document.getElementById(
-        "weekCarCostInput"
+        "weekTaxInput"
     ).value =
-        carCost > 0
-            ? carCost
+        carCosts.tax > 0
+            ? carCosts.tax
             : "";
+
+    document.getElementById(
+        "weekRentalInput"
+    ).value =
+        carCosts.rental > 0
+            ? carCosts.rental
+            : "";
+
+    updateWeekCarCostPreview();
 
 
     /* DAILY BREAKDOWN */
@@ -3896,8 +4389,7 @@ function renderWeekStats() {
                         (sum, item) =>
                             sum +
                             Number(
-                                item.duration ||
-                                0
+                                item.duration || 0
                             ),
                         0
                     );
@@ -3907,8 +4399,7 @@ function renderWeekStats() {
                         (sum, item) =>
                             sum +
                             Number(
-                                item.income ||
-                                0
+                                item.income || 0
                             ),
                         0
                     );
@@ -3918,8 +4409,7 @@ function renderWeekStats() {
                         (sum, item) =>
                             sum +
                             Number(
-                                item.tips ||
-                                0
+                                item.tips || 0
                             ),
                         0
                     );
@@ -3929,8 +4419,7 @@ function renderWeekStats() {
                         (sum, item) =>
                             sum +
                             Number(
-                                item.fuel ||
-                                0
+                                item.fuel || 0
                             ),
                         0
                     );
@@ -3940,8 +4429,7 @@ function renderWeekStats() {
                         (sum, item) =>
                             sum +
                             Number(
-                                item.otherExpenses ||
-                                0
+                                item.otherExpenses || 0
                             ),
                         0
                     );
@@ -3951,8 +4439,7 @@ function renderWeekStats() {
                         (sum, item) =>
                             sum +
                             Number(
-                                item.profit ||
-                                0
+                                item.profit || 0
                             ),
                         0
                     );
@@ -3962,8 +4449,7 @@ function renderWeekStats() {
                         (sum, item) =>
                             sum +
                             Number(
-                                item.cash ||
-                                0
+                                item.cash || 0
                             ),
                         0
                     );
@@ -4102,18 +4588,23 @@ function renderMonthStats() {
     const monthEntries =
         entries.filter(
             item =>
-                String(
-                    item.date || ""
-                ) >=
-                firstDay &&
-                String(
-                    item.date || ""
-                ) <=
-                lastDay
+                String(item.date || "") >= firstDay &&
+                String(item.date || "") <= lastDay
         );
 
     const shifts =
         monthEntries.length;
+
+    const workedDates =
+        new Set(
+            monthEntries.map(
+                item =>
+                    String(item.date)
+            )
+        );
+
+    const workedDays =
+        workedDates.size;
 
     const minutes =
         monthEntries.reduce(
@@ -4165,18 +4656,31 @@ function renderMonthStats() {
             0
         );
 
-    const carCost =
+
+    /*
+     * КЛЮЧОВИЙ МОМЕНТ:
+     *
+     * Тут більше НЕ беремо
+     * весь тиждень за датою понеділка.
+     *
+     * getCarCostForMonth()
+     * ділить кожен тиждень
+     * пропорційно календарним дням.
+     */
+
+    const carCosts =
         getCarCostForMonth(
             monthKey
         );
 
-    const normalExpenses =
-        fuel +
-        otherExpenses;
+    const carCost =
+        carCosts.total;
 
     const totalExpenses =
-        normalExpenses +
-        carCost;
+        fuel +
+        otherExpenses +
+        carCosts.tax +
+        carCosts.rental;
 
     const cash =
         monthEntries.reduce(
@@ -4188,23 +4692,19 @@ function renderMonthStats() {
             0
         );
 
-    const profitBeforeCar =
-        monthEntries.reduce(
-            (sum, item) =>
-                sum +
-                Number(
-                    item.profit || 0
-                ),
-            0
-        );
+    const baseProfit =
+        income -
+        fuel -
+        otherExpenses;
 
     const profit =
-        profitBeforeCar -
-        carCost;
+        baseProfit -
+        carCosts.tax -
+        carCosts.rental;
 
     const averageDay =
-        shifts > 0
-            ? profit / shifts
+        workedDays > 0
+            ? profit / workedDays
             : 0;
 
     const averageHour =
@@ -4213,17 +4713,25 @@ function renderMonthStats() {
               (minutes / 60)
             : 0;
 
+    const averageShift =
+        shifts > 0
+            ? profit / shifts
+            : 0;
+
     document.getElementById(
         "monthDays"
     ).textContent =
         shifts;
 
     document.getElementById(
+        "monthWorkedDays"
+    ).textContent =
+        workedDays;
+
+    document.getElementById(
         "monthHours"
     ).textContent =
-        formatHours(
-            minutes
-        );
+        formatHours(minutes);
 
     document.getElementById(
         "monthIncome"
@@ -4246,12 +4754,17 @@ function renderMonthStats() {
         money(otherExpenses);
 
     document.getElementById(
-        "monthCarCost"
+        "monthTax"
     ).textContent =
-        money(carCost);
+        money(carCosts.tax);
 
     document.getElementById(
-        "monthCarCostLarge"
+        "monthRental"
+    ).textContent =
+        money(carCosts.rental);
+
+    document.getElementById(
+        "monthCarCost"
     ).textContent =
         money(carCost);
 
@@ -4279,6 +4792,26 @@ function renderMonthStats() {
         "monthAverageHour"
     ).textContent =
         money(averageHour);
+
+    document.getElementById(
+        "monthAverageShift"
+    ).textContent =
+        money(averageShift);
+
+    document.getElementById(
+        "monthTaxLarge"
+    ).textContent =
+        money(carCosts.tax);
+
+    document.getElementById(
+        "monthRentalLarge"
+    ).textContent =
+        money(carCosts.rental);
+
+    document.getElementById(
+        "monthCarCostLarge"
+    ).textContent =
+        money(carCost);
 }
 
 
@@ -4602,9 +5135,7 @@ async function initAuth() {
 
         setTimeout(
             () =>
-                syncWithCloud(
-                    false
-                ),
+                syncWithCloud(false),
             0
         );
     }
@@ -4628,9 +5159,7 @@ async function initAuth() {
 
                     setTimeout(
                         () =>
-                            syncWithCloud(
-                                false
-                            ),
+                            syncWithCloud(false),
                         0
                     );
                 }
