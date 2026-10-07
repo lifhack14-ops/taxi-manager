@@ -129,12 +129,6 @@ input:focus {
     border-color: #2563eb;
 }
 
-.buttons {
-    display: flex;
-    gap: 10px;
-    margin-top: 14px;
-}
-
 button {
     border: 0;
     border-radius: 10px;
@@ -142,6 +136,12 @@ button {
     font-size: 15px;
     font-weight: 600;
     cursor: pointer;
+}
+
+.buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
 }
 
 .primary {
@@ -184,11 +184,6 @@ button {
     color: #065f46;
 }
 
-.auth-status.offline {
-    background: #fff7ed;
-    color: #9a3412;
-}
-
 .auth-actions {
     display: flex;
     gap: 8px;
@@ -224,7 +219,7 @@ button {
 
 .stats {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(125px, 1fr));
     gap: 8px;
 }
 
@@ -246,10 +241,124 @@ button {
     color: #6b7280;
 }
 
+.stat.highlight {
+    background: #eff6ff;
+}
+
+.stat.expense {
+    background: #fff7ed;
+}
+
+.stat.profit {
+    background: #ecfdf5;
+}
+
+.stat.car {
+    background: #f5f3ff;
+}
+
+.navigation {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.nav-button {
+    background: white;
+    color: #4b5563;
+    border: 1px solid #e5e7eb;
+}
+
+.nav-button.active {
+    background: #111827;
+    color: white;
+    border-color: #111827;
+}
+
+.page {
+    display: none;
+}
+
+.page.active {
+    display: block;
+}
+
+.stats-switch {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.stats-switch button {
+    background: #f3f4f6;
+    color: #4b5563;
+}
+
+.stats-switch button.active {
+    background: #2563eb;
+    color: white;
+}
+
+.period-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.period-navigation button {
+    flex: 0 0 auto;
+    padding: 10px 12px;
+}
+
+.period-title {
+    text-align: center;
+    flex: 1;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.period-subtitle {
+    color: #6b7280;
+    font-size: 12px;
+    text-align: center;
+    margin-top: 3px;
+}
+
+.car-cost-box {
+    margin-top: 14px;
+    padding: 14px;
+    background: #f5f3ff;
+    border: 1px solid #ddd6fe;
+    border-radius: 12px;
+}
+
+.car-cost-box label {
+    color: #5b21b6;
+}
+
+.car-cost-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.car-cost-actions button {
+    padding: 10px 12px;
+}
+
+.car-cost-info {
+    margin-top: 8px;
+    color: #6b7280;
+    font-size: 12px;
+}
+
 .week-range {
     color: #6b7280;
     font-size: 13px;
-    margin-top: -7px;
     margin-bottom: 12px;
 }
 
@@ -268,7 +377,7 @@ button {
 .week-day-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     gap: 10px;
     margin-bottom: 8px;
 }
@@ -280,6 +389,7 @@ button {
 .week-day-date {
     color: #6b7280;
     font-size: 12px;
+    margin-top: 2px;
 }
 
 .week-day-stats {
@@ -345,15 +455,18 @@ button {
     color: #6b7280;
 }
 
+.section-note {
+    color: #6b7280;
+    font-size: 12px;
+    margin-top: -5px;
+    margin-bottom: 12px;
+}
+
+.month-expenses {
+    margin-top: 14px;
+}
+
 @media (max-width: 700px) {
-    .stats {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .stats .stat:last-child {
-        grid-column: 1 / -1;
-    }
-
     .week-day-stats {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -379,6 +492,15 @@ button {
     .week-day-stats {
         grid-template-columns: 1fr 1fr;
     }
+
+    .period-navigation button {
+        padding: 9px 10px;
+        font-size: 13px;
+    }
+
+    .period-title {
+        font-size: 14px;
+    }
 }
 </style>
 </head>
@@ -401,298 +523,505 @@ button {
 
 <div class="container">
 
-    <div class="card install-box">
-        <strong id="installTitle">📱 Встановлення</strong>
-        <div id="installText" style="margin-top:6px;font-size:13px;">
-            На iPhone натисни «Поділитися» → «На початковий екран».
-        </div>
+    <div class="navigation">
+        <button id="homeNav" class="nav-button active" onclick="showPage('home')">
+            🏠 <span data-i18n="home">Головна</span>
+        </button>
+
+        <button id="statsNav" class="nav-button" onclick="showPage('stats')">
+            📊 <span data-i18n="statistics">Статистика</span>
+        </button>
     </div>
 
-    <!-- ACCOUNT -->
-    <div class="card">
-        <h2>☁️ <span data-i18n="account">Обліковий запис</span></h2>
+    <!-- ================= HOME ================= -->
 
-        <div id="authLoggedOut">
+    <div id="homePage" class="page active">
+
+        <div class="card install-box">
+            <strong id="installTitle">📱 Встановлення</strong>
+            <div id="installText" style="margin-top:6px;font-size:13px;">
+                На iPhone натисни «Поділитися» → «На початковий екран».
+            </div>
+        </div>
+
+        <!-- ACCOUNT -->
+        <div class="card">
+            <h2>☁️ <span data-i18n="account">Обліковий запис</span></h2>
+
+            <div id="authLoggedOut">
+                <div class="grid">
+
+                    <div class="field">
+                        <label data-i18n="email">Email</label>
+                        <input id="authEmail" type="email" autocomplete="email" placeholder="you@example.com">
+                    </div>
+
+                    <div class="field">
+                        <label data-i18n="password">Пароль</label>
+                        <input id="authPassword" type="password" autocomplete="current-password" placeholder="••••••••">
+                    </div>
+
+                </div>
+
+                <div class="auth-actions" style="margin-top:12px;">
+
+                    <button class="primary" onclick="loginAccount()" data-i18n="login">
+                        Увійти
+                    </button>
+
+                    <button class="secondary" onclick="registerAccount()" data-i18n="register">
+                        Створити акаунт
+                    </button>
+
+                </div>
+            </div>
+
+            <div id="authLoggedIn" class="hidden">
+
+                <div id="accountStatus" class="auth-status connected"></div>
+
+                <div class="auth-actions">
+
+                    <button class="secondary" onclick="syncWithCloud(true)" data-i18n="sync">
+                        🔄 Синхронізувати
+                    </button>
+
+                    <button class="danger" onclick="logoutAccount()" data-i18n="logout">
+                        Вийти
+                    </button>
+
+                </div>
+            </div>
+
+            <div id="authMessage" class="message"></div>
+            <div id="syncStatus" class="sync-line"></div>
+        </div>
+
+
+        <!-- FORM -->
+        <div class="card">
+
+            <h2>📝 <span id="formTitle">Новий робочий день</span></h2>
+
             <div class="grid">
+
                 <div class="field">
-                    <label data-i18n="email">Email</label>
-                    <input id="authEmail" type="email" autocomplete="email" placeholder="you@example.com">
+                    <label data-i18n="date">Дата</label>
+                    <input type="date" id="date">
                 </div>
 
                 <div class="field">
-                    <label data-i18n="password">Пароль</label>
-                    <input id="authPassword" type="password" autocomplete="current-password" placeholder="••••••••">
+                    <label data-i18n="break">Перерва, хв</label>
+                    <input type="number" id="breakMinutes" min="0" value="0">
                 </div>
+
+                <div class="field">
+                    <label data-i18n="start">Початок</label>
+                    <input type="time" id="startTime">
+                </div>
+
+                <div class="field">
+                    <label data-i18n="end">Кінець</label>
+                    <input type="time" id="endTime">
+                </div>
+
+                <div class="field">
+                    <label>Uber</label>
+                    <input type="number" id="uber" min="0" step="0.01" placeholder="0">
+                </div>
+
+                <div class="field">
+                    <label>Bolt</label>
+                    <input type="number" id="bolt" min="0" step="0.01" placeholder="0">
+                </div>
+
+                <div class="field">
+                    <label data-i18n="otherApps">Інші додатки</label>
+                    <input type="number" id="otherApps" min="0" step="0.01" placeholder="0">
+                </div>
+
+                <div class="field">
+                    <label data-i18n="cash">Готівка</label>
+                    <input type="number" id="cash" min="0" step="0.01" placeholder="0">
+                </div>
+
+                <div class="field">
+                    <label data-i18n="tips">Чайові</label>
+                    <input type="number" id="tips" min="0" step="0.01" placeholder="0">
+                </div>
+
+                <div class="field">
+                    <label data-i18n="fuel">Пальне</label>
+                    <input type="number" id="fuel" min="0" step="0.01" placeholder="0">
+                </div>
+
+                <div class="field">
+                    <label data-i18n="otherExpenses">Інші витрати</label>
+                    <input type="number" id="otherExpenses" min="0" step="0.01" placeholder="0">
+                </div>
+
             </div>
 
-            <div class="auth-actions" style="margin-top:12px;">
-                <button class="primary" onclick="loginAccount()" data-i18n="login">
-                    Увійти
+            <div class="buttons">
+
+                <button class="primary" onclick="saveEntry()" data-i18n="save">
+                    💾 Зберегти
                 </button>
 
-                <button class="secondary" onclick="registerAccount()" data-i18n="register">
-                    Створити акаунт
-                </button>
-            </div>
-        </div>
-
-        <div id="authLoggedIn" class="hidden">
-            <div id="accountStatus" class="auth-status connected"></div>
-
-            <div class="auth-actions">
-                <button class="secondary" onclick="syncWithCloud(true)" data-i18n="sync">
-                    🔄 Синхронізувати
+                <button class="secondary" onclick="clearForm()" data-i18n="clear">
+                    Очистити
                 </button>
 
-                <button class="danger" onclick="logoutAccount()" data-i18n="logout">
-                    Вийти
+            </div>
+
+            <div id="formMessage" class="message"></div>
+
+        </div>
+
+
+        <!-- HISTORY -->
+        <div class="card">
+
+            <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:12px;">
+
+                <h2 style="margin:0;">
+                    📋 <span data-i18n="history">Історія</span>
+                </h2>
+
+                <button class="secondary small-button" onclick="exportCSV()" data-i18n="export">
+                    CSV
                 </button>
+
             </div>
+
+            <div id="entriesList"></div>
+
         </div>
 
-        <div id="authMessage" class="message"></div>
-
-        <div id="syncStatus" class="sync-line"></div>
     </div>
 
-    <!-- FORM -->
-    <div class="card">
-        <h2>📝 <span id="formTitle">Новий робочий день</span></h2>
 
-        <div class="grid">
+    <!-- ================= STATISTICS ================= -->
 
-            <div class="field">
-                <label data-i18n="date">Дата</label>
-                <input type="date" id="date">
-            </div>
+    <div id="statsPage" class="page">
 
-            <div class="field">
-                <label data-i18n="break">Перерва, хв</label>
-                <input type="number" id="breakMinutes" min="0" value="0">
-            </div>
+        <div class="card">
 
-            <div class="field">
-                <label data-i18n="start">Початок</label>
-                <input type="time" id="startTime">
-            </div>
+            <h2>📊 <span data-i18n="statistics">Статистика</span></h2>
 
-            <div class="field">
-                <label data-i18n="end">Кінець</label>
-                <input type="time" id="endTime">
-            </div>
+            <div class="stats-switch">
 
-            <div class="field">
-                <label>Uber</label>
-                <input type="number" id="uber" min="0" step="0.01" placeholder="0">
-            </div>
+                <button id="weekTab" onclick="setStatsMode('week')">
+                    📆 <span data-i18n="weekStats">Тиждень</span>
+                </button>
 
-            <div class="field">
-                <label>Bolt</label>
-                <input type="number" id="bolt" min="0" step="0.01" placeholder="0">
-            </div>
+                <button id="monthTab" onclick="setStatsMode('month')">
+                    📅 <span data-i18n="monthStats">Місяць</span>
+                </button>
 
-            <div class="field">
-                <label data-i18n="otherApps">Інші додатки</label>
-                <input type="number" id="otherApps" min="0" step="0.01" placeholder="0">
-            </div>
-
-            <div class="field">
-                <label data-i18n="cash">Готівка</label>
-                <input type="number" id="cash" min="0" step="0.01" placeholder="0">
-            </div>
-
-            <div class="field">
-                <label data-i18n="tips">Чайові</label>
-                <input type="number" id="tips" min="0" step="0.01" placeholder="0">
-            </div>
-
-            <div class="field">
-                <label data-i18n="fuel">Пальне</label>
-                <input type="number" id="fuel" min="0" step="0.01" placeholder="0">
-            </div>
-
-            <div class="field">
-                <label data-i18n="otherExpenses">Інші витрати</label>
-                <input type="number" id="otherExpenses" min="0" step="0.01" placeholder="0">
             </div>
 
         </div>
 
-        <div class="buttons">
-            <button class="primary" onclick="saveEntry()" data-i18n="save">
-                💾 Зберегти
-            </button>
 
-            <button class="secondary" onclick="clearForm()" data-i18n="clear">
-                Очистити
-            </button>
+        <!-- WEEKLY STATISTICS -->
+
+        <div id="weeklyStatsPage">
+
+            <div class="card">
+
+                <div class="period-navigation">
+
+                    <button class="secondary" onclick="changeWeek(-1)">
+                        ←
+                    </button>
+
+                    <div class="period-title">
+
+                        <div id="weekTitle">
+                            Тиждень
+                        </div>
+
+                        <div id="weekRange" class="period-subtitle"></div>
+
+                    </div>
+
+                    <button class="secondary" onclick="changeWeek(1)">
+                        →
+                    </button>
+
+                </div>
+
+                <div class="buttons" style="margin-top:0;margin-bottom:14px;">
+
+                    <button class="secondary" onclick="goCurrentWeek()" style="width:100%;">
+                        📍 <span data-i18n="currentWeek">Поточний тиждень</span>
+                    </button>
+
+                </div>
+
+
+                <div class="stats">
+
+                    <div class="stat">
+                        <div class="stat-value" id="weekDays">0</div>
+                        <div class="stat-label" data-i18n="shifts">Змін</div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="stat-value" id="weekHours">0</div>
+                        <div class="stat-label" data-i18n="hours">Годин</div>
+                    </div>
+
+                    <div class="stat highlight">
+                        <div class="stat-value" id="weekIncome">0 zł</div>
+                        <div class="stat-label" data-i18n="income">Дохід</div>
+                    </div>
+
+                    <div class="stat highlight">
+                        <div class="stat-value" id="weekTips">0 zł</div>
+                        <div class="stat-label" data-i18n="tips">Чайові</div>
+                    </div>
+
+                    <div class="stat expense">
+                        <div class="stat-value" id="weekFuel">0 zł</div>
+                        <div class="stat-label" data-i18n="fuel">Пальне</div>
+                    </div>
+
+                    <div class="stat expense">
+                        <div class="stat-value" id="weekOtherExpenses">0 zł</div>
+                        <div class="stat-label" data-i18n="otherExpenses">Інші витрати</div>
+                    </div>
+
+                    <div class="stat car">
+                        <div class="stat-value" id="weekCarCost">0 zł</div>
+                        <div class="stat-label" data-i18n="carCost">Податок + оренда</div>
+                    </div>
+
+                    <div class="stat expense">
+                        <div class="stat-value" id="weekExpenses">0 zł</div>
+                        <div class="stat-label" data-i18n="expenses">Всього витрат</div>
+                    </div>
+
+                    <div class="stat profit">
+                        <div class="stat-value" id="weekProfit">0 zł</div>
+                        <div class="stat-label" data-i18n="profit">Чистими</div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="stat-value" id="weekCash">0 zł</div>
+                        <div class="stat-label" data-i18n="cash">Готівка</div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="stat-value" id="weekAverageDay">0 zł</div>
+                        <div class="stat-label" data-i18n="averageDay">Середнє за день</div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="stat-value" id="weekAverageHour">0 zł</div>
+                        <div class="stat-label" data-i18n="averageHour">Середнє за годину</div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="stat-value" id="weekAverageShift">0 zł</div>
+                        <div class="stat-label" data-i18n="averageShift">Середнє за зміну</div>
+                    </div>
+
+                </div>
+
+
+                <!-- WEEKLY CAR COST -->
+
+                <div class="car-cost-box">
+
+                    <label for="weekCarCostInput">
+                        🚗 <span data-i18n="carCostInput">Податок + оренда автомобіля за цей тиждень</span>
+                    </label>
+
+                    <input
+                        type="number"
+                        id="weekCarCostInput"
+                        min="0"
+                        step="0.01"
+                        placeholder="0"
+                        style="margin-top:6px;"
+                    >
+
+                    <div class="car-cost-actions">
+
+                        <button class="primary" onclick="saveWeekCarCost()">
+                            💾 <span data-i18n="saveCarCost">Зберегти</span>
+                        </button>
+
+                        <button class="secondary" onclick="clearWeekCarCost()">
+                            <span data-i18n="clear">Очистити</span>
+                        </button>
+
+                    </div>
+
+                    <div class="car-cost-info" data-i18n="carCostInfo">
+                        Ця сума враховується у витратах вибраного тижня та відповідного місяця.
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- WEEKLY BREAKDOWN -->
+
+            <div class="card">
+
+                <h2 style="margin-bottom:10px;">
+                    📋 <span data-i18n="breakdown">По днях</span>
+                </h2>
+
+                <div id="weekDaysList"></div>
+
+            </div>
+
         </div>
 
-        <div id="formMessage" class="message"></div>
-    </div>
 
-    <!-- TOTAL -->
-    <div class="card">
-        <h2>📊 <span data-i18n="totalStats">Загальна статистика</span></h2>
+        <!-- MONTHLY STATISTICS -->
 
-        <div class="stats">
-            <div class="stat">
-                <div class="stat-value" id="totalDays">0</div>
-                <div class="stat-label" data-i18n="days">Днів</div>
+        <div id="monthlyStatsPage" class="hidden">
+
+            <div class="card">
+
+                <div class="period-navigation">
+
+                    <button class="secondary" onclick="changeMonth(-1)">
+                        ←
+                    </button>
+
+                    <div class="period-title">
+
+                        <div id="monthTitle">
+                            Місяць
+                        </div>
+
+                        <div id="monthRange" class="period-subtitle"></div>
+
+                    </div>
+
+                    <button class="secondary" onclick="changeMonth(1)">
+                        →
+                    </button>
+
+                </div>
+
+                <div class="buttons" style="margin-top:0;margin-bottom:14px;">
+
+                    <button class="secondary" onclick="goCurrentMonth()" style="width:100%;">
+                        📍 <span data-i18n="currentMonth">Поточний місяць</span>
+                    </button>
+
+                </div>
+
+
+                <div class="stats">
+
+                    <div class="stat">
+                        <div class="stat-value" id="monthDays">0</div>
+                        <div class="stat-label" data-i18n="shifts">Змін</div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="stat-value" id="monthHours">0</div>
+                        <div class="stat-label" data-i18n="hours">Годин</div>
+                    </div>
+
+                    <div class="stat highlight">
+                        <div class="stat-value" id="monthIncome">0 zł</div>
+                        <div class="stat-label" data-i18n="income">Дохід</div>
+                    </div>
+
+                    <div class="stat highlight">
+                        <div class="stat-value" id="monthTips">0 zł</div>
+                        <div class="stat-label" data-i18n="tips">Чайові</div>
+                    </div>
+
+                    <div class="stat expense">
+                        <div class="stat-value" id="monthFuel">0 zł</div>
+                        <div class="stat-label" data-i18n="fuel">Пальне</div>
+                    </div>
+
+                    <div class="stat expense">
+                        <div class="stat-value" id="monthOtherExpenses">0 zł</div>
+                        <div class="stat-label" data-i18n="otherExpenses">Інші витрати</div>
+                    </div>
+
+                    <div class="stat car">
+                        <div class="stat-value" id="monthCarCost">0 zł</div>
+                        <div class="stat-label" data-i18n="carCost">Податок + оренда</div>
+                    </div>
+
+                    <div class="stat expense">
+                        <div class="stat-value" id="monthExpenses">0 zł</div>
+                        <div class="stat-label" data-i18n="expenses">Всього витрат</div>
+                    </div>
+
+                    <div class="stat profit">
+                        <div class="stat-value" id="monthProfit">0 zł</div>
+                        <div class="stat-label" data-i18n="profit">Чистими</div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="stat-value" id="monthCash">0 zł</div>
+                        <div class="stat-label" data-i18n="cash">Готівка</div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="stat-value" id="monthAverageDay">0 zł</div>
+                        <div class="stat-label" data-i18n="averageDay">Середнє за день</div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="stat-value" id="monthAverageHour">0 zł</div>
+                        <div class="stat-label" data-i18n="averageHour">Середнє за годину</div>
+                    </div>
+
+                </div>
+
             </div>
 
-            <div class="stat">
-                <div class="stat-value" id="totalHours">0</div>
-                <div class="stat-label" data-i18n="hours">Годин</div>
+
+            <!-- MONTHLY CAR COSTS -->
+
+            <div class="card">
+
+                <h2>
+                    🚗 <span data-i18n="carCostMonthTitle">Податок + оренда за місяць</span>
+                </h2>
+
+                <div class="section-note" data-i18n="carCostMonthNote">
+                    Тут показана сума всіх щотижневих оплат, які належать до вибраного місяця.
+                </div>
+
+                <div class="stat car" style="margin-top:8px;">
+                    <div class="stat-value" id="monthCarCostLarge">0 zł</div>
+                    <div class="stat-label" data-i18n="carCost">Податок + оренда</div>
+                </div>
+
             </div>
 
-            <div class="stat">
-                <div class="stat-value" id="totalIncome">0 zł</div>
-                <div class="stat-label" data-i18n="income">Дохід</div>
-            </div>
-
-            <div class="stat">
-                <div class="stat-value" id="totalTips">0 zł</div>
-                <div class="stat-label" data-i18n="tips">Чайові</div>
-            </div>
-
-            <div class="stat">
-                <div class="stat-value" id="totalCash">0 zł</div>
-                <div class="stat-label" data-i18n="cash">Готівка</div>
-            </div>
-
-            <div class="stat">
-                <div class="stat-value" id="totalProfit">0 zł</div>
-                <div class="stat-label" data-i18n="profit">Чистими</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- WEEK -->
-    <div class="card">
-        <h2>📆 <span data-i18n="weekStats">Статистика за тиждень</span></h2>
-
-        <div id="weekRange" class="week-range"></div>
-
-        <div class="stats">
-            <div class="stat">
-                <div class="stat-value" id="weekDays">0</div>
-                <div class="stat-label" data-i18n="shifts">Змін</div>
-            </div>
-
-            <div class="stat">
-                <div class="stat-value" id="weekHours">0</div>
-                <div class="stat-label" data-i18n="hours">Годин</div>
-            </div>
-
-            <div class="stat">
-                <div class="stat-value" id="weekIncome">0 zł</div>
-                <div class="stat-label" data-i18n="income">Дохід</div>
-            </div>
-
-            <div class="stat">
-                <div class="stat-value" id="weekTips">0 zł</div>
-                <div class="stat-label" data-i18n="tips">Чайові</div>
-            </div>
-
-            <div class="stat">
-                <div class="stat-value" id="weekExpenses">0 zł</div>
-                <div class="stat-label" data-i18n="expenses">Витрати</div>
-            </div>
-
-            <div class="stat">
-                <div class="stat-value" id="weekProfit">0 zł</div>
-                <div class="stat-label" data-i18n="profit">Чистими</div>
-            </div>
-
-            <div class="stat">
-                <div class="stat-value" id="weekCash">0 zł</div>
-                <div class="stat-label" data-i18n="cash">Готівка</div>
-            </div>
-
-            <div class="stat">
-                <div class="stat-value" id="weekAverageDay">0 zł</div>
-                <div class="stat-label" data-i18n="averageDay">Середнє за день</div>
-            </div>
-
-            <div class="stat">
-                <div class="stat-value" id="weekAverageHour">0 zł</div>
-                <div class="stat-label" data-i18n="averageHour">Середнє за годину</div>
-            </div>
-
-            <div class="stat">
-                <div class="stat-value" id="weekAverageShift">0 zł</div>
-                <div class="stat-label" data-i18n="averageShift">Середнє за зміну</div>
-            </div>
-        </div>
-
-        <div class="week-days">
-            <h3 id="weekBreakdownTitle" style="margin:0 0 10px;font-size:16px;">
-                По днях
-            </h3>
-
-            <div id="weekDaysList"></div>
-        </div>
-    </div>
-
-    <!-- MONTH -->
-    <div class="card">
-        <h2>📅 <span data-i18n="monthStats">Статистика за місяць</span></h2>
-
-        <div class="stats">
-            <div class="stat">
-                <div class="stat-value" id="monthDays">0</div>
-                <div class="stat-label" data-i18n="days">Днів</div>
-            </div>
-
-            <div class="stat">
-                <div class="stat-value" id="monthHours">0</div>
-                <div class="stat-label" data-i18n="hours">Годин</div>
-            </div>
-
-            <div class="stat">
-                <div class="stat-value" id="monthIncome">0 zł</div>
-                <div class="stat-label" data-i18n="income">Дохід</div>
-            </div>
-
-            <div class="stat">
-                <div class="stat-value" id="monthTips">0 zł</div>
-                <div class="stat-label" data-i18n="tips">Чайові</div>
-            </div>
-
-            <div class="stat">
-                <div class="stat-value" id="monthCash">0 zł</div>
-                <div class="stat-label" data-i18n="cash">Готівка</div>
-            </div>
-
-            <div class="stat">
-                <div class="stat-value" id="monthProfit">0 zł</div>
-                <div class="stat-label" data-i18n="profit">Чистими</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- HISTORY -->
-    <div class="card">
-        <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:12px;">
-            <h2 style="margin:0;">📋 <span data-i18n="history">Історія</span></h2>
-
-            <button class="secondary small-button" onclick="exportCSV()" data-i18n="export">
-                CSV
-            </button>
         </div>
 
-        <div id="entriesList"></div>
     </div>
 
 </div>
 
+
 <script>
+
 /* =========================================================
    SUPABASE
 ========================================================= */
 
-const SUPABASE_URL = "https://evrxgxhralvxckpjoclj.supabase.co";
+const SUPABASE_URL =
+    "https://evrxgxhralvxckpjoclj.supabase.co";
 
 const SUPABASE_PUBLISHABLE_KEY =
     "sb_publishable_Bk6mnQQQFh1G7pjwxxsDBg_OS9zj3rM";
@@ -700,10 +1029,11 @@ const SUPABASE_PUBLISHABLE_KEY =
 let supabaseClient = null;
 
 if (window.supabase) {
-    supabaseClient = window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_PUBLISHABLE_KEY
-    );
+    supabaseClient =
+        window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_PUBLISHABLE_KEY
+        );
 }
 
 
@@ -712,8 +1042,12 @@ if (window.supabase) {
 ========================================================= */
 
 const translations = {
+
     uk: {
         subtitle: "Облік роботи та доходів",
+        home: "Головна",
+        statistics: "Статистика",
+
         account: "Обліковий запис",
         email: "Email",
         password: "Пароль",
@@ -721,68 +1055,91 @@ const translations = {
         register: "Створити акаунт",
         logout: "Вийти",
         sync: "🔄 Синхронізувати",
+
         date: "Дата",
         break: "Перерва, хв",
         start: "Початок",
         end: "Кінець",
+
         otherApps: "Інші додатки",
         cash: "Готівка",
         tips: "Чайові",
         fuel: "Пальне",
         otherExpenses: "Інші витрати",
+
         save: "💾 Зберегти",
         clear: "Очистити",
+
         totalStats: "Загальна статистика",
-        weekStats: "Статистика за тиждень",
-        monthStats: "Статистика за місяць",
+        weekStats: "Тиждень",
+        monthStats: "Місяць",
+
         days: "Днів",
         shifts: "Змін",
         hours: "Годин",
+
         income: "Дохід",
-        expenses: "Витрати",
+        expenses: "Всього витрат",
         profit: "Чистими",
+
         averageDay: "Середнє за день",
         averageHour: "Середнє за годину",
         averageShift: "Середнє за зміну",
+
+        carCost: "Податок + оренда",
+        carCostInput: "Податок + оренда автомобіля за цей тиждень",
+        saveCarCost: "Зберегти",
+        carCostInfo: "Ця сума враховується у витратах вибраного тижня та відповідного місяця.",
+        carCostMonthTitle: "Податок + оренда за місяць",
+        carCostMonthNote: "Тут показана сума всіх щотижневих оплат, які належать до вибраного місяця.",
+
+        currentWeek: "Поточний тиждень",
+        currentMonth: "Поточний місяць",
+
         breakdown: "По днях",
         noWork: "Без роботи",
+
         history: "Історія",
         export: "CSV",
         edit: "Редагувати",
         delete: "Видалити",
         noEntries: "Записів поки немає.",
+
         loggedIn: "☁️ Підключено: ",
         syncDone: "Синхронізацію завершено.",
         syncing: "Синхронізація...",
         offline: "Працюємо офлайн. Дані збережені на телефоні.",
+
         accountCreated: "Акаунт створено. Перевір пошту для підтвердження.",
         accountReady: "Акаунт готовий.",
         loginSuccess: "Вхід виконано.",
         logoutSuccess: "Ви вийшли з акаунта.",
+
         wrongCredentials: "Неправильний email або пароль.",
         passwordShort: "Пароль має містити щонайменше 6 символів.",
         fillAuth: "Введи email і пароль.",
+
         saveSuccess: "Запис збережено.",
         deleteConfirm: "Видалити цей запис?",
         deleteSuccess: "Запис видалено.",
+
         syncError: "Помилка синхронізації: ",
         cloudLoaded: "Дані завантажено з хмари.",
         localUploaded: "Локальні записи завантажено в хмару.",
+
         emptyFields: "Вкажи дату, початок і кінець роботи.",
+
         installTitle: "📱 Встановлення",
         installText: "На iPhone натисни «Поділитися» → «На початковий екран».",
+
         newDay: "Новий робочий день",
         editDay: "Редагування робочого дня",
+
         hour: "год",
         minute: "хв",
-        dayMon: "Понеділок",
-        dayTue: "Вівторок",
-        dayWed: "Середа",
-        dayThu: "Четвер",
-        dayFri: "П’ятниця",
-        daySat: "Субота",
-        daySun: "Неділя",
+
         weekFrom: "Тиждень:",
+
         dayIncome: "Дохід",
         dayTips: "Чайові",
         dayFuel: "Пальне",
@@ -793,6 +1150,9 @@ const translations = {
 
     pl: {
         subtitle: "Ewidencja pracy i dochodów",
+        home: "Główna",
+        statistics: "Statystyki",
+
         account: "Konto",
         email: "Email",
         password: "Hasło",
@@ -800,68 +1160,91 @@ const translations = {
         register: "Utwórz konto",
         logout: "Wyloguj",
         sync: "🔄 Synchronizuj",
+
         date: "Data",
         break: "Przerwa, min",
         start: "Początek",
         end: "Koniec",
+
         otherApps: "Inne aplikacje",
         cash: "Gotówka",
         tips: "Napiwki",
         fuel: "Paliwo",
         otherExpenses: "Inne wydatki",
+
         save: "💾 Zapisz",
         clear: "Wyczyść",
+
         totalStats: "Statystyki ogólne",
-        weekStats: "Statystyki tygodnia",
-        monthStats: "Statystyki miesiąca",
+        weekStats: "Tydzień",
+        monthStats: "Miesiąc",
+
         days: "Dni",
         shifts: "Zmiany",
         hours: "Godziny",
+
         income: "Dochód",
-        expenses: "Wydatki",
+        expenses: "Wszystkie wydatki",
         profit: "Na czysto",
+
         averageDay: "Średnio dziennie",
         averageHour: "Średnio na godzinę",
         averageShift: "Średnio na zmianę",
+
+        carCost: "Podatek + wynajem",
+        carCostInput: "Podatek + wynajem samochodu za ten tydzień",
+        saveCarCost: "Zapisz",
+        carCostInfo: "Ta kwota jest uwzględniana w wydatkach wybranego tygodnia i odpowiedniego miesiąca.",
+        carCostMonthTitle: "Podatek + wynajem za miesiąc",
+        carCostMonthNote: "Tutaj pokazana jest suma wszystkich tygodniowych opłat przypisanych do wybranego miesiąca.",
+
+        currentWeek: "Bieżący tydzień",
+        currentMonth: "Bieżący miesiąc",
+
         breakdown: "Podział na dni",
         noWork: "Brak pracy",
+
         history: "Historia",
         export: "CSV",
         edit: "Edytuj",
         delete: "Usuń",
         noEntries: "Brak zapisów.",
+
         loggedIn: "☁️ Połączono: ",
         syncDone: "Synchronizacja zakończona.",
         syncing: "Synchronizacja...",
         offline: "Praca offline. Dane zapisane w telefonie.",
+
         accountCreated: "Konto utworzone. Sprawdź email, aby potwierdzić konto.",
         accountReady: "Konto gotowe.",
         loginSuccess: "Zalogowano.",
         logoutSuccess: "Wylogowano.",
+
         wrongCredentials: "Nieprawidłowy email lub hasło.",
         passwordShort: "Hasło musi mieć co najmniej 6 znaków.",
         fillAuth: "Wpisz email i hasło.",
+
         saveSuccess: "Zapis zapisany.",
         deleteConfirm: "Usunąć ten zapis?",
         deleteSuccess: "Zapis usunięty.",
+
         syncError: "Błąd synchronizacji: ",
         cloudLoaded: "Dane pobrane z chmury.",
         localUploaded: "Lokalne zapisy przesłane do chmury.",
+
         emptyFields: "Podaj datę, początek i koniec pracy.",
+
         installTitle: "📱 Instalacja",
         installText: "Na iPhone kliknij „Udostępnij” → „Dodaj do ekranu początkowego”.",
+
         newDay: "Nowy dzień pracy",
         editDay: "Edycja dnia pracy",
+
         hour: "godz.",
         minute: "min",
-        dayMon: "Poniedziałek",
-        dayTue: "Wtorek",
-        dayWed: "Środa",
-        dayThu: "Czwartek",
-        dayFri: "Piątek",
-        daySat: "Sobota",
-        daySun: "Niedziela",
+
         weekFrom: "Tydzień:",
+
         dayIncome: "Dochód",
         dayTips: "Napiwki",
         dayFuel: "Paliwo",
@@ -880,11 +1263,16 @@ let currentLanguage =
     localStorage.getItem("taxiLanguage") || "uk";
 
 function t(key) {
-    return translations[currentLanguage][key] || key;
+    return (
+        translations[currentLanguage][key] ||
+        key
+    );
 }
 
 function setLanguage(language) {
-    currentLanguage = language;
+
+    currentLanguage =
+        language;
 
     localStorage.setItem(
         "taxiLanguage",
@@ -896,42 +1284,56 @@ function setLanguage(language) {
 }
 
 function updateLanguageUI() {
+
     document.documentElement.lang =
         currentLanguage;
 
-    document.getElementById("subtitle").textContent =
+    document.getElementById(
+        "subtitle"
+    ).textContent =
         t("subtitle");
 
-    document.getElementById("installTitle").textContent =
+    document.getElementById(
+        "installTitle"
+    ).textContent =
         t("installTitle");
 
-    document.getElementById("installText").textContent =
+    document.getElementById(
+        "installText"
+    ).textContent =
         t("installText");
 
-    document.getElementById("ukBtn").classList.toggle(
+    document.getElementById(
+        "ukBtn"
+    ).classList.toggle(
         "active",
         currentLanguage === "uk"
     );
 
-    document.getElementById("plBtn").classList.toggle(
+    document.getElementById(
+        "plBtn"
+    ).classList.toggle(
         "active",
         currentLanguage === "pl"
     );
 
-    document.querySelectorAll("[data-i18n]").forEach(el => {
+    document.querySelectorAll(
+        "[data-i18n]"
+    ).forEach(el => {
         el.textContent =
             t(el.dataset.i18n);
     });
 
-    document.getElementById("formTitle").textContent =
+    document.getElementById(
+        "formTitle"
+    ).textContent =
         editingId
             ? t("editDay")
             : t("newDay");
 
-    document.getElementById("weekBreakdownTitle").textContent =
-        t("breakdown");
-
     updateAuthUI();
+
+    updateStatsModeUI();
 }
 
 
@@ -942,9 +1344,12 @@ function updateLanguageUI() {
 let entries = [];
 
 try {
-    entries = JSON.parse(
-        localStorage.getItem("taxiEntries") || "[]"
-    );
+    entries =
+        JSON.parse(
+            localStorage.getItem(
+                "taxiEntries"
+            ) || "[]"
+        );
 } catch {
     entries = [];
 }
@@ -956,11 +1361,191 @@ let syncRunning = false;
 let deletedClientIds = [];
 
 try {
-    deletedClientIds = JSON.parse(
-        localStorage.getItem("taxiDeletedIds") || "[]"
-    );
+    deletedClientIds =
+        JSON.parse(
+            localStorage.getItem(
+                "taxiDeletedIds"
+            ) || "[]"
+        );
 } catch {
     deletedClientIds = [];
+}
+
+
+/*
+ * Окреме локальне сховище
+ * для щотижневого податку + оренди.
+ *
+ * Формат:
+ * {
+ *   "2026-10-05": 800,
+ *   "2026-09-28": 800
+ * }
+ */
+let weeklyCarCosts = {};
+
+try {
+    weeklyCarCosts =
+        JSON.parse(
+            localStorage.getItem(
+                "taxiWeeklyCarCosts"
+            ) || "{}"
+        );
+} catch {
+    weeklyCarCosts = {};
+}
+
+
+/* =========================================================
+   STATISTICS NAVIGATION
+========================================================= */
+
+let statsMode =
+    localStorage.getItem(
+        "taxiStatsMode"
+    ) || "week";
+
+let selectedWeekOffset =
+    Number(
+        localStorage.getItem(
+            "taxiSelectedWeekOffset"
+        )
+    ) || 0;
+
+let selectedMonthOffset =
+    Number(
+        localStorage.getItem(
+            "taxiSelectedMonthOffset"
+        )
+    ) || 0;
+
+function showPage(page) {
+
+    const home =
+        document.getElementById(
+            "homePage"
+        );
+
+    const stats =
+        document.getElementById(
+            "statsPage"
+        );
+
+    const homeNav =
+        document.getElementById(
+            "homeNav"
+        );
+
+    const statsNav =
+        document.getElementById(
+            "statsNav"
+        );
+
+    if (page === "stats") {
+
+        home.classList.remove(
+            "active"
+        );
+
+        stats.classList.add(
+            "active"
+        );
+
+        homeNav.classList.remove(
+            "active"
+        );
+
+        statsNav.classList.add(
+            "active"
+        );
+
+        renderStatistics();
+
+    } else {
+
+        stats.classList.remove(
+            "active"
+        );
+
+        home.classList.add(
+            "active"
+        );
+
+        statsNav.classList.remove(
+            "active"
+        );
+
+        homeNav.classList.add(
+            "active"
+        );
+    }
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+}
+
+function setStatsMode(mode) {
+
+    statsMode =
+        mode;
+
+    localStorage.setItem(
+        "taxiStatsMode",
+        mode
+    );
+
+    updateStatsModeUI();
+    renderStatistics();
+}
+
+function updateStatsModeUI() {
+
+    const weekTab =
+        document.getElementById(
+            "weekTab"
+        );
+
+    const monthTab =
+        document.getElementById(
+            "monthTab"
+        );
+
+    const weekPage =
+        document.getElementById(
+            "weeklyStatsPage"
+        );
+
+    const monthPage =
+        document.getElementById(
+            "monthlyStatsPage"
+        );
+
+    if (!weekTab) return;
+
+    const isWeek =
+        statsMode === "week";
+
+    weekTab.classList.toggle(
+        "active",
+        isWeek
+    );
+
+    monthTab.classList.toggle(
+        "active",
+        !isWeek
+    );
+
+    weekPage.classList.toggle(
+        "hidden",
+        !isWeek
+    );
+
+    monthPage.classList.toggle(
+        "hidden",
+        isWeek
+    );
 }
 
 
@@ -969,6 +1554,7 @@ try {
 ========================================================= */
 
 function makeClientId() {
+
     if (
         window.crypto &&
         crypto.randomUUID
@@ -986,6 +1572,7 @@ function makeClientId() {
 }
 
 function saveLocal() {
+
     localStorage.setItem(
         "taxiEntries",
         JSON.stringify(entries)
@@ -993,27 +1580,41 @@ function saveLocal() {
 
     localStorage.setItem(
         "taxiDeletedIds",
-        JSON.stringify(deletedClientIds)
+        JSON.stringify(
+            deletedClientIds
+        )
+    );
+
+    localStorage.setItem(
+        "taxiWeeklyCarCosts",
+        JSON.stringify(
+            weeklyCarCosts
+        )
     );
 }
 
 function numberValue(id) {
+
     return (
         Number(
-            document.getElementById(id).value
+            document.getElementById(
+                id
+            ).value
         ) || 0
     );
 }
 
 function timeToMinutes(time) {
+
     if (!time) return 0;
 
     const [
         hours,
         minutes
-    ] = time
-        .split(":")
-        .map(Number);
+    ] =
+        time
+            .split(":")
+            .map(Number);
 
     return (
         hours * 60 +
@@ -1025,6 +1626,7 @@ function calculateDuration(
     start,
     end
 ) {
+
     let startMinutes =
         timeToMinutes(start);
 
@@ -1047,6 +1649,7 @@ function calculateDuration(
 }
 
 function formatHours(minutes) {
+
     const h =
         Math.floor(
             minutes / 60
@@ -1067,11 +1670,8 @@ function formatHours(minutes) {
     );
 }
 
-/*
- * Усі грошові значення в інтерфейсі показуємо в PLN.
- * Самі числа в базі не конвертуються і не змінюються.
- */
 function money(value) {
+
     return (
         Number(value || 0)
             .toFixed(2) +
@@ -1080,6 +1680,7 @@ function money(value) {
 }
 
 function formatDate(date) {
+
     if (!date) return "";
 
     const parts =
@@ -1099,12 +1700,14 @@ function formatDate(date) {
 }
 
 function setDefaultDate() {
+
     const input =
         document.getElementById(
             "date"
         );
 
     if (!input.value) {
+
         const now =
             new Date();
 
@@ -1122,12 +1725,8 @@ function setDefaultDate() {
     }
 }
 
-
-/* =========================================================
-   WEEK HELPERS
-========================================================= */
-
 function getLocalDateString(date) {
+
     const year =
         date.getFullYear();
 
@@ -1146,18 +1745,33 @@ function getLocalDateString(date) {
     );
 }
 
+function parseLocalDate(dateString) {
+
+    const parts =
+        dateString
+            .split("-")
+            .map(Number);
+
+    return new Date(
+        parts[0],
+        parts[1] - 1,
+        parts[2]
+    );
+}
+
+
+/* =========================================================
+   WEEK HELPERS
+========================================================= */
+
 function getStartOfCurrentWeek() {
+
     const now =
         new Date();
 
     const day =
         now.getDay();
 
-    /*
-     * JavaScript:
-     * Sunday = 0
-     * Monday = 1
-     */
     const daysFromMonday =
         day === 0
             ? 6
@@ -1181,9 +1795,25 @@ function getStartOfCurrentWeek() {
     return monday;
 }
 
-function getWeekDates() {
+function getSelectedWeekStart() {
+
     const monday =
         getStartOfCurrentWeek();
+
+    monday.setDate(
+        monday.getDate() +
+        (
+            selectedWeekOffset *
+            7
+        )
+    );
+
+    return monday;
+}
+
+function getWeekDatesFromStart(
+    monday
+) {
 
     const dates = [];
 
@@ -1192,11 +1822,13 @@ function getWeekDates() {
         i < 7;
         i++
     ) {
+
         const date =
             new Date(monday);
 
         date.setDate(
-            monday.getDate() + i
+            monday.getDate() +
+            i
         );
 
         dates.push(date);
@@ -1206,6 +1838,7 @@ function getWeekDates() {
 }
 
 function getWeekdayName(index) {
+
     const keys = [
         "dayMon",
         "dayTue",
@@ -1219,9 +1852,248 @@ function getWeekdayName(index) {
     return t(keys[index]);
 }
 
+function getSelectedWeekKey() {
+
+    return getLocalDateString(
+        getSelectedWeekStart()
+    );
+}
+
+function changeWeek(direction) {
+
+    selectedWeekOffset +=
+        direction;
+
+    localStorage.setItem(
+        "taxiSelectedWeekOffset",
+        String(
+            selectedWeekOffset
+        )
+    );
+
+    renderWeekStats();
+}
+
+function goCurrentWeek() {
+
+    selectedWeekOffset =
+        0;
+
+    localStorage.setItem(
+        "taxiSelectedWeekOffset",
+        "0"
+    );
+
+    renderWeekStats();
+}
+
 
 /* =========================================================
-   MIGRATION OF OLD LOCAL DATA
+   MONTH HELPERS
+========================================================= */
+
+function getSelectedMonthDate() {
+
+    const now =
+        new Date();
+
+    return new Date(
+        now.getFullYear(),
+        now.getMonth() +
+            selectedMonthOffset,
+        1
+    );
+}
+
+function getMonthKey(date) {
+
+    const year =
+        date.getFullYear();
+
+    const month =
+        String(
+            date.getMonth() + 1
+        ).padStart(2, "0");
+
+    return (
+        `${year}-${month}`
+    );
+}
+
+function getMonthName(date) {
+
+    const names =
+        currentLanguage === "pl"
+            ? [
+                "Styczeń",
+                "Luty",
+                "Marzec",
+                "Kwiecień",
+                "Maj",
+                "Czerwiec",
+                "Lipiec",
+                "Sierpień",
+                "Wrzesień",
+                "Październik",
+                "Listopad",
+                "Grudzień"
+            ]
+            : [
+                "Січень",
+                "Лютий",
+                "Березень",
+                "Квітень",
+                "Травень",
+                "Червень",
+                "Липень",
+                "Серпень",
+                "Вересень",
+                "Жовтень",
+                "Листопад",
+                "Грудень"
+            ];
+
+    return names[
+        date.getMonth()
+    ];
+}
+
+function changeMonth(direction) {
+
+    selectedMonthOffset +=
+        direction;
+
+    localStorage.setItem(
+        "taxiSelectedMonthOffset",
+        String(
+            selectedMonthOffset
+        )
+    );
+
+    renderMonthStats();
+}
+
+function goCurrentMonth() {
+
+    selectedMonthOffset =
+        0;
+
+    localStorage.setItem(
+        "taxiSelectedMonthOffset",
+        "0"
+    );
+
+    renderMonthStats();
+}
+
+
+/* =========================================================
+   CAR COST
+========================================================= */
+
+function getWeekCarCost(
+    weekKey
+) {
+
+    return Number(
+        weeklyCarCosts[
+            weekKey
+        ] || 0
+    );
+}
+
+function saveWeekCarCost() {
+
+    const input =
+        document.getElementById(
+            "weekCarCostInput"
+        );
+
+    const value =
+        Math.max(
+            0,
+            Number(
+                input.value
+            ) || 0
+        );
+
+    const weekKey =
+        getSelectedWeekKey();
+
+    if (value > 0) {
+
+        weeklyCarCosts[
+            weekKey
+        ] = value;
+
+    } else {
+
+        delete weeklyCarCosts[
+            weekKey
+        ];
+    }
+
+    saveLocal();
+
+    renderWeekStats();
+    renderMonthStats();
+}
+
+function clearWeekCarCost() {
+
+    const weekKey =
+        getSelectedWeekKey();
+
+    delete weeklyCarCosts[
+        weekKey
+    ];
+
+    saveLocal();
+
+    renderWeekStats();
+    renderMonthStats();
+}
+
+
+/*
+ * Для місячної статистики:
+ * беремо всі тижневі платежі,
+ * дата початку яких потрапляє
+ * у вибраний місяць.
+ */
+function getCarCostForMonth(
+    monthKey
+) {
+
+    let total = 0;
+
+    Object.keys(
+        weeklyCarCosts
+    ).forEach(
+        weekKey => {
+
+            if (
+                weekKey.startsWith(
+                    monthKey
+                )
+            ) {
+
+                total +=
+                    Number(
+                        weeklyCarCosts[
+                            weekKey
+                        ] || 0
+                    );
+            }
+        }
+    );
+
+    return total;
+}
+
+
+/* =========================================================
+   MIGRATION OLD DATA
 ========================================================= */
 
 entries =
@@ -1338,12 +2210,16 @@ saveLocal();
 ========================================================= */
 
 function toCloudRow(entry) {
+
     return {
+
         user_id:
             currentUser.id,
 
         client_id:
-            String(entry.clientId),
+            String(
+                entry.clientId
+            ),
 
         date:
             entry.date,
@@ -1428,7 +2304,9 @@ function toCloudRow(entry) {
 }
 
 function fromCloudRow(row) {
+
     return {
+
         id:
             row.client_id,
 
@@ -1523,6 +2401,7 @@ function fromCloudRow(row) {
 ========================================================= */
 
 function updateAuthUI() {
+
     const loggedOut =
         document.getElementById(
             "authLoggedOut"
@@ -1546,6 +2425,7 @@ function updateAuthUI() {
     }
 
     if (currentUser) {
+
         loggedOut.classList.add(
             "hidden"
         );
@@ -1560,7 +2440,9 @@ function updateAuthUI() {
                 currentUser.email ||
                 ""
             );
+
     } else {
+
         loggedOut.classList.remove(
             "hidden"
         );
@@ -1575,6 +2457,7 @@ function showAuthMessage(
     message,
     type = "success"
 ) {
+
     const box =
         document.getElementById(
             "authMessage"
@@ -1592,6 +2475,7 @@ function showFormMessage(
     message,
     type = "success"
 ) {
+
     const box =
         document.getElementById(
             "formMessage"
@@ -1604,16 +2488,20 @@ function showFormMessage(
         "message show " +
         type;
 
-    setTimeout(() => {
-        box.classList.remove(
-            "show"
-        );
-    }, 3000);
+    setTimeout(
+        () => {
+            box.classList.remove(
+                "show"
+            );
+        },
+        3000
+    );
 }
 
 function setSyncStatus(
     message
 ) {
+
     document.getElementById(
         "syncStatus"
     ).textContent =
@@ -1626,12 +2514,15 @@ function setSyncStatus(
 ========================================================= */
 
 function getRedirectUrl() {
+
     return window.location.href
         .split("#")[0];
 }
 
 async function registerAccount() {
+
     if (!supabaseClient) {
+
         showAuthMessage(
             "Supabase не завантажився. Перевір інтернет.",
             "error"
@@ -1654,6 +2545,7 @@ async function registerAccount() {
         !email ||
         !password
     ) {
+
         showAuthMessage(
             t("fillAuth"),
             "error"
@@ -1665,6 +2557,7 @@ async function registerAccount() {
     if (
         password.length < 6
     ) {
+
         showAuthMessage(
             t("passwordShort"),
             "error"
@@ -1694,6 +2587,7 @@ async function registerAccount() {
             });
 
     if (error) {
+
         showAuthMessage(
             error.message,
             "error"
@@ -1706,6 +2600,7 @@ async function registerAccount() {
         data.session &&
         data.user
     ) {
+
         currentUser =
             data.user;
 
@@ -1719,7 +2614,9 @@ async function registerAccount() {
         await syncWithCloud(
             true
         );
+
     } else {
+
         showAuthMessage(
             t("accountCreated"),
             "success"
@@ -1728,7 +2625,9 @@ async function registerAccount() {
 }
 
 async function loginAccount() {
+
     if (!supabaseClient) {
+
         showAuthMessage(
             "Supabase не завантажився. Перевір інтернет.",
             "error"
@@ -1751,6 +2650,7 @@ async function loginAccount() {
         !email ||
         !password
     ) {
+
         showAuthMessage(
             t("fillAuth"),
             "error"
@@ -1775,6 +2675,7 @@ async function loginAccount() {
             });
 
     if (error) {
+
         showAuthMessage(
             t("wrongCredentials"),
             "error"
@@ -1799,6 +2700,7 @@ async function loginAccount() {
 }
 
 async function logoutAccount() {
+
     if (!supabaseClient) {
         return;
     }
@@ -1808,6 +2710,7 @@ async function logoutAccount() {
             .signOut();
 
     if (error) {
+
         showAuthMessage(
             error.message,
             "error"
@@ -1816,7 +2719,8 @@ async function logoutAccount() {
         return;
     }
 
-    currentUser = null;
+    currentUser =
+        null;
 
     updateAuthUI();
 
@@ -1836,6 +2740,7 @@ async function logoutAccount() {
 async function syncEntryToCloud(
     entry
 ) {
+
     if (
         !currentUser ||
         !supabaseClient
@@ -1862,6 +2767,7 @@ async function syncEntryToCloud(
 async function deleteEntryFromCloud(
     clientId
 ) {
+
     if (
         !currentUser ||
         !supabaseClient
@@ -1888,6 +2794,7 @@ async function deleteEntryFromCloud(
 }
 
 async function syncDeletedItems() {
+
     if (
         !currentUser ||
         !supabaseClient
@@ -1908,7 +2815,9 @@ async function syncDeletedItems() {
         const clientId
         of copy
     ) {
+
         try {
+
             await deleteEntryFromCloud(
                 clientId
             );
@@ -1923,6 +2832,7 @@ async function syncDeletedItems() {
             saveLocal();
 
         } catch (error) {
+
             console.error(error);
         }
     }
@@ -1931,6 +2841,7 @@ async function syncDeletedItems() {
 async function syncWithCloud(
     showMessageAfter = false
 ) {
+
     if (
         !currentUser ||
         !supabaseClient
@@ -1943,6 +2854,7 @@ async function syncWithCloud(
     }
 
     if (!navigator.onLine) {
+
         setSyncStatus(
             t("offline")
         );
@@ -1957,6 +2869,7 @@ async function syncWithCloud(
     );
 
     try {
+
         await syncDeletedItems();
 
         const {
@@ -1987,6 +2900,7 @@ async function syncWithCloud(
 
         entries.forEach(
             entry => {
+
                 localMap.set(
                     String(
                         entry.clientId
@@ -2001,6 +2915,7 @@ async function syncWithCloud(
 
         cloudEntries.forEach(
             entry => {
+
                 cloudMap.set(
                     String(
                         entry.clientId
@@ -2025,6 +2940,7 @@ async function syncWithCloud(
                     );
 
                 if (!cloud) {
+
                     mergedMap.set(
                         clientId,
                         local
@@ -2049,11 +2965,14 @@ async function syncWithCloud(
                     cloudTime >
                     localTime
                 ) {
+
                     mergedMap.set(
                         clientId,
                         cloud
                     );
+
                 } else {
+
                     mergedMap.set(
                         clientId,
                         local
@@ -2073,6 +2992,7 @@ async function syncWithCloud(
                         clientId
                     )
                 ) {
+
                     mergedMap.set(
                         clientId,
                         cloud
@@ -2092,6 +3012,7 @@ async function syncWithCloud(
             const entry
             of entries
         ) {
+
             await syncEntryToCloud(
                 entry
             );
@@ -2106,21 +3027,27 @@ async function syncWithCloud(
         if (
             showMessageAfter
         ) {
+
             if (
                 cloudEntries.length > 0
             ) {
+
                 showAuthMessage(
                     t("cloudLoaded"),
                     "success"
                 );
+
             } else if (
                 entries.length > 0
             ) {
+
                 showAuthMessage(
                     t("localUploaded"),
                     "success"
                 );
+
             } else {
+
                 showAuthMessage(
                     t("syncDone"),
                     "success"
@@ -2129,6 +3056,7 @@ async function syncWithCloud(
         }
 
     } catch (error) {
+
         console.error(
             "Cloud sync error:",
             error
@@ -2142,6 +3070,7 @@ async function syncWithCloud(
         if (
             showMessageAfter
         ) {
+
             showAuthMessage(
                 t("syncError") +
                 error.message,
@@ -2150,7 +3079,9 @@ async function syncWithCloud(
         }
 
     } finally {
-        syncRunning = false;
+
+        syncRunning =
+            false;
     }
 }
 
@@ -2160,6 +3091,7 @@ async function syncWithCloud(
 ========================================================= */
 
 async function saveEntry() {
+
     const date =
         document.getElementById(
             "date"
@@ -2190,6 +3122,7 @@ async function saveEntry() {
         !startTime ||
         !endTime
     ) {
+
         showFormMessage(
             t("emptyFields"),
             "error"
@@ -2235,7 +3168,9 @@ async function saveEntry() {
         );
 
     /*
-     * Готівка НЕ входить у дохід.
+     * Готівка НЕ є доходом.
+     *
+     * Чайові вже входять у дохід.
      */
     const income =
         uber +
@@ -2267,11 +3202,15 @@ async function saveEntry() {
             );
 
         if (!oldEntry) {
-            editingId = null;
+
+            editingId =
+                null;
+
             return;
         }
 
         entry = {
+
             ...oldEntry,
 
             date,
@@ -2285,6 +3224,7 @@ async function saveEntry() {
             uber,
             bolt,
             otherApps,
+
             cash,
             tips,
 
@@ -2315,6 +3255,7 @@ async function saveEntry() {
     } else {
 
         entry = {
+
             id:
                 Date.now(),
 
@@ -2332,6 +3273,7 @@ async function saveEntry() {
             uber,
             bolt,
             otherApps,
+
             cash,
             tips,
 
@@ -2346,7 +3288,9 @@ async function saveEntry() {
                 Date.now()
         };
 
-        entries.push(entry);
+        entries.push(
+            entry
+        );
     }
 
     saveLocal();
@@ -2364,7 +3308,9 @@ async function saveEntry() {
         currentUser &&
         navigator.onLine
     ) {
+
         try {
+
             await syncEntryToCloud(
                 entry
             );
@@ -2374,6 +3320,7 @@ async function saveEntry() {
             );
 
         } catch (error) {
+
             console.error(error);
 
             setSyncStatus(
@@ -2385,6 +3332,7 @@ async function saveEntry() {
     } else if (
         currentUser
     ) {
+
         setSyncStatus(
             t("offline")
         );
@@ -2397,7 +3345,9 @@ async function saveEntry() {
 ========================================================= */
 
 function clearForm() {
-    editingId = null;
+
+    editingId =
+        null;
 
     document.getElementById(
         "date"
@@ -2459,6 +3409,7 @@ function clearForm() {
 function editEntry(
     clientId
 ) {
+
     const entry =
         entries.find(
             item =>
@@ -2537,6 +3488,8 @@ function editEntry(
     ).textContent =
         t("editDay");
 
+    showPage("home");
+
     window.scrollTo({
         top: 0,
         behavior: "smooth"
@@ -2551,6 +3504,7 @@ function editEntry(
 async function deleteEntry(
     clientId
 ) {
+
     if (
         !confirm(
             t("deleteConfirm")
@@ -2596,11 +3550,10 @@ async function deleteEntry(
 
     if (currentUser) {
 
-        if (
-            navigator.onLine
-        ) {
+        if (navigator.onLine) {
 
             try {
+
                 await deleteEntryFromCloud(
                     entry.clientId
                 );
@@ -2620,6 +3573,7 @@ async function deleteEntry(
                         entry.clientId
                     )
                 ) {
+
                     deletedClientIds.push(
                         entry.clientId
                     );
@@ -2640,6 +3594,7 @@ async function deleteEntry(
                     entry.clientId
                 )
             ) {
+
                 deletedClientIds.push(
                     entry.clientId
                 );
@@ -2656,114 +3611,32 @@ async function deleteEntry(
 
 
 /* =========================================================
-   STATISTICS - TOTAL
+   TOTAL STATISTICS
 ========================================================= */
 
 function renderTotalStats() {
 
-    const totalDays =
-        entries.length;
-
-    const totalMinutes =
-        entries.reduce(
-            (sum, item) =>
-                sum +
-                Number(
-                    item.duration || 0
-                ),
-            0
-        );
-
-    const totalIncome =
-        entries.reduce(
-            (sum, item) =>
-                sum +
-                Number(
-                    item.income || 0
-                ),
-            0
-        );
-
-    const totalTips =
-        entries.reduce(
-            (sum, item) =>
-                sum +
-                Number(
-                    item.tips || 0
-                ),
-            0
-        );
-
-    const totalCash =
-        entries.reduce(
-            (sum, item) =>
-                sum +
-                Number(
-                    item.cash || 0
-                ),
-            0
-        );
-
-    const totalProfit =
-        entries.reduce(
-            (sum, item) =>
-                sum +
-                Number(
-                    item.profit || 0
-                ),
-            0
-        );
-
-    document.getElementById(
-        "totalDays"
-    ).textContent =
-        totalDays;
-
-    document.getElementById(
-        "totalHours"
-    ).textContent =
-        formatHours(
-            totalMinutes
-        );
-
-    document.getElementById(
-        "totalIncome"
-    ).textContent =
-        money(
-            totalIncome
-        );
-
-    document.getElementById(
-        "totalTips"
-    ).textContent =
-        money(
-            totalTips
-        );
-
-    document.getElementById(
-        "totalCash"
-    ).textContent =
-        money(
-            totalCash
-        );
-
-    document.getElementById(
-        "totalProfit"
-    ).textContent =
-        money(
-            totalProfit
-        );
+    /*
+     * Ця функція більше не показує
+     * окрему картку на головній,
+     * але залишена для сумісності.
+     */
 }
 
 
 /* =========================================================
-   STATISTICS - WEEK
+   WEEK STATISTICS
 ========================================================= */
 
 function renderWeekStats() {
 
+    const weekStart =
+        getSelectedWeekStart();
+
     const weekDates =
-        getWeekDates();
+        getWeekDatesFromStart(
+            weekStart
+        );
 
     const monday =
         weekDates[0];
@@ -2782,21 +3655,26 @@ function renderWeekStats() {
         );
 
     document.getElementById(
+        "weekTitle"
+    ).textContent =
+        t("weekStats");
+
+    document.getElementById(
         "weekRange"
     ).textContent =
-        `${t("weekFrom")} ` +
-        `${formatDate(mondayString)} – ` +
-        `${formatDate(sundayString)}`;
+        `${formatDate(mondayString)} – ${formatDate(sundayString)}`;
 
     const weekEntries =
         entries.filter(
             item =>
                 String(
                     item.date || ""
-                ) >= mondayString &&
+                ) >=
+                mondayString &&
                 String(
                     item.date || ""
-                ) <= sundayString
+                ) <=
+                sundayString
         );
 
     const shifts =
@@ -2832,25 +3710,38 @@ function renderWeekStats() {
             0
         );
 
-    const expenses =
+    const fuel =
         weekEntries.reduce(
             (sum, item) =>
                 sum +
                 Number(
-                    item.expenses || 0
+                    item.fuel || 0
                 ),
             0
         );
 
-    const profit =
+    const otherExpenses =
         weekEntries.reduce(
             (sum, item) =>
                 sum +
                 Number(
-                    item.profit || 0
+                    item.otherExpenses || 0
                 ),
             0
         );
+
+    const carCost =
+        getWeekCarCost(
+            mondayString
+        );
+
+    const normalExpenses =
+        fuel +
+        otherExpenses;
+
+    const totalExpenses =
+        normalExpenses +
+        carCost;
 
     const cash =
         weekEntries.reduce(
@@ -2861,6 +3752,25 @@ function renderWeekStats() {
                 ),
             0
         );
+
+    /*
+     * Податок + оренда є реальною
+     * витратою, тому віднімаємо її
+     * від прибутку.
+     */
+    const profitBeforeCar =
+        weekEntries.reduce(
+            (sum, item) =>
+                sum +
+                Number(
+                    item.profit || 0
+                ),
+            0
+        );
+
+    const profit =
+        profitBeforeCar -
+        carCost;
 
     const averageDay =
         shifts > 0
@@ -2901,9 +3811,24 @@ function renderWeekStats() {
         money(tips);
 
     document.getElementById(
+        "weekFuel"
+    ).textContent =
+        money(fuel);
+
+    document.getElementById(
+        "weekOtherExpenses"
+    ).textContent =
+        money(otherExpenses);
+
+    document.getElementById(
+        "weekCarCost"
+    ).textContent =
+        money(carCost);
+
+    document.getElementById(
         "weekExpenses"
     ).textContent =
-        money(expenses);
+        money(totalExpenses);
 
     document.getElementById(
         "weekProfit"
@@ -2930,10 +3855,16 @@ function renderWeekStats() {
     ).textContent =
         money(averageShift);
 
+    document.getElementById(
+        "weekCarCostInput"
+    ).value =
+        carCost > 0
+            ? carCost
+            : "";
 
-    /*
-     * Розбивка по кожному дню
-     */
+
+    /* DAILY BREAKDOWN */
+
     const weekDaysList =
         document.getElementById(
             "weekDaysList"
@@ -2941,7 +3872,10 @@ function renderWeekStats() {
 
     weekDaysList.innerHTML =
         weekDates.map(
-            (date, index) => {
+            (
+                date,
+                index
+            ) => {
 
                 const dateString =
                     getLocalDateString(
@@ -3038,10 +3972,13 @@ function renderWeekStats() {
                     dayEntries.length > 0;
 
                 return `
+
                     <div class="week-day">
 
                         <div class="week-day-header">
+
                             <div>
+
                                 <div class="week-day-name">
                                     ${getWeekdayName(index)}
                                 </div>
@@ -3049,6 +3986,7 @@ function renderWeekStats() {
                                 <div class="week-day-date">
                                     ${formatDate(dateString)}
                                 </div>
+
                             </div>
 
                             <strong>
@@ -3058,11 +3996,13 @@ function renderWeekStats() {
                                         : t("noWork")
                                 }
                             </strong>
+
                         </div>
 
                         ${
                             hasWork
                                 ? `
+
                                     <div class="week-day-stats">
 
                                         <div class="week-day-stat">
@@ -3095,11 +4035,13 @@ function renderWeekStats() {
                                         </div>
 
                                     </div>
+
                                 `
                                 : ""
                         }
 
                     </div>
+
                 `;
             }
         ).join("");
@@ -3107,36 +4049,70 @@ function renderWeekStats() {
 
 
 /* =========================================================
-   STATISTICS - MONTH
+   MONTH STATISTICS
 ========================================================= */
 
 function renderMonthStats() {
 
-    const now =
-        new Date();
+    const selectedDate =
+        getSelectedMonthDate();
+
+    const monthKey =
+        getMonthKey(
+            selectedDate
+        );
 
     const year =
-        now.getFullYear();
+        selectedDate.getFullYear();
 
     const month =
         String(
-            now.getMonth() + 1
+            selectedDate.getMonth() + 1
         ).padStart(2, "0");
 
-    const prefix =
-        `${year}-${month}`;
+    const firstDay =
+        `${year}-${month}-01`;
+
+    const lastDayDate =
+        new Date(
+            year,
+            selectedDate.getMonth() + 1,
+            0
+        );
+
+    const lastDay =
+        getLocalDateString(
+            lastDayDate
+        );
+
+    document.getElementById(
+        "monthTitle"
+    ).textContent =
+        getMonthName(
+            selectedDate
+        ) +
+        " " +
+        year;
+
+    document.getElementById(
+        "monthRange"
+    ).textContent =
+        `${formatDate(firstDay)} – ${formatDate(lastDay)}`;
 
     const monthEntries =
         entries.filter(
             item =>
                 String(
                     item.date || ""
-                ).startsWith(
-                    prefix
-                )
+                ) >=
+                firstDay &&
+                String(
+                    item.date || ""
+                ) <=
+                lastDay
         );
 
-    const days =
+    const shifts =
         monthEntries.length;
 
     const minutes =
@@ -3169,6 +4145,39 @@ function renderMonthStats() {
             0
         );
 
+    const fuel =
+        monthEntries.reduce(
+            (sum, item) =>
+                sum +
+                Number(
+                    item.fuel || 0
+                ),
+            0
+        );
+
+    const otherExpenses =
+        monthEntries.reduce(
+            (sum, item) =>
+                sum +
+                Number(
+                    item.otherExpenses || 0
+                ),
+            0
+        );
+
+    const carCost =
+        getCarCostForMonth(
+            monthKey
+        );
+
+    const normalExpenses =
+        fuel +
+        otherExpenses;
+
+    const totalExpenses =
+        normalExpenses +
+        carCost;
+
     const cash =
         monthEntries.reduce(
             (sum, item) =>
@@ -3179,7 +4188,7 @@ function renderMonthStats() {
             0
         );
 
-    const profit =
+    const profitBeforeCar =
         monthEntries.reduce(
             (sum, item) =>
                 sum +
@@ -3189,10 +4198,25 @@ function renderMonthStats() {
             0
         );
 
+    const profit =
+        profitBeforeCar -
+        carCost;
+
+    const averageDay =
+        shifts > 0
+            ? profit / shifts
+            : 0;
+
+    const averageHour =
+        minutes > 0
+            ? profit /
+              (minutes / 60)
+            : 0;
+
     document.getElementById(
         "monthDays"
     ).textContent =
-        days;
+        shifts;
 
     document.getElementById(
         "monthHours"
@@ -3212,14 +4236,70 @@ function renderMonthStats() {
         money(tips);
 
     document.getElementById(
-        "monthCash"
+        "monthFuel"
     ).textContent =
-        money(cash);
+        money(fuel);
+
+    document.getElementById(
+        "monthOtherExpenses"
+    ).textContent =
+        money(otherExpenses);
+
+    document.getElementById(
+        "monthCarCost"
+    ).textContent =
+        money(carCost);
+
+    document.getElementById(
+        "monthCarCostLarge"
+    ).textContent =
+        money(carCost);
+
+    document.getElementById(
+        "monthExpenses"
+    ).textContent =
+        money(totalExpenses);
 
     document.getElementById(
         "monthProfit"
     ).textContent =
         money(profit);
+
+    document.getElementById(
+        "monthCash"
+    ).textContent =
+        money(cash);
+
+    document.getElementById(
+        "monthAverageDay"
+    ).textContent =
+        money(averageDay);
+
+    document.getElementById(
+        "monthAverageHour"
+    ).textContent =
+        money(averageHour);
+}
+
+
+/* =========================================================
+   STATISTICS RENDER
+========================================================= */
+
+function renderStatistics() {
+
+    updateStatsModeUI();
+
+    if (
+        statsMode === "week"
+    ) {
+
+        renderWeekStats();
+
+    } else {
+
+        renderMonthStats();
+    }
 }
 
 
@@ -3268,11 +4348,13 @@ function renderEntries() {
                         : 0;
 
                 return `
+
                     <div class="history-item">
 
                         <div class="history-top">
 
                             <div>
+
                                 <div class="history-date">
                                     ${formatDate(item.date)}
                                 </div>
@@ -3280,6 +4362,7 @@ function renderEntries() {
                                 <div style="font-size:13px;color:#6b7280;margin-top:3px;">
                                     ${item.startTime} – ${item.endTime}
                                 </div>
+
                             </div>
 
                             <strong>
@@ -3347,6 +4430,7 @@ function renderEntries() {
                         </div>
 
                     </div>
+
                 `;
             }
         ).join("");
@@ -3381,19 +4465,25 @@ function exportCSV() {
     const rows =
         entries.map(
             item => [
+
                 item.date,
                 item.startTime,
                 item.endTime,
+
                 item.totalDuration,
                 item.breakMinutes,
                 item.duration,
+
                 item.uber,
                 item.bolt,
                 item.otherApps,
+
                 item.cash,
                 item.tips,
+
                 item.fuel,
                 item.otherExpenses,
+
                 item.income,
                 item.expenses,
                 item.profit
@@ -3446,14 +4536,17 @@ function exportCSV() {
             "a"
         );
 
-    a.href = url;
+    a.href =
+        url;
 
     a.download =
         `taxi-manager-${new Date()
             .toISOString()
             .slice(0, 10)}.csv`;
 
-    document.body.appendChild(a);
+    document.body.appendChild(
+        a
+    );
 
     a.click();
 
@@ -3466,20 +4559,16 @@ function exportCSV() {
 
 
 /* =========================================================
-   RENDER
+   RENDER ALL
 ========================================================= */
 
 function renderAll() {
 
     updateLanguageUI();
 
-    renderTotalStats();
-
-    renderWeekStats();
-
-    renderMonthStats();
-
     renderEntries();
+
+    renderStatistics();
 }
 
 
@@ -3490,7 +4579,9 @@ function renderAll() {
 async function initAuth() {
 
     if (!supabaseClient) {
+
         updateAuthUI();
+
         return;
     }
 
@@ -3508,6 +4599,7 @@ async function initAuth() {
     updateAuthUI();
 
     if (currentUser) {
+
         setTimeout(
             () =>
                 syncWithCloud(
@@ -3533,6 +4625,7 @@ async function initAuth() {
                 if (
                     session?.user
                 ) {
+
                     setTimeout(
                         () =>
                             syncWithCloud(
@@ -3555,6 +4648,7 @@ window.addEventListener(
     () => {
 
         if (currentUser) {
+
             syncWithCloud(
                 false
             );
@@ -3567,6 +4661,7 @@ window.addEventListener(
     () => {
 
         if (currentUser) {
+
             setSyncStatus(
                 t("offline")
             );
@@ -3595,6 +4690,7 @@ initAuth();
 if (
     "serviceWorker" in navigator
 ) {
+
     window.addEventListener(
         "load",
         () => {
@@ -3611,6 +4707,7 @@ if (
         }
     );
 }
+
 </script>
 
 </body>
