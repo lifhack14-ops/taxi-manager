@@ -602,6 +602,30 @@ button {
     .nav-button { font-size:12px; padding:10px 4px; }
 }
 
+
+/* TAXI MANAGER 2 — appearance */
+:root{color-scheme:light;--tm-bg:#f3f4f6;--tm-card:#fff;--tm-text:#111827;--tm-muted:#4b5563;--tm-line:#e5e7eb}
+body{background:var(--tm-bg);color:var(--tm-text)}
+.card,.nav-button,.week-day,.history-item,.budget-item{background:var(--tm-card);color:var(--tm-text);border-color:var(--tm-line)}
+body.tm-dark{color-scheme:dark;--tm-bg:#0b1220;--tm-card:#182338;--tm-text:#edf2fa;--tm-muted:#bac5d6;--tm-line:#35445d}
+body.tm-dark input,body.tm-dark select{background:#25344c!important;color:#f8fafc!important;border-color:#465670!important}
+body.tm-dark label,body.tm-dark .section-note,body.tm-dark .budget-note,body.tm-dark .history-main,body.tm-dark .history-date,body.tm-dark .period-subtitle,body.tm-dark .stat-label{color:#bac5d6}
+body.tm-dark .stat,body.tm-dark .week-day-stat{background:#25344c;color:#f8fafc}
+body.tm-dark .secondary,body.tm-dark .budget-type-switch button,body.tm-dark .stats-switch button{background:#35445d;color:#fff}
+body.tm-dark .stat.highlight,body.tm-dark .stat.car,body.tm-dark .stat.profit,body.tm-dark .stat.expense,body.tm-dark .stat.tax,body.tm-dark .stat.rental{background:#263c50}
+body.tm-dark .car-cost-box{background:#2b2850;border-color:#554b85}
+body.tm-dark .car-cost-box label{color:#d3c8ff}
+body.tm-dark .car-cost-total{background:#25344c}
+body.tm-dark .auth-status{background:#204e46;color:#dcfff4}
+body.tm-dark .nav-button.active{background:#2563eb;color:white}
+.tm-toolbar{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:12px}
+.tm-toolbar select,.tm-toolbar button{width:auto;padding:10px;border-radius:10px}
+.tm-chart{display:flex;align-items:flex-end;gap:7px;height:175px;margin-top:16px;border-bottom:1px solid var(--tm-line)}
+.tm-chart-col{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:end;height:100%;gap:4px}
+.tm-chart-bar{width:min(100%,40px);background:linear-gradient(180deg,#38bdf8,#2563eb);border-radius:7px 7px 0 0;min-height:2px}
+.tm-chart-val{font-size:10px;white-space:nowrap;color:var(--tm-muted)}
+.tm-chart-day{font-size:11px;color:var(--tm-muted)}
+.tm-hint{font-size:12px;color:var(--tm-muted);line-height:1.5;margin-top:9px}
 </style>
 </head>
 
@@ -623,7 +647,7 @@ button {
 
 <div class="container">
 
-    <div class="navigation">
+    <div class="tm-toolbar"><span id="tmThemeLabel">🎨 Тема</span><button class="secondary" type="button" id="tmThemeButton" onclick="tmToggleTheme()">🌙 Темна тема</button></div><div class="navigation">
         <button id="homeNav" class="nav-button active" onclick="showPage('home')">
             🏠 <span data-i18n="home">Головна</span>
         </button>
@@ -704,7 +728,7 @@ button {
 
             <h2>📝 <span id="formTitle">Новий робочий день</span></h2>
 
-            <div class="grid">
+            <div class="tm-toolbar"><label for="tmEntryDriver">🚕 Хто працював?</label><select id="tmEntryDriver"><option value="me">👨 Я</option><option value="partner">👩 Дружина</option></select></div><div class="grid">
 
                 <div class="field">
                     <label data-i18n="date">Дата</label>
@@ -823,7 +847,8 @@ button {
         </div>
 
 
-        <!-- WEEK -->
+        <div class="card"><div class="tm-toolbar"><strong id="tmProfileTitle">👥 Статистика водіїв</strong><select id="tmStatsFilter" onchange="tmChangeFilter(this.value)"><option value="all">👨‍👩‍👧 Разом</option><option value="me">👨 Я</option><option value="partner">👩 Дружина</option></select></div><div class="tm-hint" id="tmProfileHint">Старі записи без водія віднесено до «Я». Нові записи позначаються вибраним водієм.</div></div><div class="card"><h2 id="tmChartTitle">📈 Дохід за 7 днів</h2><div id="tmIncomeChart" class="tm-chart"></div><div class="tm-hint" id="tmChartNote">Графік показує дохід за вибраний тиждень.</div></div>
+<!-- WEEK -->
 
         <div id="weeklyStatsPage">
 
@@ -3039,6 +3064,8 @@ function toCloudRow(entry) {
                 entry.profit || 0
             ),
 
+        driver_profile: entry.driverProfile || "me",
+
         updated_at:
             new Date(
                 entry.updatedAt ||
@@ -3130,6 +3157,8 @@ function fromCloudRow(row) {
             Number(
                 row.profit || 0
             ),
+
+        driverProfile: row.driver_profile || "me",
 
         updatedAt:
             new Date(
@@ -3538,8 +3567,7 @@ async function syncWeeklyCarCosts() {
             }
         }
         saveLocal();
-        renderWeekStats();
-        renderMonthStats();
+        renderStatistics();
     } catch (error) {
         console.error("Weekly car costs sync error:", error);
         setSyncStatus("Помилка синхронізації податку/оренди: " + error.message);
@@ -4047,6 +4075,7 @@ async function saveEntry() {
             expenses,
             profit,
 
+            driverProfile: document.getElementById("tmEntryDriver").value,
             updatedAt:
                 Date.now()
         };
@@ -4096,6 +4125,7 @@ async function saveEntry() {
             expenses,
             profit,
 
+            driverProfile: document.getElementById("tmEntryDriver").value,
             updatedAt:
                 Date.now()
         };
@@ -4238,6 +4268,8 @@ function editEntry(clientId) {
 
     document.getElementById("otherExpenses").value =
         entry.otherExpenses || "";
+
+    document.getElementById("tmEntryDriver").value = entry.driverProfile || "me";
 
     document.getElementById("formTitle").textContent =
         t("editDay");
@@ -5088,21 +5120,33 @@ function renderMonthStats() {
 ========================================================= */
 
 function renderStatistics() {
-
     updateStatsModeUI();
-
-    if (
-        statsMode === "week"
-    ) {
-
-        renderWeekStats();
-
-    } else {
-
-        renderMonthStats();
-    }
+    const allEntries = entries;
+    const filter = document.getElementById("tmStatsFilter")?.value || "all";
+    try {
+        if (filter !== "all") entries = allEntries.filter(e => (e.driverProfile || "me") === filter);
+        if (statsMode === "week") renderWeekStats(); else renderMonthStats();
+        tmRenderIncomeChart(entries);
+    } finally { entries = allEntries; }
 }
 
+function tmRenderIncomeChart(list) {
+    const target = document.getElementById("tmIncomeChart");
+    if (!target) return;
+    const start = getSelectedWeekStart();
+    const dates = getWeekDatesFromStart(start);
+    const values = dates.map(d => list.filter(e => e.date === getLocalDateString(d)).reduce((sum,e)=>sum+(Number(e.income)||0),0));
+    const max = Math.max(1,...values);
+    const days = ["Пн","Вт","Ср","Чт","Пт","Сб","Нд"];
+    target.innerHTML = values.map((v,i)=>`<div class="tm-chart-col"><span class="tm-chart-val">${Math.round(v)} zł</span><div class="tm-chart-bar" style="height:${Math.max(2,v/max*115)}px" title="${days[i]}: ${v.toFixed(2)} zł"></div><span class="tm-chart-day">${days[i]}</span></div>`).join("");
+}
+function tmChangeFilter(value) { renderStatistics(); }
+function tmToggleTheme() { const next = document.body.classList.contains("tm-dark") ? "light" : "dark"; localStorage.setItem("taxiTheme",next); tmApplyTheme(); }
+function tmApplyTheme() {
+    const dark = localStorage.getItem("taxiTheme") === "dark";
+    document.body.classList.toggle("tm-dark",dark);
+    const b=document.getElementById("tmThemeButton"); if(b) b.textContent=dark?"☀️ Світла тема":"🌙 Темна тема";
+}
 
 /* =========================================================
    HISTORY
@@ -5733,6 +5777,7 @@ setBudgetType("expense");
 
 updateLanguageUI();
 
+tmApplyTheme();
 renderAll();
 
 initAuth();
