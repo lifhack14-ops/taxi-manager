@@ -1367,7 +1367,7 @@ input,select,textarea{font-size:16px;min-width:0}button{touch-action:manipulatio
       <div style="display:flex;gap:8px;align-items:center"><input id="shopNewName" type="text" placeholder="Наприклад, вода" style="flex:1;min-width:0"><button class="primary" type="button" onclick="shopAddCustom()">＋ Додати</button></div>
       <div style="display:flex;flex-wrap:wrap;gap:7px;margin-top:12px" id="shopQuickAdd"></div>
     </div>
-    <div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h2 style="margin:0">📝 Треба купити</h2><button class="secondary" type="button" onclick="shopClearBought()">Очистити куплене</button></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="primary" id="shopRemindBtn" type="button" onclick="shopRemindNow()">🔔 Нагадай мені</button><button class="secondary" type="button" onclick="shopCopyList()">📋 Копіювати список</button></div><p class="tm-hint" style="margin:8px 0 0">Натисни, коли хочеш отримати нагадування про товари, які ще треба купити.</p><div id="shopStatus" class="tm-hint" style="margin:8px 0" role="status" aria-live="polite"></div><div id="shopList"></div></div>
+    <div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h2 style="margin:0">📝 Треба купити</h2><button class="secondary" type="button" onclick="shopClearBought()">Очистити куплене</button></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="primary" id="shopRemindBtn" type="button" onclick="shopToggleReminderForm()">🔔 Нагадати мені</button><button class="secondary" type="button" onclick="shopCopyList()">📋 Копіювати список</button></div><p class="tm-hint" style="margin:8px 0 0">Обери дату й час — нагадування прийде push-сповіщенням на підключені телефони, навіть коли застосунок закритий.</p><div id="shopStatus" class="tm-hint" style="margin:8px 0" role="status" aria-live="polite"></div><div id="shopReminderForm" class="hidden" style="margin:14px 0;padding:14px;border:1px solid var(--tm-line);border-radius:14px"><h3 style="margin:0 0 12px;font-size:15px">⏰ Запланувати нагадування</h3><div class="field" style="margin-bottom:10px"><label for="shopReminderTitle">Що нагадати?</label><input id="shopReminderTitle" type="text" maxlength="120" value="Нагадування Taxi Manager" placeholder="Наприклад, перевірити оплату"></div><div class="field" style="margin-bottom:10px"><label for="shopReminderBody">Деталі (необов'язково)</label><input id="shopReminderBody" type="text" maxlength="300" placeholder="Наприклад, перевірити оплату Bolt"></div><div class="grid" style="gap:10px"><div class="field"><label for="shopReminderDate">Дата</label><input id="shopReminderDate" type="date" required></div><div class="field"><label for="shopReminderTime">Час</label><input id="shopReminderTime" type="time" required value="09:00"></div></div><div class="buttons"><button class="primary" type="button" id="shopReminderSaveBtn" onclick="shopSaveScheduledReminder()">💾 Зберегти нагадування</button><button class="secondary" type="button" onclick="shopToggleReminderForm(false)">Скасувати</button></div><p class="tm-hint">Нагадування зберігається в хмарі. Переконайся, що обидва телефони підключені до сповіщень у налаштуваннях.</p></div><div id="shopScheduledReminders"></div><div id="shopList"></div></div>
     <div class="card"><h2>📦 Часто купуєте</h2><div id="shopFavorites" style="display:flex;flex-wrap:wrap;gap:7px"></div></div>
   </div>
   <div id="settingsPage" class="page">
@@ -6265,6 +6265,119 @@ function shopStartRealtime(){
    else if(payload.eventType==='DELETE'){const old=payload.old;shopItems=shopItems.filter(x=>x.id!==old.id);}
    shopLocalSave();shopRender();shopShowCloudStatus();
  }).subscribe((status)=>{if(status==='CHANNEL_ERROR'||status==='TIMED_OUT')shopSetStatus('⚠️ Реальний час недоступний. Перезавантаж список або перевір Supabase Realtime.');});
+}
+
+
+/* =========================================================
+   SCHEDULED PUSH REMINDERS — Supabase
+========================================================= */
+function tmReminderEsc(value) {
+  return String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function tmReminderLocalDate(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return y + "-" + m + "-" + d;
+}
+function shopToggleReminderForm(force) {
+  const form = document.getElementById("shopReminderForm");
+  if (!form) return;
+  const show = typeof force === "boolean" ? force : form.classList.contains("hidden");
+  if (show && (!supabaseClient || !currentUser)) {
+    shopSetStatus("Спочатку увійди в акаунт, щоб зберігати нагадування між телефонами.");
+    return;
+  }
+  form.classList.toggle("hidden", !show);
+  if (show) {
+    const date = document.getElementById("shopReminderDate");
+    const time = document.getElementById("shopReminderTime");
+    if (date && !date.value) {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      date.value = tmReminderLocalDate(tomorrow);
+    }
+    if (time && !time.value) time.value = "09:00";
+    shopLoadScheduledReminders();
+  }
+}
+async function shopSaveScheduledReminder() {
+  const titleEl = document.getElementById("shopReminderTitle");
+  const bodyEl = document.getElementById("shopReminderBody");
+  const dateEl = document.getElementById("shopReminderDate");
+  const timeEl = document.getElementById("shopReminderTime");
+  const button = document.getElementById("shopReminderSaveBtn");
+  if (!supabaseClient || !currentUser) {
+    shopSetStatus("Спочатку увійди в акаунт.");
+    return;
+  }
+  const title = (titleEl?.value || "").trim();
+  const body = (bodyEl?.value || "").trim();
+  const date = dateEl?.value || "";
+  const time = timeEl?.value || "";
+  if (!title || !date || !time) {
+    shopSetStatus("Вкажи текст, дату й час нагадування.");
+    return;
+  }
+  const localDateTime = new Date(date + "T" + time + ":00");
+  if (Number.isNaN(localDateTime.getTime()) || localDateTime.getTime() <= Date.now()) {
+    shopSetStatus("Обери дату й час у майбутньому.");
+    return;
+  }
+  if (button) { button.disabled = true; button.textContent = "Збереження…"; }
+  try {
+    const { error } = await supabaseClient.from("scheduled_reminders").insert({
+      user_id: currentUser.id,
+      title: title.slice(0, 120),
+      body: body.slice(0, 300),
+      remind_at: localDateTime.toISOString()
+    });
+    if (error) throw error;
+    shopSetStatus("✅ Нагадування збережено. Воно прийде на підключені телефони у вибраний час.");
+    if (bodyEl) bodyEl.value = "";
+    await shopLoadScheduledReminders();
+  } catch (error) {
+    console.error("Save scheduled reminder:", error);
+    shopSetStatus("Не вдалося зберегти нагадування. Перевір, чи виконано SQL-налаштування scheduled_reminders у Supabase. " + (error?.message || ""));
+  } finally {
+    if (button) { button.disabled = false; button.textContent = "💾 Зберегти нагадування"; }
+  }
+}
+async function shopLoadScheduledReminders() {
+  const list = document.getElementById("shopScheduledReminders");
+  if (!list || !supabaseClient || !currentUser) return;
+  try {
+    const { data, error } = await supabaseClient.from("scheduled_reminders")
+      .select("id,title,body,remind_at,sent_at")
+      .eq("user_id", currentUser.id)
+      .is("sent_at", null)
+      .order("remind_at", { ascending: true })
+      .limit(50);
+    if (error) throw error;
+    if (!data?.length) {
+      list.innerHTML = '<p class="tm-hint">Запланованих нагадувань поки немає.</p>';
+      return;
+    }
+    list.innerHTML = '<h3 style="font-size:14px;margin:16px 0 8px">📅 Заплановані нагадування</h3>' + data.map(item => {
+      const when = new Date(item.remind_at);
+      const whenText = when.toLocaleString(undefined, { year:"numeric", month:"short", day:"numeric", hour:"2-digit", minute:"2-digit" });
+      return '<div class="history-item" style="margin-bottom:8px"><div class="history-top"><div style="min-width:0"><strong>' + tmReminderEsc(item.title) + '</strong><div class="tm-hint">' + tmReminderEsc(whenText) + '</div>' + (item.body ? '<div class="tm-hint">' + tmReminderEsc(item.body) + '</div>' : '') + '</div><button class="danger small-button" type="button" onclick="shopDeleteScheduledReminder(\'' + tmReminderEsc(item.id) + '\')">Скасувати</button></div></div>';
+    }).join("");
+  } catch (error) {
+    console.error("Load scheduled reminders:", error);
+    list.innerHTML = '<p class="tm-hint">Не вдалося завантажити заплановані нагадування. Перевір SQL-налаштування в Supabase.</p>';
+  }
+}
+async function shopDeleteScheduledReminder(id) {
+  if (!supabaseClient || !currentUser) return;
+  if (!confirm("Скасувати це нагадування?")) return;
+  const { error } = await supabaseClient.from("scheduled_reminders").delete().eq("id", id).eq("user_id", currentUser.id);
+  if (error) {
+    shopSetStatus("Не вдалося скасувати нагадування: " + error.message);
+    return;
+  }
+  shopSetStatus("Нагадування скасовано.");
+  await shopLoadScheduledReminders();
 }
 
 </script>
