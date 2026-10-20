@@ -1434,7 +1434,16 @@ if (window.supabase) {
     supabaseClient =
         window.supabase.createClient(
             SUPABASE_URL,
-            SUPABASE_PUBLISHABLE_KEY
+            SUPABASE_PUBLISHABLE_KEY,
+            {
+                auth: {
+                    // Keep the login between app launches using first-party browser storage.
+                    persistSession: true,
+                    autoRefreshToken: true,
+                    detectSessionInUrl: true,
+                    storage: window.localStorage
+                }
+            }
         );
 }
 
