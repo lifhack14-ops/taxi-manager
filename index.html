@@ -710,6 +710,22 @@ body.tm-neon .tm-chart-bar{background:linear-gradient(180deg,#16d9ff,#9b5cff 70%
 body.tm-neon .tm4-choice-row button{background:#171a37;color:var(--tm-text);border-color:#34345f}
 body.tm-neon .tm4-choice-row button.selected{box-shadow:0 0 0 2px rgba(22,217,255,.22),0 0 18px rgba(118,88,255,.18)}
 body.tm-neon label,body.tm-neon .subtitle,body.tm-neon .stat-label{color:#b9c3e8}
+
+/* Nike Sport theme — black, white and volt accents */
+body.tm-nike{color-scheme:dark;--tm-bg:#101010;--tm-card:#1b1b1b;--tm-text:#f7f7f7;--tm-muted:#b7b7b7;--tm-line:#383838;--tm-navy:#080808;--tm-blue:#d7ff00;--tm-blue-text:#d7ff00;--tm-green:#d7ff00;--tm-muted-bg:#252525;--tm-soft-shadow:0 12px 28px rgba(0,0,0,.3)}
+body.tm-nike header,body.tm-nike .tm4-header{background:#080808;color:#fff;border-color:#333}
+body.tm-nike .card,body.tm-nike .tm4-preference-card{background:#1b1b1b;border-color:#383838}
+body.tm-nike .tm4-earnings{background:linear-gradient(120deg,#d7ff00,#a9cc00);color:#101010;box-shadow:0 12px 24px rgba(215,255,0,.12)}
+body.tm-nike .tm4-earnings small{color:#303800}
+body.tm-nike .tm4-coin{color:#101010;text-shadow:none}
+body.tm-nike button.primary,body.tm-nike .primary,body.tm-nike .nav-button.active,body.tm-nike .tm4-choice-row button.selected{background:#d7ff00;color:#101010;border-color:#d7ff00}
+body.tm-nike .tm4-theme-toggle,body.tm-nike .nav-button,body.tm-nike input,body.tm-nike select,body.tm-nike textarea{background:#1b1b1b;color:#f7f7f7;border-color:#484848}
+body.tm-nike .stat,body.tm-nike .week-day,body.tm-nike .tm-taxi-subnav,body.tm-nike .tm-taxi-subtab.active{background:#252525;color:#f7f7f7;border-color:#383838}
+body.tm-nike .tm-chart-bar{background:linear-gradient(180deg,#f7f7f7,#d7ff00)}
+body.tm-nike label,body.tm-nike .subtitle,body.tm-nike .stat-label{color:#b7b7b7}
+body.tm-nike .tm4-quick-icon.blue{background:#d7ff00;color:#101010}
+body.tm-nike .tm4-app-logo.bolt{background:#d7ff00;color:#101010}
+
 </style>
 </head>
 
@@ -1384,7 +1400,7 @@ body.tm-neon label,body.tm-neon .subtitle,body.tm-neon .stat-label{color:#b9c3e8
   </div>
   <div id="settingsPage" class="page">
     <div class="tm4-panel-heading"><h2 data-v4="settingsTitle">Налаштування</h2></div>
-    <div class="card tm4-preference-card"><h2 data-v4="appearance">🎨 Оформлення</h2><div class="tm4-choice-row"><button id="tm4DarkBtn" type="button" onclick="tm4ChooseTheme('dark')">🌙 <span data-v4="darkTheme">Темна</span></button><button id="tm4LightBtn" type="button" onclick="tm4ChooseTheme('light')">☀️ <span data-v4="lightTheme">Світла</span></button></div><div class="tm4-choice-row"><button id="tm4NeonBtn" type="button" onclick="tm4ChooseTheme('neon')">✨ <span>Neon Premium</span></button></div><div class="tm4-choice-row"><button id="tm4UkrBtn" type="button" onclick="setLanguage('uk')">🇺🇦 Українська</button><button id="tm4PlBtn" type="button" onclick="setLanguage('pl')">🇵🇱 Polski</button></div></div>
+    <div class="card tm4-preference-card"><h2 data-v4="appearance">🎨 Оформлення</h2><div class="tm4-choice-row"><button id="tm4DarkBtn" type="button" onclick="tm4ChooseTheme('dark')">🌙 <span data-v4="darkTheme">Темна</span></button><button id="tm4LightBtn" type="button" onclick="tm4ChooseTheme('light')">☀️ <span data-v4="lightTheme">Світла</span></button></div><div class="tm4-choice-row"><button id="tm4NeonBtn" type="button" onclick="tm4ChooseTheme('neon')">✨ <span>Neon Premium</span></button><button id="tm4NikeBtn" type="button" onclick="tm4ChooseTheme('nike')">✔ <span>Nike Sport</span></button></div><div class="tm4-choice-row"><button id="tm4UkrBtn" type="button" onclick="setLanguage('uk')">🇺🇦 Українська</button><button id="tm4PlBtn" type="button" onclick="setLanguage('pl')">🇵🇱 Polski</button></div></div>
     <div id="tm4SettingsMount"></div>
     <div class="card" id="pushNotificationsCard">
       <h2>🔔 Сповіщення Trach Family</h2>
@@ -5289,13 +5305,22 @@ function tmRenderIncomeChart(list) {
     if(title)title.textContent=currentLanguage==='pl' ? (statsMode==='month'?'📈 Zarobki według tygodni':'📈 Zarobki w ciągu 7 dni') : (statsMode==='month'?'📈 Дохід за тижнями':'📈 Дохід за 7 днів');
 }
 function tmChangeFilter(value) { renderStatistics(); }
-function tmToggleTheme() { const next = document.body.classList.contains("tm-dark") ? "light" : "dark"; localStorage.setItem("taxiTheme",next); tmApplyTheme(); if(typeof tm4UpdateTheme==="function") tm4UpdateTheme(); }
+function tmToggleTheme() {
+    const themes = ["light","dark","neon","nike"];
+    const current = localStorage.getItem("taxiTheme") || "light";
+    const next = themes[(themes.indexOf(current) + 1) % themes.length];
+    localStorage.setItem("taxiTheme", next);
+    tmApplyTheme();
+    if (typeof tm4UpdateTheme === "function") tm4UpdateTheme();
+}
 function tmApplyTheme() {
     const theme = localStorage.getItem("taxiTheme") || "light";
-    const dark = theme === "dark" || theme === "neon";
-    document.body.classList.toggle("tm-dark",dark);
-    document.body.classList.toggle("tm-neon",theme === "neon");
-    const b=document.getElementById("tmThemeButton"); if(b) b.textContent=dark?"☀️ Світла тема":"🌙 Темна тема";
+    const dark = ["dark","neon","nike"].includes(theme);
+    document.body.classList.toggle("tm-dark", dark);
+    document.body.classList.toggle("tm-neon", theme === "neon");
+    document.body.classList.toggle("tm-nike", theme === "nike");
+    const b = document.getElementById("tmThemeButton");
+    if (b) b.textContent = theme === "nike" ? "✔ Nike" : theme === "neon" ? "✨ Neon" : dark ? "☀️" : "🌙";
 }
 
 /* =========================================================
@@ -5940,11 +5965,11 @@ function tm4RenderStatsKpi(){
 function tm4ChooseTheme(value){localStorage.setItem('taxiTheme',value);tmApplyTheme();tm4UpdateTheme()}
 function tm4UpdateTheme(){
   const selected=localStorage.getItem('taxiTheme')||'light';
-  const dark=selected==='dark'||selected==='neon';
-  const themeBtn=document.getElementById('tmThemeButton'); if(themeBtn){themeBtn.textContent=dark?'☀':'☾';themeBtn.setAttribute('aria-label',dark?(tm4Lang()==='pl'?'Włącz jasny motyw':'Увімкнути світлу тему'):(tm4Lang()==='pl'?'Włącz ciemny motyw':'Увімкнути темну тему'))}
-  for(const [id,value] of [['tm4DarkBtn','dark'],['tm4LightBtn','light'],['tm4NeonBtn','neon']])document.getElementById(id)?.classList.toggle('selected',selected===value);
+  const dark=['dark','neon','nike'].includes(selected);
+  const themeBtn=document.getElementById('tmThemeButton'); if(themeBtn){themeBtn.textContent=selected==='nike'?'✔ Nike':selected==='neon'?'✨ Neon':dark?'☀':'☾';themeBtn.setAttribute('aria-label',tm4Lang()==='pl'?'Zmień motyw':'Змінити тему')}
+  for(const [id,value] of [['tm4DarkBtn','dark'],['tm4LightBtn','light'],['tm4NeonBtn','neon'],['tm4NikeBtn','nike']])document.getElementById(id)?.classList.toggle('selected',selected===value);
   tm4UpdateHeroImage();
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content',selected==='neon'?'#09091c':(dark?'#061321':'#f5f8fc'));
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content',selected==='nike'?'#111111':selected==='neon'?'#09091c':(dark?'#061321':'#f5f8fc'));
 }
 function tm4UpdateHeroImage(){const img=document.getElementById('tm4CoverPhoto');if(!img)return;const theme=document.body.classList.contains('tm-dark')?'dark':'light';const lang=tm4Lang();if(img.dataset.theme!==theme||img.dataset.language!==lang){img.src=TM4_IMAGES[theme][lang];img.dataset.theme=theme;img.dataset.language=lang;}img.alt=tm4Text[lang].heroAlt;const title=document.getElementById('tm5CoverTitle');const subtitle=document.getElementById('tm5CoverSubtitle');if(title)title.textContent=lang==='pl'?'DZIEŃ PRACY':'РОБОЧИЙ ДЕНЬ';if(subtitle)subtitle.textContent=lang==='pl'?'PRACUJ • ZARABIAJ • ROZWIJAJ SIĘ':'ПРАЦЮЙ • ЗАРОБЛЯЙ • РОЗВИВАЙСЯ';}
 function tm4UpdateLanguage(){
