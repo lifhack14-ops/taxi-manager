@@ -1374,6 +1374,12 @@ input,select,textarea{font-size:16px;min-width:0}button{touch-action:manipulatio
     <div class="tm4-panel-heading"><h2 data-v4="settingsTitle">Налаштування</h2></div>
     <div class="card tm4-preference-card"><h2 data-v4="appearance">🎨 Оформлення</h2><div class="tm4-choice-row"><button id="tm4DarkBtn" type="button" onclick="tm4ChooseTheme('dark')">🌙 <span data-v4="darkTheme">Темна</span></button><button id="tm4LightBtn" type="button" onclick="tm4ChooseTheme('light')">☀️ <span data-v4="lightTheme">Світла</span></button></div><div class="tm4-choice-row"><button id="tm4UkrBtn" type="button" onclick="setLanguage('uk')">🇺🇦 Українська</button><button id="tm4PlBtn" type="button" onclick="setLanguage('pl')">🇵🇱 Polski</button></div></div>
     <div id="tm4SettingsMount"></div>
+    <div class="card" id="pushNotificationsCard">
+      <h2>🔔 Сповіщення Trach Family</h2>
+      <p style="line-height:1.5;margin:0 0 12px">Увімкни сповіщення на цьому iPhone. Повтори на другому телефоні, увійшовши в той самий акаунт.</p>
+      <button class="primary" id="enablePushButton" type="button" onclick="enablePushNotifications()">🔔 Увімкнути сповіщення на цьому телефоні</button>
+      <div id="pushNotificationStatus" class="sync-line" role="status" aria-live="polite" style="margin-top:10px">Потрібне підключення до інтернету.</div>
+    </div>
   </div>
 </div>
 
@@ -6041,6 +6047,102 @@ if (
                 );
         }
     );
+}
+
+/* =========================================================
+   TRAch FAMILY PUSH SUBSCRIPTIONS
+========================================================= */
+const TRACh_VAPID_PUBLIC_KEY = "BOMYO4EEFePnnqa7iAEnKIQ1WK3pM2vM5kynLJfQ3mFk9n0QVjxsTAbyhVov_bCEL2Yo_xOagTtJlH7-JzceExo";
+
+function trachUrlBase64ToUint8Array(base64String) {
+    const padding = "=".repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+    const raw = atob(base64);
+    return Uint8Array.from([...raw].map(char => char.charCodeAt(0)));
+}
+
+function trachPushStatus(message, isError = false) {
+    const el = document.getElementById("pushNotificationStatus");
+    if (el) {
+        el.textContent = message;
+        el.style.color = isError ? "#b91c1c" : "";
+    }
+}
+
+async function enablePushNotifications() {
+    const button = document.getElementById("enablePushButton");
+    try {
+        if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) {
+            trachPushStatus("Цей браузер не підтримує push-сповіщення. На iPhone відкрий застосунок із початкового екрана.", true);
+            return;
+        }
+        if (!supabaseClient || !currentUser) {
+            trachPushStatus("Спочатку увійди у свій акаунт Trach Family.", true);
+            return;
+        }
+        if (location.protocol !== "https:" && location.hostname !== "localhost") {
+            trachPushStatus("Для сповіщень потрібне захищене HTTPS-з’єднання.", true);
+            return;
+        }
+        if (button) {
+            button.disabled = true;
+            button.textContent = "Підключення…";
+        }
+        const permission = await Notification.requestPermission();
+        if (permission !== "granted") {
+            trachPushStatus("Дозвіл не надано. Дозволь сповіщення в налаштуваннях iPhone.", true);
+            return;
+        }
+        const registration = await navigator.serviceWorker.ready;
+        let subscription = await registration.pushManager.getSubscription();
+        if (!subscription) {
+            subscription = await registration.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: trachUrlBase64ToUint8Array(TRACh_VAPID_PUBLIC_KEY)
+            });
+        }
+        const payload = {
+            user_id: currentUser.id,
+            endpoint: subscription.endpoint,
+            subscription: subscription.toJSON(),
+            device_label: /iPhone|iPad|iPod/i.test(navigator.userAgent) ? "Trach Family iPhone/iPad" : "Trach Family browser",
+            updated_at: new Date().toISOString()
+        };
+        const { error } = await supabaseClient
+            .from("push_subscriptions")
+            .upsert(payload, { onConflict: "endpoint" });
+        if (error) throw error;
+        trachPushStatus("✅ Цей пристрій підписаний на сповіщення. Після налаштування серверного відправлення тут зможуть з’являтися сімейні нагадування.");
+    } catch (error) {
+        console.error("Trach Family push setup:", error);
+        trachPushStatus("Не вдалося увімкнути сповіщення: " + (error?.message || "невідома помилка"), true);
+    } finally {
+        if (button) {
+            button.disabled = false;
+            button.textContent = "🔔 Увімкнути сповіщення на цьому телефоні";
+        }
+    }
+}
+
+async function trachRefreshPushStatus() {
+    const button = document.getElementById("enablePushButton");
+    if (!button) return;
+    if (!currentUser) {
+        trachPushStatus("Увійди в акаунт, щоб зареєструвати цей пристрій.");
+        return;
+    }
+    if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+        trachPushStatus("Push-сповіщення не підтримуються цим браузером.", true);
+        return;
+    }
+    try {
+        const registration = await navigator.serviceWorker.ready;
+        const subscription = await registration.pushManager.getSubscription();
+        if (subscription) trachPushStatus("Цей браузер має підписку на сповіщення.");
+        else trachPushStatus("Натисни кнопку, щоб увімкнути сповіщення на цьому телефоні.");
+    } catch (_) {
+        trachPushStatus("Натисни кнопку, щоб увімкнути сповіщення на цьому телефоні.");
+    }
 }
 
 /* =========================================================
