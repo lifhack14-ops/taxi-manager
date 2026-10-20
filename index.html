@@ -698,7 +698,7 @@ input,select,textarea{font-size:16px;min-width:0}button{touch-action:manipulatio
 .tm-taxi-subtab{flex:1;min-width:0;border:0;border-radius:11px;padding:10px 8px;background:transparent;color:var(--tm-muted);font-size:13px;font-weight:750;display:flex;align-items:center;justify-content:center;gap:7px}
 .tm-taxi-subtab.active{background:var(--tm-card);color:var(--tm-blue-text);box-shadow:0 2px 8px #10213a12}
 .navigation{grid-template-columns:repeat(4,minmax(0,1fr))!important}
-</style>
+\n/* Neon Premium theme: optional third palette, keeps the existing layout and functionality */\nbody.tm-neon{color-scheme:dark;--tm-bg:#09091c;--tm-card:#11142b;--tm-text:#f6f4ff;--tm-muted:#a9b4d8;--tm-line:#292b55;--tm-navy:#09091c;--tm-blue:#16d9ff;--tm-blue-text:#61e8ff;--tm-green:#c2ff4d;--tm-muted-bg:#171a37;--tm-soft-shadow:0 12px 30px rgba(0,0,0,.28)}\nbody.tm-neon header,body.tm-neon .tm4-header{background:linear-gradient(115deg,#09091c 0%,#17113b 55%,#102b4c 100%);color:var(--tm-text);border-color:#30305f}\nbody.tm-neon .card,body.tm-neon .tm4-preference-card{background:linear-gradient(145deg,rgba(17,20,43,.98),rgba(20,19,53,.98));border-color:#34345f;box-shadow:0 10px 28px rgba(0,0,0,.22)}\nbody.tm-neon button.primary,body.tm-neon .primary,body.tm-neon .tm4-choice-row button.selected,body.tm-neon .nav-button.active{background:linear-gradient(105deg,#00d8ff,#7658ff 58%,#ff4db8);color:#fff;border-color:transparent}\nbody.tm-neon .tm4-theme-toggle,body.tm-neon .nav-button,body.tm-neon input,body.tm-neon select,body.tm-neon textarea{background:#11142b;color:var(--tm-text);border-color:#34345f}\nbody.tm-neon .stat,body.tm-neon .week-day,body.tm-neon .tm-taxi-subnav,body.tm-neon .tm-taxi-subtab.active{background:#171a37;color:var(--tm-text);border-color:#30345f}\nbody.tm-neon .tm-chart-bar{background:linear-gradient(180deg,#16d9ff,#9b5cff 70%,#ff4db8)}\nbody.tm-neon .tm4-choice-row button{background:#171a37;color:var(--tm-text);border-color:#34345f}\nbody.tm-neon .tm4-choice-row button.selected{box-shadow:0 0 0 2px rgba(22,217,255,.22),0 0 18px rgba(118,88,255,.18)}\nbody.tm-neon label,body.tm-neon .subtitle,body.tm-neon .stat-label{color:#b9c3e8}\n</style>
 </head>
 
 <body>
@@ -1372,7 +1372,7 @@ input,select,textarea{font-size:16px;min-width:0}button{touch-action:manipulatio
   </div>
   <div id="settingsPage" class="page">
     <div class="tm4-panel-heading"><h2 data-v4="settingsTitle">Налаштування</h2></div>
-    <div class="card tm4-preference-card"><h2 data-v4="appearance">🎨 Оформлення</h2><div class="tm4-choice-row"><button id="tm4DarkBtn" type="button" onclick="tm4ChooseTheme('dark')">🌙 <span data-v4="darkTheme">Темна</span></button><button id="tm4LightBtn" type="button" onclick="tm4ChooseTheme('light')">☀️ <span data-v4="lightTheme">Світла</span></button></div><div class="tm4-choice-row"><button id="tm4UkrBtn" type="button" onclick="setLanguage('uk')">🇺🇦 Українська</button><button id="tm4PlBtn" type="button" onclick="setLanguage('pl')">🇵🇱 Polski</button></div></div>
+    <div class="card tm4-preference-card"><h2 data-v4="appearance">🎨 Оформлення</h2><div class="tm4-choice-row"><button id="tm4DarkBtn" type="button" onclick="tm4ChooseTheme('dark')">🌙 <span data-v4="darkTheme">Темна</span></button><button id="tm4LightBtn" type="button" onclick="tm4ChooseTheme('light')">☀️ <span data-v4="lightTheme">Світла</span></button></div><div class="tm4-choice-row"><button id="tm4NeonBtn" type="button" onclick="tm4ChooseTheme('neon')">✨ <span>Neon Premium</span></button></div><div class="tm4-choice-row"><button id="tm4UkrBtn" type="button" onclick="setLanguage('uk')">🇺🇦 Українська</button><button id="tm4PlBtn" type="button" onclick="setLanguage('pl')">🇵🇱 Polski</button></div></div>
     <div id="tm4SettingsMount"></div>
     <div class="card" id="pushNotificationsCard">
       <h2>🔔 Сповіщення Trach Family</h2>
@@ -5277,10 +5277,12 @@ function tmRenderIncomeChart(list) {
     if(title)title.textContent=currentLanguage==='pl' ? (statsMode==='month'?'📈 Zarobki według tygodni':'📈 Zarobki w ciągu 7 dni') : (statsMode==='month'?'📈 Дохід за тижнями':'📈 Дохід за 7 днів');
 }
 function tmChangeFilter(value) { renderStatistics(); }
-function tmToggleTheme() { const next = document.body.classList.contains("tm-dark") ? "light" : "dark"; localStorage.setItem("taxiTheme",next); tmApplyTheme(); }
+function tmToggleTheme() { const next = document.body.classList.contains("tm-dark") ? "light" : "dark"; localStorage.setItem("taxiTheme",next); tmApplyTheme(); if(typeof tm4UpdateTheme==="function") tm4UpdateTheme(); }
 function tmApplyTheme() {
-    const dark = localStorage.getItem("taxiTheme") === "dark";
+    const theme = localStorage.getItem("taxiTheme") || "light";
+    const dark = theme === "dark" || theme === "neon";
     document.body.classList.toggle("tm-dark",dark);
+    document.body.classList.toggle("tm-neon",theme === "neon");
     const b=document.getElementById("tmThemeButton"); if(b) b.textContent=dark?"☀️ Світла тема":"🌙 Темна тема";
 }
 
@@ -5925,11 +5927,12 @@ function tm4RenderStatsKpi(){
 
 function tm4ChooseTheme(value){localStorage.setItem('taxiTheme',value);tmApplyTheme();tm4UpdateTheme()}
 function tm4UpdateTheme(){
-  const dark=document.body.classList.contains('tm-dark');
+  const selected=localStorage.getItem('taxiTheme')||'light';
+  const dark=selected==='dark'||selected==='neon';
   const themeBtn=document.getElementById('tmThemeButton'); if(themeBtn){themeBtn.textContent=dark?'☀':'☾';themeBtn.setAttribute('aria-label',dark?(tm4Lang()==='pl'?'Włącz jasny motyw':'Увімкнути світлу тему'):(tm4Lang()==='pl'?'Włącz ciemny motyw':'Увімкнути темну тему'))}
-  for(const id of ['tm4DarkBtn','tm4LightBtn'])document.getElementById(id)?.classList.toggle('selected',id===(dark?'tm4DarkBtn':'tm4LightBtn'));
+  for(const [id,value] of [['tm4DarkBtn','dark'],['tm4LightBtn','light'],['tm4NeonBtn','neon']])document.getElementById(id)?.classList.toggle('selected',selected===value);
   tm4UpdateHeroImage();
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content',dark?'#061321':'#f5f8fc');
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content',selected==='neon'?'#09091c':(dark?'#061321':'#f5f8fc'));
 }
 function tm4UpdateHeroImage(){const img=document.getElementById('tm4CoverPhoto');if(!img)return;const theme=document.body.classList.contains('tm-dark')?'dark':'light';const lang=tm4Lang();if(img.dataset.theme!==theme||img.dataset.language!==lang){img.src=TM4_IMAGES[theme][lang];img.dataset.theme=theme;img.dataset.language=lang;}img.alt=tm4Text[lang].heroAlt;const title=document.getElementById('tm5CoverTitle');const subtitle=document.getElementById('tm5CoverSubtitle');if(title)title.textContent=lang==='pl'?'DZIEŃ PRACY':'РОБОЧИЙ ДЕНЬ';if(subtitle)subtitle.textContent=lang==='pl'?'PRACUJ • ZARABIAJ • ROZWIJAJ SIĘ':'ПРАЦЮЙ • ЗАРОБЛЯЙ • РОЗВИВАЙСЯ';}
 function tm4UpdateLanguage(){
