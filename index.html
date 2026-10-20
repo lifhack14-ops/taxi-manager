@@ -5987,7 +5987,7 @@ function tm4UpdateLanguage(){
   document.getElementById('tm4EntryHeading').textContent=L.entryTitle;
   document.getElementById('tm4UkrBtn')?.classList.toggle('selected',lang==='uk');document.getElementById('tm4PlBtn')?.classList.toggle('selected',lang==='pl');
   const h=document.getElementById('tm4HistoryAll');if(h)h.textContent=L[document.getElementById('homePage').classList.contains('tm4-history-truncated')?'showAll':'hideAll'];
-  tm4RenderDashboard();tm4RenderFormTotal();tm4UpdateTheme();
+  tm4RenderDashboard();tm4RenderFormTotal();tm4UpdateTheme();if(typeof shopRender==='function')shopRender();
   if(document.getElementById('statsPage')?.classList.contains('active'))renderStatistics();
 }
 function tm4SetHomeProfile(value){if(!['me','partner','all'].includes(value))return;tm4HomeProfile=value;localStorage.setItem('taxiHomeProfile',value);tm4RenderDashboard()}
@@ -6225,14 +6225,32 @@ let shopBusy = false;
 let shopRealtimeChannel = null;
 let shopRealtimeUserId = null;
 const shopLocalKey = 'taxiShoppingFallbackV1';
+// Translate built-in product names for display while preserving the stored names.
+const SHOP_NAME_TRANSLATIONS = {
+ 'Вода':['Вода','Woda'],'Молоко':['Молоко','Mleko'],'Хліб':['Хліб','Chleb'],'Яйця':['Яйця','Jajka'],
+ 'Масло':['Масло','Masło'],'Сир':['Сир','Ser'],'Йогурт':['Йогурт','Jogurt'],'Кава':['Кава','Kawa'],
+ 'Чай':['Чай','Herbata'],'Цукор':['Цукор','Cukier'],'Борошно':['Борошно','Mąka'],'Рис':['Рис','Ryż'],
+ 'Макарони':['Макарони','Makaron'],'Картопля':['Картопля','Ziemniaki'],'Помідори':['Помідори','Pomidory'],
+ 'Огірки':['Огірки','Ogórki'],'Яблука':['Яблука','Jabłka'],'Банани':['Банани','Banany'],
+ 'М’ясо':['М’ясо','Mięso'],'Курка':['Курка','Kurczak'],'Риба':['Риба','Ryba'],'Олія':['Олія','Olej'],
+ 'Серветки':['Серветки','Serwetki'],'Пральний порошок':['Пральний порошок','Proszek do prania'],
+ 'Туалетний папір':['Туалетний папір','Papier toaletowy'],'Шампунь':['Шампунь','Szampon']
+};
+function shopTranslateName(name){
+ const value=String(name??''); const lang=tm4Lang()==='pl'?1:0;
+ for(const pair of Object.values(SHOP_NAME_TRANSLATIONS)){
+  if(pair.some(v=>v.toLocaleLowerCase()===value.toLocaleLowerCase()))return pair[lang];
+ }
+ return value;
+}
 function shopEsc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function shopRender(){
  const quick=document.getElementById('shopQuickAdd'), fav=document.getElementById('shopFavorites'), list=document.getElementById('shopList'); if(!quick||!fav||!list)return;
  const active=shopItems.filter(x=>!x.bought), bought=shopItems.filter(x=>x.bought);
- const btn=n=>`<button class="secondary" style="padding:7px 10px" onclick="shopAddPreset('${shopEsc(n).replace(/\\/g,'\\\\').replace(/'/g,"\\'")}')">＋ ${shopEsc(n)}</button>`;
+ const btn=n=>`<button class="secondary" style="padding:7px 10px" onclick="shopAddPreset('${shopEsc(n).replace(/\\/g,'\\\\').replace(/'/g,"\\'")}')">＋ ${shopEsc(shopTranslateName(n))}</button>`;
  quick.innerHTML=SHOP_QUICK.slice(0,12).map(btn).join('');
  const names=[...new Set([...SHOP_QUICK,...shopItems.map(x=>x.name)])]; fav.innerHTML=names.map(btn).join('');
- const row=x=>`<div style="display:flex;align-items:center;gap:9px;padding:10px 0;border-bottom:1px solid var(--tm-line);${x.bought?'opacity:.58':''}"><input type="checkbox" ${x.bought?'checked':''} aria-label="Позначити ${shopEsc(x.name)} купленим" onchange="shopToggle('${shopEsc(x.id)}',this.checked)" style="min-height:20px;width:20px;flex:0 0 20px"><div style="flex:1;min-width:0;${x.bought?'text-decoration:line-through':''}"><strong>${shopEsc(x.name)}</strong>${x.qty&&String(x.qty)!=='1'?` <span class="tm-hint">× ${shopEsc(x.qty)}</span>`:''}</div><button class="secondary" style="padding:6px 9px" aria-label="Видалити ${shopEsc(x.name)}" onclick="shopRemove('${shopEsc(x.id)}')">✕</button></div>`;
+ const row=x=>`<div style="display:flex;align-items:center;gap:9px;padding:10px 0;border-bottom:1px solid var(--tm-line);${x.bought?'opacity:.58':''}"><input type="checkbox" ${x.bought?'checked':''} aria-label="Позначити ${shopEsc(x.name)} купленим" onchange="shopToggle('${shopEsc(x.id)}',this.checked)" style="min-height:20px;width:20px;flex:0 0 20px"><div style="flex:1;min-width:0;${x.bought?'text-decoration:line-through':''}"><strong>${shopEsc(shopTranslateName(x.name))}</strong>${x.qty&&String(x.qty)!=='1'?` <span class="tm-hint">× ${shopEsc(x.qty)}</span>`:''}</div><button class="secondary" style="padding:6px 9px" aria-label="Видалити ${shopEsc(x.name)}" onclick="shopRemove('${shopEsc(x.id)}')">✕</button></div>`;
  list.innerHTML=(active.length?active.map(row).join(''):'<p class="empty">Список поки порожній. Додай товар вище 🙂</p>')+(bought.length?'<h3 style="font-size:13px;margin-top:16px">Куплено</h3>'+bought.map(row).join(''):'');
 }
 function shopSetStatus(t){const e=document.getElementById('shopStatus');if(e)e.textContent=t;}
