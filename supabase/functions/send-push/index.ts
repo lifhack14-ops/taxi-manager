@@ -66,7 +66,7 @@ Deno.serve(async (req: Request) => {
 
     await Promise.all(rows.map(async (row: { id: string; endpoint: string; subscription: unknown }) => {
       try {
-        await webpush.sendNotification(row.subscription as webpush.PushSubscription, JSON.stringify({
+        await webpush.sendNotification(row.subscription as any, JSON.stringify({
           title, body, url: targetUrl, tag: "trach-family-" + Date.now(),
         }));
         sent++;
