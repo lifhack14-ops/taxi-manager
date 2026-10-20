@@ -1,11 +1,11 @@
 
-const CACHE_NAME = "trach-family-v8";
+const CACHE_NAME = "trach-family-v9";
 
 const APP_SHELL = [
   "./",
   "./index.html",
   "./manifest.json",
-  "./icon-512.png"
+  "./taxi-emblem.svg"
 ];
 
 self.addEventListener("install", event => {
@@ -90,8 +90,8 @@ self.addEventListener("push", event => {
   event.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,
-      icon: "./icon-512.png",
-      badge: "./icon-512.png",
+      icon: "./taxi-emblem.svg",
+      badge: "./taxi-emblem.svg",
       data: { url: data.url || "./" },
       tag: data.tag || "trach-family-reminder",
       renotify: true
