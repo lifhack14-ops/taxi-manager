@@ -1,5 +1,5 @@
 
-const CACHE_NAME = "trach-family-v4";
+const CACHE_NAME = "trach-family-v5";
 
 const APP_SHELL = [
   "./",
