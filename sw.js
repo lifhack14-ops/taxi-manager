@@ -1,12 +1,11 @@
 
-const CACHE_NAME = "trach-family-v6";
+const CACHE_NAME = "trach-family-v7";
 
 const APP_SHELL = [
   "./",
   "./index.html",
   "./manifest.json",
-  "./icon-512.png",
-  "./taxi-emblem.svg?v=2"
+  "./icon-512.png"
 ];
 
 self.addEventListener("install", event => {
