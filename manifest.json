@@ -1,4 +1,3 @@
-
 {
   "name": "Trach Family",
   "short_name": "Trach Family",
@@ -12,9 +11,10 @@
   "lang": "uk",
   "icons": [
     {
-      "src": "icon-512.png?v=8",
-      "sizes": "512x512",
-      "type": "image/png"
+      "src": "taxi-emblem.svg?v=3",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
     }
   ]
 }
