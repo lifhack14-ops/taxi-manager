@@ -1415,6 +1415,9 @@ body.tm-nike .tm4-app-logo.bolt{background:#d7ff00;color:#101010}
 
 <script>
 
+// Initialize shared shopping state before startup functions can run.
+let shopItems = [];
+
 /* =========================================================
    SUPABASE
 ========================================================= */
@@ -6220,7 +6223,6 @@ async function trachRefreshPushStatus() {
    enables RLS so each signed-in account only accesses its own list.
 ========================================================= */
 const SHOP_QUICK = ['Вода','Молоко','Хліб','Яйця','Масло','Сир','Йогурт','Кава','Чай','Цукор','Борошно','Рис','Макарони','Картопля','Помідори','Огірки','Яблука','Банани','М’ясо','Курка','Риба','Олія','Серветки','Пральний порошок','Туалетний папір','Шампунь'];
-let shopItems = [];
 let shopBusy = false;
 let shopRealtimeChannel = null;
 let shopRealtimeUserId = null;
