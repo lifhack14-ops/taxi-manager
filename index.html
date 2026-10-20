@@ -5987,7 +5987,7 @@ function tm4UpdateLanguage(){
   document.getElementById('tm4EntryHeading').textContent=L.entryTitle;
   document.getElementById('tm4UkrBtn')?.classList.toggle('selected',lang==='uk');document.getElementById('tm4PlBtn')?.classList.toggle('selected',lang==='pl');
   const h=document.getElementById('tm4HistoryAll');if(h)h.textContent=L[document.getElementById('homePage').classList.contains('tm4-history-truncated')?'showAll':'hideAll'];
-  tm4RenderDashboard();tm4RenderFormTotal();tm4UpdateTheme();if(typeof shopRender==='function')shopRender();
+  tm4RenderDashboard();tm4RenderFormTotal();tm4UpdateTheme();if(typeof shopRender==='function')queueMicrotask(()=>shopRender());
   if(document.getElementById('statsPage')?.classList.contains('active'))renderStatistics();
 }
 function tm4SetHomeProfile(value){if(!['me','partner','all'].includes(value))return;tm4HomeProfile=value;localStorage.setItem('taxiHomeProfile',value);tm4RenderDashboard()}
