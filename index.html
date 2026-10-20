@@ -1378,6 +1378,7 @@ input,select,textarea{font-size:16px;min-width:0}button{touch-action:manipulatio
       <h2>🔔 Сповіщення Trach Family</h2>
       <p style="line-height:1.5;margin:0 0 12px">Увімкни сповіщення на цьому iPhone. Повтори на другому телефоні, увійшовши в той самий акаунт.</p>
       <button class="primary" id="enablePushButton" type="button" onclick="enablePushNotifications()">🔔 Увімкнути сповіщення на цьому телефоні</button>
+      <button class="secondary" id="testPushButton" type="button" onclick="sendTestPushNotification()" style="margin-top:8px">📨 Надіслати тестове сповіщення</button>
       <div id="pushNotificationStatus" class="sync-line" role="status" aria-live="polite" style="margin-top:10px">Потрібне підключення до інтернету.</div>
     </div>
   </div>
@@ -6052,7 +6053,7 @@ if (
 /* =========================================================
    TRAch FAMILY PUSH SUBSCRIPTIONS
 ========================================================= */
-const TRACh_VAPID_PUBLIC_KEY = "BOMYO4EEFePnnqa7iAEnKIQ1WK3pM2vM5kynLJfQ3mFk9n0QVjxsTAbyhVov_bCEL2Yo_xOagTtJlH7-JzceExo";
+const TRACh_VAPID_PUBLIC_KEY = "BKEeuhg83nA-XD8t_epQUEomcVOu9Q03MZXndeGTpx9SYIwNZjGbpTcvCYv9bC6YQGZF3RE0Cw0ffGe7yvdrbIM";
 
 function trachUrlBase64ToUint8Array(base64String) {
     const padding = "=".repeat((4 - base64String.length % 4) % 4);
@@ -6121,6 +6122,31 @@ async function enablePushNotifications() {
             button.disabled = false;
             button.textContent = "🔔 Увімкнути сповіщення на цьому телефоні";
         }
+    }
+}
+
+async function sendTestPushNotification() {
+    const button = document.getElementById("testPushButton");
+    try {
+        if (!supabaseClient || !currentUser) {
+            trachPushStatus("Спочатку увійди у свій акаунт Trach Family.", true);
+            return;
+        }
+        if (button) { button.disabled = true; button.textContent = "Надсилання…"; }
+        const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
+        if (sessionError) throw sessionError;
+        const accessToken = sessionData.session?.access_token;
+        if (!accessToken) throw new Error("Сеанс закінчився. Увійди в акаунт ще раз.");
+        const { data, error } = await supabaseClient.functions.invoke("send-push", {
+            body: { title: "Trach Family — тест", body: "Push-сповіщення працюють на цьому пристрої.", url: "./" }
+        });
+        if (error) throw error;
+        trachPushStatus(data?.message || "✅ Тестове сповіщення відправлено на підключені пристрої.");
+    } catch (error) {
+        console.error("Trach Family test push:", error);
+        trachPushStatus("Не вдалося надіслати тест: " + (error?.message || "перевір налаштування Edge Function"), true);
+    } finally {
+        if (button) { button.disabled = false; button.textContent = "📨 Надіслати тестове сповіщення"; }
     }
 }
 
