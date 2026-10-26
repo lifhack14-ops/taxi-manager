@@ -574,6 +574,15 @@ button {
 .budget-month-row { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; }
 .budget-month-row input { flex: 1; min-width: 0; }
 .budget-category-row { margin: 13px 0; }
+.budget-category-button{display:block;width:100%;text-align:left;padding:0;margin:13px 0;background:transparent!important;color:inherit!important;border:0!important;border-radius:10px;box-shadow:none!important;cursor:pointer}
+.budget-category-button:hover,.budget-category-button:focus-visible{outline:2px solid var(--tm-blue,#2563eb);outline-offset:5px;transform:none}
+.budget-category-button.selected .budget-category-head{color:var(--tm-blue,#2563eb)}
+.budget-category-button .budget-track{transition:height .15s}
+.budget-category-button.selected .budget-track{height:10px}
+.budget-history-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.budget-history-heading h2{margin:0}
+.budget-detail-clear{padding:7px 10px;font-size:12px;white-space:nowrap}
+
 .budget-category-head { display:flex; justify-content:space-between; gap:10px; font-size:13px; margin-bottom:6px; }
 .budget-track { height: 8px; background:#e5e7eb; border-radius:999px; overflow:hidden; }
 .budget-track-fill { height:100%; border-radius:999px; background:#6478d3; }
@@ -1378,7 +1387,8 @@ body.tm-nike .tm4-app-logo.bolt{background:#d7ff00;color:#101010}
         </div>
 
         <div class="card">
-            <h2>📋 <span data-i18n="budgetHistory">Операції за місяць</span></h2>
+            <div class="budget-history-heading"><h2>📋 <span id="budgetHistoryTitle" data-i18n="budgetHistory">Операції за місяць</span></h2><button id="budgetDetailClear" class="secondary budget-detail-clear hidden" type="button" onclick="clearBudgetCategoryFilter()" data-i18n="budgetDetailAll">Показати всі</button></div>
+            <p id="budgetDetailHint" class="budget-note hidden"></p>
             <div id="budgetEntriesList"></div>
         </div>
     </div>
@@ -1615,6 +1625,9 @@ const translations = {
         budgetNotePlaceholder: "Наприклад, закупи на тиждень",
         budgetSave: "💾 Зберегти операцію",
         budgetHistory: "Операції за місяць",
+        budgetDetailAll: "Показати всі",
+        budgetDetailHint: "Натисни на категорію вище, щоб побачити витрати з датами та коментарями.",
+        budgetDetailNoEntries: "У цій категорії за вибраний місяць витрат немає.",
         budgetLocalNote: "Операції зберігаються на телефоні та синхронізуються через Supabase після налаштування таблиці family_budget_entries.",
         budgetSaved: "Операцію збережено.",
         budgetDeleteConfirm: "Видалити цю операцію?",
@@ -1812,6 +1825,9 @@ const translations = {
         budgetNotePlaceholder: "Np. zakupy na cały tydzień",
         budgetSave: "💾 Zapisz operację",
         budgetHistory: "Operacje w miesiącu",
+        budgetDetailAll: "Pokaż wszystkie",
+        budgetDetailHint: "Kliknij kategorię powyżej, aby zobaczyć wydatki z datami i komentarzami.",
+        budgetDetailNoEntries: "Brak wydatków w tej kategorii w wybranym miesiącu.",
         budgetLocalNote: "Operacje są zapisywane lokalnie i synchronizowane przez Supabase po utworzeniu tabeli family_budget_entries.",
         budgetSaved: "Operację zapisano.",
         budgetDeleteConfirm: "Usunąć tę operację?",
@@ -5610,6 +5626,17 @@ function deleteBudgetEntry(id) {
     renderFamilyBudget();
 }
 
+let selectedBudgetCategory = null;
+function clearBudgetCategoryFilter() {
+    selectedBudgetCategory = null;
+    renderFamilyBudget();
+}
+document.getElementById("budgetCategoryChart")?.addEventListener("click", function(event) {
+    const button = event.target.closest("[data-budget-category]");
+    if (!button) return;
+    selectedBudgetCategory = selectedBudgetCategory === button.dataset.budgetCategory ? null : button.dataset.budgetCategory;
+    renderFamilyBudget();
+});
 function renderFamilyBudget() {
     if (!document.getElementById("budgetMonth")) return;
     const month = getBudgetMonth();
@@ -5629,22 +5656,34 @@ function renderFamilyBudget() {
     document.getElementById("budgetChartEmpty").classList.toggle("hidden", categories.length > 0);
     chart.innerHTML = categories.map(([key, amount]) => {
         const pct = expenses > 0 ? Math.min(100, amount / expenses * 100) : 0;
-        return `<div class="budget-category-row">
+        const selected = selectedBudgetCategory === key;
+        return `<button type="button" class="budget-category-button ${selected ? "selected" : ""}" data-budget-category="${escapeBudgetHtml(key)}" aria-pressed="${selected}" title="${escapeBudgetHtml(t("budgetDetailHint"))}">
             <div class="budget-category-head"><span class="tm4-category-left"><span class="tm4-cat-symbol ${escapeBudgetHtml(tm4CategoryColor(key))}">${escapeBudgetHtml(tm4CategoryIcon(key))}</span>${escapeBudgetHtml(budgetCategoryLabel(key))}</span><strong>${budgetMoney(amount)} · ${Math.round(pct)}%</strong></div>
             <div class="budget-track"><div class="budget-track-fill" style="width:${pct.toFixed(2)}%"></div></div>
-        </div>`;
+        </button>`;
     }).join("");
 
     const list = document.getElementById("budgetEntriesList");
-    items.sort((a,b) => b.date.localeCompare(a.date) || (b.updatedAt || "").localeCompare(a.updatedAt || ""));
-    if (!items.length) {
-        list.innerHTML = `<div class="budget-empty">${escapeBudgetHtml(t("budgetNoOperations"))}</div>`;
+    const historyTitle = document.getElementById("budgetHistoryTitle");
+    const clearButton = document.getElementById("budgetDetailClear");
+    const detailHint = document.getElementById("budgetDetailHint");
+    const categoryLabel = selectedBudgetCategory ? budgetCategoryLabel(selectedBudgetCategory) : "";
+    if (historyTitle) historyTitle.textContent = selectedBudgetCategory ? t("budgetExpenses") + ": " + categoryLabel : t("budgetHistory");
+    if (clearButton) clearButton.classList.toggle("hidden", !selectedBudgetCategory);
+    if (detailHint) {
+        detailHint.textContent = selectedBudgetCategory ? t("budgetDetailHint") : "";
+        detailHint.classList.toggle("hidden", !selectedBudgetCategory);
+    }
+    const visibleItems = items.filter(item => !selectedBudgetCategory || (item.type === "expense" && item.category === selectedBudgetCategory));
+    visibleItems.sort((a,b) => b.date.localeCompare(a.date) || (b.updatedAt || "").localeCompare(a.updatedAt || ""));
+    if (!visibleItems.length) {
+        list.innerHTML = `<div class="budget-empty">${escapeBudgetHtml(selectedBudgetCategory ? t("budgetDetailNoEntries") : t("budgetNoOperations"))}</div>`;
         return;
     }
     const whoLabels = {
         me: t("budgetMe"), partner: t("budgetPartner"), family: t("budgetFamily")
     };
-    list.innerHTML = items.map(item => {
+    list.innerHTML = visibleItems.map(item => {
         const isIncome = item.type === "income";
         return `<div class="budget-item">
             <div class="budget-item-top">
