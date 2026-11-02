@@ -1137,11 +1137,6 @@ body.tm-nike .tm4-app-logo.bolt{background:#d7ff00;color:#101010}
 
                     </div>
 
-                    <div style="margin-top:10px;">
-                        <button id="weekCarPaidBtn" class="secondary" style="width:100%;" onclick="toggleWeekCarPaid()">Я оплатив</button>
-                        <div id="weekCarPaidStatus" class="car-cost-info" aria-live="polite">Оплату ще не позначено</div>
-                    </div>
-
                     <div class="car-cost-info" data-i18n="carCostInfo">
                         Ця сума належить до всіх 7 календарних днів тижня. У місячній статистиці вона автоматично розподіляється між місяцями пропорційно кількості днів.
                     </div>
@@ -1300,6 +1295,8 @@ body.tm-nike .tm4-app-logo.bolt{background:#d7ff00;color:#101010}
                 <div class="stat expense" style="margin-bottom:12px;">
                     <label for="monthVatInput" style="display:block;font-weight:700;margin-bottom:6px;">VAT 8,5 за цей місяць (вводиться вручну)</label>
                     <input id="monthVatInput" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00" style="width:100%;" onchange="saveMonthVat()">
+                    <button id="monthVatPaidBtn" class="primary" style="width:100%;margin-top:10px;" onclick="toggleMonthVatPaid()">💸 Я оплатив VAT 8,5</button>
+                    <div id="monthVatPaidStatus" class="car-cost-info" style="margin-top:6px;text-align:center;" aria-live="polite">⏳ Ще не оплачено</div>
                 </div>
 
                 <div class="month-car-grid">
@@ -2023,6 +2020,14 @@ try {
     monthlyVat = {};
 }
 
+let monthlyVatPaid = {};
+try {
+    monthlyVatPaid = JSON.parse(localStorage.getItem("taxiMonthlyVatPaid") || "{}");
+    if (!monthlyVatPaid || typeof monthlyVatPaid !== "object" || Array.isArray(monthlyVatPaid)) monthlyVatPaid = {};
+} catch {
+    monthlyVatPaid = {};
+}
+
 function saveMonthVat() {
     const monthKey = getMonthKey(getSelectedMonthDate());
     const input = document.getElementById("monthVatInput");
@@ -2031,6 +2036,22 @@ function saveMonthVat() {
     else delete monthlyVat[monthKey];
     localStorage.setItem("taxiMonthlyVat", JSON.stringify(monthlyVat));
     renderMonthStats();
+}
+
+function toggleMonthVatPaid() {
+    const monthKey = getMonthKey(getSelectedMonthDate());
+    monthlyVatPaid[monthKey] = monthlyVatPaid[monthKey] !== true;
+    localStorage.setItem("taxiMonthlyVatPaid", JSON.stringify(monthlyVatPaid));
+    updateMonthVatPaidUI();
+}
+
+function updateMonthVatPaidUI() {
+    const monthKey = getMonthKey(getSelectedMonthDate());
+    const paid = monthlyVatPaid[monthKey] === true;
+    const button = document.getElementById("monthVatPaidBtn");
+    const status = document.getElementById("monthVatPaidStatus");
+    if (button) button.textContent = paid ? "✅ VAT 8,5 оплачено — скасувати" : "💸 Я оплатив VAT 8,5";
+    if (status) status.textContent = paid ? "🎉 Оплату VAT 8,5 за цей місяць позначено як здійснену" : "⏳ Ще не оплачено";
 }
 
 
@@ -5200,6 +5221,7 @@ function renderMonthStats() {
         carCosts.total;
 
     const vat = Math.max(0, Number(monthlyVat[monthKey]) || 0);
+    updateMonthVatPaidUI();
     const vatInput = document.getElementById("monthVatInput");
     if (vatInput && document.activeElement !== vatInput) vatInput.value = vat ? String(vat) : "";
 
