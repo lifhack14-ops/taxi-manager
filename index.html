@@ -1292,6 +1292,11 @@ body.tm-nike .tm4-app-logo.bolt{background:#d7ff00;color:#101010}
                     Кожна тижнева оплата ділиться на 7 календарних днів. Місяць отримує тільки ту частину суми, яка припадає на його дні.
                 </div>
 
+                <div class="stat expense" style="margin-bottom:12px;">
+                    <label for="monthVatInput" style="display:block;font-weight:700;margin-bottom:6px;">ПДВ за цей місяць (вводиться вручну)</label>
+                    <input id="monthVatInput" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00" style="width:100%;" onchange="saveMonthVat()">
+                </div>
+
                 <div class="month-car-grid">
 
                     <div class="stat tax">
@@ -2003,6 +2008,26 @@ try {
 
     weeklyCarCosts = {};
 }
+
+// Manual monthly VAT amount, keyed by the month it belongs to.
+let monthlyVat = {};
+try {
+    monthlyVat = JSON.parse(localStorage.getItem("taxiMonthlyVat") || "{}");
+    if (!monthlyVat || typeof monthlyVat !== "object" || Array.isArray(monthlyVat)) monthlyVat = {};
+} catch {
+    monthlyVat = {};
+}
+
+function saveMonthVat() {
+    const monthKey = getMonthKey(getSelectedMonthDate());
+    const input = document.getElementById("monthVatInput");
+    const amount = Math.max(0, Number(input?.value) || 0);
+    if (amount > 0) monthlyVat[monthKey] = amount;
+    else delete monthlyVat[monthKey];
+    localStorage.setItem("taxiMonthlyVat", JSON.stringify(monthlyVat));
+    renderMonthStats();
+}
+
 
 
 /* =========================================================
@@ -5146,11 +5171,16 @@ function renderMonthStats() {
     const carCost =
         carCosts.total;
 
+    const vat = Math.max(0, Number(monthlyVat[monthKey]) || 0);
+    const vatInput = document.getElementById("monthVatInput");
+    if (vatInput && document.activeElement !== vatInput) vatInput.value = vat ? String(vat) : "";
+
     const totalExpenses =
         fuel +
         otherExpenses +
         carCosts.tax +
-        carCosts.rental;
+        carCosts.rental +
+        vat;
 
     const cash =
         monthEntries.reduce(
@@ -5170,7 +5200,8 @@ function renderMonthStats() {
     const profit =
         baseProfit -
         carCosts.tax -
-        carCosts.rental;
+        carCosts.rental -
+        vat;
 
     const averageDay =
         workedDays > 0
