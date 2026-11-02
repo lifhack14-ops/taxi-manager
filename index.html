@@ -1137,6 +1137,11 @@ body.tm-nike .tm4-app-logo.bolt{background:#d7ff00;color:#101010}
 
                     </div>
 
+                    <div style="margin-top:10px;">
+                        <button id="weekCarPaidBtn" class="secondary" style="width:100%;" onclick="toggleWeekCarPaid()">Я оплатив</button>
+                        <div id="weekCarPaidStatus" class="car-cost-info" aria-live="polite">Оплату ще не позначено</div>
+                    </div>
+
                     <div class="car-cost-info" data-i18n="carCostInfo">
                         Ця сума належить до всіх 7 календарних днів тижня. У місячній статистиці вона автоматично розподіляється між місяцями пропорційно кількості днів.
                     </div>
@@ -1293,7 +1298,7 @@ body.tm-nike .tm4-app-logo.bolt{background:#d7ff00;color:#101010}
                 </div>
 
                 <div class="stat expense" style="margin-bottom:12px;">
-                    <label for="monthVatInput" style="display:block;font-weight:700;margin-bottom:6px;">ПДВ за цей місяць (вводиться вручну)</label>
+                    <label for="monthVatInput" style="display:block;font-weight:700;margin-bottom:6px;">VAT 8,5 за цей місяць (вводиться вручну)</label>
                     <input id="monthVatInput" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00" style="width:100%;" onchange="saveMonthVat()">
                 </div>
 
@@ -2690,14 +2695,16 @@ function normalizeWeeklyCarCosts() {
                     tax:
                         Math.max(0, tax),
                     rental:
-                        Math.max(0, rental)
+                        Math.max(0, rental),
+                    paid: value.paid === true
                 };
 
                 if (
                     value.tax !==
                     normalized.tax ||
                     value.rental !==
-                    normalized.rental
+                    normalized.rental ||
+                    value.paid !== normalized.paid
                 ) {
 
                     weeklyCarCosts[
@@ -2761,7 +2768,8 @@ function getWeekCarCostBreakdown(
                     Number(
                         value.rental || 0
                     )
-                )
+                ),
+            paid: value.paid === true
         };
     }
 
@@ -2857,7 +2865,8 @@ function saveWeekCarCost() {
             weekKey
         ] = {
             tax,
-            rental
+            rental,
+            paid: weeklyCarCosts[weekKey]?.paid === true
         };
     }
 
@@ -2866,6 +2875,24 @@ function saveWeekCarCost() {
 
     renderWeekStats();
     renderMonthStats();
+    updateWeekCarPaidUI();
+}
+
+function toggleWeekCarPaid() {
+    const weekKey = getSelectedWeekKey();
+    const current = weeklyCarCosts[weekKey] || { tax: 0, rental: 0, paid: false };
+    weeklyCarCosts[weekKey] = { tax: Number(current.tax) || 0, rental: Number(current.rental) || 0, paid: current.paid !== true };
+    saveLocal();
+    queueCarCostSync(weekKey);
+    updateWeekCarPaidUI();
+}
+
+function updateWeekCarPaidUI() {
+    const paid = weeklyCarCosts[getSelectedWeekKey()]?.paid === true;
+    const button = document.getElementById("weekCarPaidBtn");
+    const status = document.getElementById("weekCarPaidStatus");
+    if (button) button.textContent = paid ? "✓ Оплачено — скасувати" : "Я оплатив";
+    if (status) status.textContent = paid ? "Оплату за цей тиждень позначено як здійснену" : "Оплату ще не позначено";
 }
 
 function clearWeekCarCost() {
