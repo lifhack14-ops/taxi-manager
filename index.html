@@ -801,11 +801,11 @@ body.tm-nike .tm4-app-logo.bolt{background:#d7ff00;color:#101010}
 
                 <div class="auth-actions" style="margin-top:12px;">
 
-                    <button class="primary" onclick="loginAccount()" data-i18n="login">
+                    <button type="button" class="primary" onclick="loginAccount()" data-i18n="login">
                         Увійти
                     </button>
 
-                    <button class="secondary" onclick="registerAccount()" data-i18n="register">
+                    <button type="button" class="secondary" onclick="registerAccount()" data-i18n="register">
                         Створити акаунт
                     </button>
 
@@ -3646,78 +3646,49 @@ async function registerAccount() {
 }
 
 async function loginAccount() {
+    const loginButton = document.querySelector('#authLoggedOut button[onclick="loginAccount()"]');
+    if (loginButton?.disabled) return;
 
-    if (!supabaseClient) {
+    try {
+        if (!supabaseClient) {
+            showAuthMessage("Сервіс входу не завантажився. Перевір інтернет і перезавантаж програму.", "error");
+            return;
+        }
 
-        showAuthMessage(
-            "Supabase не завантажився. Перевір інтернет.",
-            "error"
-        );
+        const email = document.getElementById("authEmail")?.value.trim();
+        const password = document.getElementById("authPassword")?.value;
 
-        return;
+        if (!email || !password) {
+            showAuthMessage(t("fillAuth"), "error");
+            return;
+        }
+
+        if (loginButton) {
+            loginButton.disabled = true;
+            loginButton.textContent = "⏳ Входимо...";
+        }
+        showAuthMessage("⏳ Перевіряємо дані для входу...", "success");
+
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+        if (error) {
+            showAuthMessage(error.message || t("wrongCredentials"), "error");
+            return;
+        }
+
+        currentUser = data.user || data.session?.user || null;
+        updateAuthUI();
+        showAuthMessage(t("loginSuccess"), "success");
+        await syncWithCloud(true);
+    } catch (error) {
+        console.error("Login error:", error);
+        showAuthMessage("Не вдалося виконати вхід. Перевір інтернет і спробуй ще раз. " + (error?.message || ""), "error");
+    } finally {
+        if (loginButton) {
+            loginButton.disabled = false;
+            loginButton.textContent = t("login");
+        }
     }
-
-    const email =
-        document.getElementById(
-            "authEmail"
-        ).value.trim();
-
-    const password =
-        document.getElementById(
-            "authPassword"
-        ).value;
-
-    if (
-        !email ||
-        !password
-    ) {
-
-        showAuthMessage(
-            t("fillAuth"),
-            "error"
-        );
-
-        return;
-    }
-
-    showAuthMessage(
-        t("syncing"),
-        "success"
-    );
-
-    const {
-        data,
-        error
-    } =
-        await supabaseClient.auth
-            .signInWithPassword({
-                email,
-                password
-            });
-
-    if (error) {
-
-        showAuthMessage(
-            t("wrongCredentials"),
-            "error"
-        );
-
-        return;
-    }
-
-    currentUser =
-        data.user;
-
-    updateAuthUI();
-
-    showAuthMessage(
-        t("loginSuccess"),
-        "success"
-    );
-
-    await syncWithCloud(
-        true
-    );
 }
 
 async function logoutAccount() {
