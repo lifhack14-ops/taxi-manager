@@ -1275,6 +1275,12 @@ body.tm-nike .tm4-app-logo.bolt{background:#d7ff00;color:#101010}
 
                 </div>
 
+                <div class="tm-earnings-calendar">
+                    <h3>🗓️ Заробіток по днях</h3>
+                    <div id="monthEarningsCalendar"></div>
+                    <div class="tm-calendar-legend">Сума за день = дохід + чайові. Порожні дні — без записів.</div>
+                </div>
+
             </div>
 
 
@@ -4635,6 +4641,20 @@ async function deleteEntry(clientId) {
 }
 
 
+
+/* Monthly earnings calendar */
+.tm-earnings-calendar { margin-top:16px; }
+.tm-earnings-calendar h3 { margin:0 0 10px; font-size:17px; }
+.tm-calendar-grid { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:5px; }
+.tm-calendar-weekday { text-align:center; font-size:11px; color:#6b7280; font-weight:700; padding:4px 0; }
+.tm-calendar-day { min-height:65px; border:1px solid #e5e7eb; border-radius:9px; padding:6px 3px; text-align:center; background:#f9fafb; min-width:0; }
+.tm-calendar-day.empty { background:transparent; border-color:transparent; }
+.tm-calendar-day.worked { background:#ecfdf5; border-color:#a7f3d0; }
+.tm-calendar-day .day-number { display:block; font-size:12px; color:#6b7280; margin-bottom:5px; }
+.tm-calendar-day .day-amount { display:block; font-size:clamp(9px,2.4vw,12px); font-weight:800; color:#047857; overflow-wrap:anywhere; }
+.tm-calendar-day.today { outline:2px solid #3b82f6; outline-offset:-2px; }
+.tm-calendar-legend { margin-top:9px; font-size:12px; color:#6b7280; }
+
 /* =========================================================
    WEEK STATISTICS
 ========================================================= */
@@ -5082,6 +5102,36 @@ function renderWeekStats() {
    MONTH STATISTICS
 ========================================================= */
 
+function renderMonthEarningsCalendar(year, monthIndex, monthEntries) {
+    const root = document.getElementById("monthEarningsCalendar");
+    if (!root) return;
+    const weekdays = currentLanguage === "pl"
+        ? ["Pn", "Wt", "Śr", "Cz", "Pt", "So", "Nd"]
+        : ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Нд"];
+    const firstWeekday = (new Date(year, monthIndex, 1).getDay() + 6) % 7;
+    const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+    const totals = {};
+    monthEntries.forEach(item => {
+        const day = String(item.date || "");
+        if (!day) return;
+        totals[day] = (totals[day] || 0) + Number(item.income || 0) + Number(item.tips || 0);
+    });
+    const today = getLocalDateString(new Date());
+    let html = '<div class="tm-calendar-grid">';
+    weekdays.forEach(day => { html += '<div class="tm-calendar-weekday">' + day + '</div>'; });
+    for (let i = 0; i < firstWeekday; i++) html += '<div class="tm-calendar-day empty"></div>';
+    for (let day = 1; day <= daysInMonth; day++) {
+        const key = year + "-" + String(monthIndex + 1).padStart(2, "0") + "-" + String(day).padStart(2, "0");
+        const amount = totals[key] || 0;
+        const worked = Object.prototype.hasOwnProperty.call(totals, key);
+        const classes = "tm-calendar-day" + (worked ? " worked" : "") + (key === today ? " today" : "");
+        const shown = worked ? amount.toLocaleString(currentLanguage === "pl" ? "pl-PL" : "uk-UA", {maximumFractionDigits:0}) + " zł" : "—";
+        html += '<div class="' + classes + '" title="' + key + ': ' + (worked ? shown : "немає записів") + '"><span class="day-number">' + day + '</span><span class="day-amount">' + shown + '</span></div>';
+    }
+    html += '</div>';
+    root.innerHTML = html;
+}
+
 function renderMonthStats() {
 
     const selectedDate =
@@ -5135,6 +5185,8 @@ function renderMonthStats() {
                 String(item.date || "") >= firstDay &&
                 String(item.date || "") <= lastDay
         );
+
+    renderMonthEarningsCalendar(year, selectedDate.getMonth(), monthEntries);
 
     const shifts =
         monthEntries.length;
