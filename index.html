@@ -1290,7 +1290,7 @@ body.tm-nike .tm4-app-logo.bolt{background:#d7ff00;color:#101010}
                 <div class="tm-earnings-calendar">
                     <h3>🗓️ Заробіток по днях</h3>
                     <div id="monthEarningsCalendar"></div>
-                    <div class="tm-calendar-legend">Сума за день = дохід + чайові. Порожні дні — без записів.</div>
+                    <div class="tm-calendar-legend">Сума за день = дохід, без чайових. Порожні дні — без записів.</div>
                 </div>
 
             </div>
@@ -5085,7 +5085,7 @@ function renderMonthEarningsCalendar(year, monthIndex, monthEntries) {
     monthEntries.forEach(item => {
         const day = String(item.date || "");
         if (!day) return;
-        totals[day] = (totals[day] || 0) + Number(item.income || 0) + Number(item.tips || 0);
+        totals[day] = (totals[day] || 0) + Number(item.income || 0);
     });
     const today = getLocalDateString(new Date());
     let html = '<div class="tm-calendar-grid">';
