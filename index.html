@@ -735,6 +735,18 @@ body.tm-nike label,body.tm-nike .subtitle,body.tm-nike .stat-label{color:#b7b7b7
 body.tm-nike .tm4-quick-icon.blue{background:#d7ff00;color:#101010}
 body.tm-nike .tm4-app-logo.bolt{background:#d7ff00;color:#101010}
 
+/* Monthly earnings calendar */
+.tm-earnings-calendar { margin-top:16px; }
+.tm-earnings-calendar h3 { margin:0 0 10px; font-size:17px; }
+.tm-calendar-grid { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:5px; }
+.tm-calendar-weekday { text-align:center; font-size:11px; color:#6b7280; font-weight:700; padding:4px 0; }
+.tm-calendar-day { min-height:65px; border:1px solid #e5e7eb; border-radius:9px; padding:6px 3px; text-align:center; background:#f9fafb; min-width:0; }
+.tm-calendar-day.empty { background:transparent; border-color:transparent; }
+.tm-calendar-day.worked { background:#ecfdf5; border-color:#a7f3d0; }
+.tm-calendar-day .day-number { display:block; font-size:12px; color:#6b7280; margin-bottom:5px; }
+.tm-calendar-day .day-amount { display:block; font-size:clamp(9px,2.4vw,12px); font-weight:800; color:#047857; overflow-wrap:anywhere; }
+.tm-calendar-day.today { outline:2px solid #3b82f6; outline-offset:-2px; }
+.tm-calendar-legend { margin-top:9px; font-size:12px; color:#6b7280; }
 </style>
 </head>
 
@@ -4613,18 +4625,6 @@ async function deleteEntry(clientId) {
 
 
 
-/* Monthly earnings calendar */
-.tm-earnings-calendar { margin-top:16px; }
-.tm-earnings-calendar h3 { margin:0 0 10px; font-size:17px; }
-.tm-calendar-grid { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:5px; }
-.tm-calendar-weekday { text-align:center; font-size:11px; color:#6b7280; font-weight:700; padding:4px 0; }
-.tm-calendar-day { min-height:65px; border:1px solid #e5e7eb; border-radius:9px; padding:6px 3px; text-align:center; background:#f9fafb; min-width:0; }
-.tm-calendar-day.empty { background:transparent; border-color:transparent; }
-.tm-calendar-day.worked { background:#ecfdf5; border-color:#a7f3d0; }
-.tm-calendar-day .day-number { display:block; font-size:12px; color:#6b7280; margin-bottom:5px; }
-.tm-calendar-day .day-amount { display:block; font-size:clamp(9px,2.4vw,12px); font-weight:800; color:#047857; overflow-wrap:anywhere; }
-.tm-calendar-day.today { outline:2px solid #3b82f6; outline-offset:-2px; }
-.tm-calendar-legend { margin-top:9px; font-size:12px; color:#6b7280; }
 
 /* =========================================================
    WEEK STATISTICS
